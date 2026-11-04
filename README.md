@@ -1,0 +1,31 @@
+# Margot Acessórios — Vitrine V1
+
+Template responsivo inspirado no layout delicado escolhido para a Margot: tons rosados, dourado e pérola. Publicação estática pelo **GitHub Pages**; sem servidor, API paga, biblioteca ou build obrigatório.
+
+## Abrir e publicar
+
+- Abra `index.html` no navegador para conferir o layout.
+- GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions** (configuração única). O workflow `.github/workflows/pages.yml` publica a branch `main` quando atualizado.
+- Endereço previsto depois do deploy: `https://k410sh4.github.io/Margot/`.
+
+## Como trocar os produtos
+
+Em `store.js`, edite a lista `STORE.products`. Cada item possui `id` (único e estável), `name`, `category`, `price` e `art`. Os artigos são **fictícios, com preços ilustrativos**; confirme todos antes de permitir pedidos comerciais.
+
+Para adicionar fotos reais numa próxima versão, acrescente `image: './assets/products/arquivo.webp'` aos produtos e adapte `renderProducts()` e a miniatura da sacola para usar `<img>` com `alt` apropriado e fallback para `jewelrySvg(...)`. Guarde arquivos dentro de `assets/products/`, preferindo WebP/AVIF, proporção quadrada, boa resolução e tamanho otimizado.
+
+## Comportamento atual
+
+- Busca, filtros, favoritos e sacola funcionam em navegador; favoritos e sacola usam `localStorage`.
+- Botão **Copiar lista de interesse** prepara uma mensagem, mas **não envia WhatsApp, confirma pedido, cobra pagamento nem sincroniza estoque**. Esses recursos serão conectados somente com dados reais de atendimento.
+- Ilustrações vetoriais são provisórias; o banner é uma composição CSS, não uma foto real.
+- Sem promessas de frete grátis, parcelamento ou políticas que ainda não foram definidas.
+
+## Próximos passos antes de abrir as vendas
+
+1. Substituir itens demonstrativos por produtos reais, estoque, valores e fotos.
+2. Definir contato oficial, endereço comercial/identificação da loja, frete, atendimento, trocas, devoluções e privacidade.
+3. Testar dispositivos móveis, acessibilidade e fluxos com produtos reais.
+4. Implementar pedidos via WhatsApp ou checkout e regras de estoque, se desejado.
+
+A página é um **template em pré-lançamento**, não uma loja operacional. Não armazena dados de pagamento.
