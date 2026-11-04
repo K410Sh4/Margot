@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbefeb">
+  <meta name="description" content="Margot Acessórios: uma vitrine delicada de bijuterias e acessórios femininos. Conheça nossas coleções.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Margot Acessórios — delicadeza em cada detalhe">
+  <meta property="og:description" content="Descubra a vitrine da Margot: brincos, colares, pulseiras, anéis e presentes especiais.">
+  <title>Margot Acessórios | Delicadeza em cada detalhe</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/pearl-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./store.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <div class="topnote">Uma dose de delicadeza para cada dia <span aria-hidden="true">✦</span> <strong>Bem-vinda à Margot</strong></div>
+  <header class="site-header">
+    <div class="header-main wrap">
+      <button class="icon-button menu-toggle" type="button" id="menu-open" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-nav"><span class="icon" data-icon="menu"></span></button>
+      <a class="brand" href="#inicio" aria-label="Margot Acessórios, início">
+        <img src="./assets/pearl-mark.svg" alt="" width="72" height="46">
+        <span class="brand-name">MARGOT</span>
+        <span class="brand-subtitle">acessórios</span>
+      </a>
+      <form class="search" id="search-form" role="search">
+        <span class="icon" data-icon="search"></span>
+        <input id="search-input" type="search" placeholder="Buscar acessórios..." aria-label="Buscar acessórios" autocomplete="off">
+        <button class="search-clear" type="button" id="clear-search" aria-label="Limpar busca" hidden>×</button>
+      </form>
+      <div class="header-actions">
+        <button class="icon-button search-mobile" type="button" id="search-open" aria-label="Abrir busca"><span class="icon" data-icon="search"></span></button>
+        <button class="icon-button" type="button" id="favorites-open" aria-label="Ver favoritos"><span class="icon" data-icon="heart"></span><span class="count" id="favorite-count" hidden>0</span></button>
+        <button class="icon-button cart-trigger" type="button" id="cart-open" aria-label="Abrir sacola"><span class="icon" data-icon="bag"></span><span class="count" id="cart-count" hidden>0</span></button>
+      </div>
+    </div>
+    <nav class="main-nav wrap" id="main-nav" aria-label="Navegação principal">
+      <a class="active" href="#inicio">Início</a>
+      <a href="#categorias">Coleções</a>
+      <a href="#produtos" data-category-link="Brincos">Brincos</a>
+      <a href="#produtos" data-category-link="Colares">Colares</a>
+      <a href="#produtos" data-category-link="Pulseiras">Pulseiras</a>
+      <a href="#produtos" data-category-link="Anéis">Anéis</a>
+      <a href="#presentes">Kits</a>
+      <a href="#produtos">Destaques</a>
+    </nav>
+  </header>
+  <main id="conteudo">
+    <section id="inicio" class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy wrap">
+        <p class="eyebrow">A delicadeza de ser você</p>
+        <h1 id="hero-title">Novas<br><em>Coleções</em><span class="mini-heart" aria-hidden="true">♡</span></h1>
+        <span class="ornament" aria-hidden="true">✧</span>
+        <p>Acessórios que realçam<br>a sua essência.</p>
+        <a class="button primary" href="#produtos">Conferir agora <span aria-hidden="true">→</span></a>
+        <span class="slide-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Ilustração editorial de uma pérola sobre tecido rosado; imagem substituível pela foto da coleção">
+        <div class="silk silk-one"></div><div class="silk silk-two"></div>
+        <div class="pearl-halo"></div><div class="pearl-large"></div>
+        <span class="hero-caption">MARGOT <small>acessórios</small></span>
+      </div>
+    </section>
+    <section class="benefits" aria-label="Diferenciais da loja">
+      <div class="wrap benefit-grid">
+        <div><span class="icon" data-icon="truck"></span><strong>Entrega a combinar</strong><small>Consulte disponibilidade</small></div>
+        <div><span class="icon" data-icon="shield"></span><strong>Atendimento pessoal</strong><small>Fale diretamente conosco</small></div>
+        <div><span class="icon" data-icon="heart"></span><strong>Escolhidos com carinho</strong><small>Detalhes que encantam</small></div>
+        <div><span class="icon" data-icon="gift"></span><strong>Presentes especiais</strong><small>Embalagem com cuidado</small></div>
+      </div>
+    </section>
+    <section class="section wrap" id="categorias" aria-labelledby="categories-heading">
+      <div class="section-heading center"><p class="eyebrow">Encontre seu detalhe favorito</p><h2 id="categories-heading">Nossas Categorias <span class="line-heart" aria-hidden="true">♡</span></h2></div>
+      <div class="categories" id="category-grid"></div>
+    </section>
+    <section class="section products-section wrap" id="produtos" aria-labelledby="products-heading">
+      <div class="section-heading"><div><p class="eyebrow">Escolhas especiais para você</p><h2 id="products-heading">Destaques da Margot</h2></div><button class="text-link" type="button" id="show-all">Ver todos <span aria-hidden="true">→</span></button></div>
+      <div class="catalog-tools"><p id="catalog-status" aria-live="polite"></p><div class="category-chips" id="category-chips" aria-label="Filtrar produtos"></div></div>
+      <div id="product-grid" class="products"></div>
+      <p class="empty-results" id="empty-results" hidden>Nenhuma peça encontrada. Experimente outra busca ou categoria.</p>
+      <p class="catalog-disclaimer">Catálogo demonstrativo: produtos, disponibilidade e valores serão confirmados antes da abertura das vendas. As imagens são ilustrações provisórias.</p>
+    </section>
+    <section class="gift-feature" id="presentes" aria-labelledby="gift-title">
+      <div class="wrap gift-inner">
+        <div class="gift-art" aria-hidden="true"><span class="gift-box"></span><span class="gift-ribbon ribbon-v"></span><span class="gift-ribbon ribbon-h"></span><span class="gift-bow bow-left"></span><span class="gift-bow bow-right"></span><span class="gift-pearl"></span></div>
+        <div class="gift-copy"><p class="eyebrow">Momentos que merecem carinho</p><h2 id="gift-title">Presenteie<br>com Elegância</h2><p>Pequenos detalhes transformam momentos em lembranças especiais.</p><a class="button primary" href="#produtos" data-category-link="Kits">Conhecer kits <span aria-hidden="true">→</span></a></div>
+      </div>
+    </section>
+    <section class="closing-note wrap"><img src="./assets/pearl-mark.svg" alt="" width="82" height="60"><p>Seu brilho está nos detalhes.</p><span>MARGOT ACESSÓRIOS</span></section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand">MARGOT <small>acessórios</small></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Contato e horário de atendimento serão divulgados em breve.</p><p>Pedidos só serão confirmados após atendimento da loja.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · Feita com carinho</span></div></footer>
+  <div id="overlay" class="overlay" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true" tabindex="-1">
+    <div class="drawer-header"><div><p class="eyebrow">Margot Acessórios</p><h2 id="drawer-title">Sua sacola</h2></div><button class="icon-button" type="button" id="drawer-close" aria-label="Fechar painel"><span class="icon" data-icon="close"></span></button></div>
+    <div id="drawer-items" class="drawer-items"></div>
+    <div id="drawer-footer" class="drawer-footer"></div>
+  </aside>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="no-script">Ative o JavaScript para utilizar a vitrine, pesquisa e sacola.</p></noscript>
+</body>
+</html>
