@@ -65,3 +65,10 @@ As cinco categorias agora usam imagens próprias em `assets/categories/` (brinco
 - Quando produtos são filtrados ou pesquisados, os novos cards recebem animações sem acumular gatilhos antigos.
 
 **Nota:** a vitrine continua demonstrativa. Nenhum recurso de pagamento, estoque real ou entrega foi adicionado.
+
+## V1.6 — loja exclusivamente online
+
+- Barra superior e aviso próximo às categorias informam que **não há loja física aberta ao público**.
+- Rodapé reforça a operação pela internet e o status de pré-lançamento.
+- A definição correta é **loja online**; marketplace, em sentido estrito, é uma plataforma que reúne vários vendedores.
+- Não foram ativadas compras, checkout ou atendimento que ainda não estejam operacionais.
