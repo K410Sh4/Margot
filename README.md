@@ -54,3 +54,14 @@ As três imagens `assets/hero-1.webp`, `hero-2.webp`, `hero-3.webp` são os bann
 ## Atualização V1.4 — categorias com fotografias ilustrativas
 
 As cinco categorias agora usam imagens próprias em `assets/categories/` (brincos, colares, pulseiras, anéis e kits), recortadas da arte aprovada. Os cards continuam clicáveis e filtram os produtos. Textos já estão nas imagens; o botão também possui rótulo acessível. Em celulares a faixa pode rolar horizontalmente.
+
+## V1.5 — animações GSAP e transições
+
+- Scripts versionados do **GSAP 3.15.0** e **ScrollTrigger** carregados com `defer` por CDN jsDelivr. `motion.js` coordena a animação.
+- Entrada suave da logo, navegação e textos do carrossel; revelação por rolagem dos benefícios, categorias, produtos, presentes e rodapé.
+- Microinteração nos cards e no botão de adicionar à sacola; animações leves no menu móvel e cabeçalho da sacola.
+- Animações progressivas: se CDN estiver indisponível, imagens, textos, filtros, botões e carrinho continuam visíveis e funcionais.
+- Respeita `prefers-reduced-motion: reduce`; nada de animação forçada, fixação no scroll ou bloqueio de interação.
+- Quando produtos são filtrados ou pesquisados, os novos cards recebem animações sem acumular gatilhos antigos.
+
+**Nota:** a vitrine continua demonstrativa. Nenhum recurso de pagamento, estoque real ou entrega foi adicionado.
