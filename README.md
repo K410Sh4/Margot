@@ -72,3 +72,23 @@ As cinco categorias agora usam imagens próprias em `assets/categories/` (brinco
 - Rodapé reforça a operação pela internet e o status de pré-lançamento.
 - A definição correta é **loja online**; marketplace, em sentido estrito, é uma plataforma que reúne vários vendedores.
 - Não foram ativadas compras, checkout ou atendimento que ainda não estejam operacionais.
+
+
+## V1.7 — Cadastro e login com Google (integração preparada)
+
+A navegação e sacola continuam acessíveis sem cadastro. Há um botão de conta no cabeçalho, janela de entrada/cadastro Google, visualização do perfil e logout. O primeiro acesso via Google cria a conta no Firebase; os demais restauram a sessão.
+
+IMPORTANTE: autenticação ainda não está ativa até configurar um projeto Firebase Web. Atualmente firebase-config.js contém null e a interface informa que o login está em preparação.
+
+### Ativação pelo responsável da loja
+
+1. Acesse https://console.firebase.google.com e crie um projeto para a Margot. Adicione um aplicativo Web e copie a configuração Web pública.
+2. No Firebase Console, em Authentication > Sign-in method, habilite Google, escolha o e-mail de suporte solicitado e salve.
+3. Em Authentication > Settings > Authorized domains, adicione k410sh4.github.io (sem https:// e sem o caminho /Margot). Adicione também qualquer domínio próprio, caso mude futuramente.
+4. Em firebase-config.js, substitua null pelo objeto firebaseConfig do projeto, com apiKey, authDomain, projectId, appId e demais campos opcionais fornecidos pelo console.
+5. Antes de ativar para clientes, finalize privacidade.html com contato oficial para solicitações sobre dados, e revise as informações de privacidade e consentimento.
+6. Publique na branch main. Teste criação de conta, login, persistência de sessão e logout em computador e celular.
+
+Não publique service-account JSON, chaves privadas, Google OAuth client_secret, tokens ou senhas. A configuração Firebase Web é pública, não confere acesso administrativo. Caso seja acrescentado backend/Firestore, ele exigirá verificação de tokens e regras de acesso independentes.
+
+Tecnologia: Firebase JavaScript SDK 13.2.0, carregado da origem oficial gstatic somente quando o Firebase estiver configurado. Autenticação por janela Google aberta por clique, sem exigir cadastro para ver o catálogo. O site não sincroniza sacola, favoritos ou pedidos e não processa pagamento.

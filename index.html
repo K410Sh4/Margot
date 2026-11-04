@@ -17,6 +17,8 @@
   <script src="./store.js" defer></script>
   <script src="./carousel.js" defer></script>
   <script src="./motion.js" defer></script>
+  <script src="./firebase-config.js" defer></script>
+  <script src="./account.js" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -33,6 +35,10 @@
         <button class="search-clear" type="button" id="clear-search" aria-label="Limpar busca" hidden>×</button>
       </form>
       <div class="header-actions">
+        <button class="icon-button account-trigger" type="button" id="account-open" aria-label="Entrar ou criar conta" title="Minha conta" aria-haspopup="dialog" aria-controls="account-dialog">
+          <svg id="account-icon" aria-hidden="true" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.2-4.2 2.8-6 7-6s6.8 1.8 7 6"/></svg>
+          <img id="account-avatar" src="" alt="" referrerpolicy="no-referrer" width="28" height="28" hidden>
+        </button>
         <button class="icon-button search-mobile" type="button" id="search-open" aria-label="Abrir busca"><span class="icon" data-icon="search"></span></button>
         <button class="icon-button" type="button" id="favorites-open" aria-label="Ver favoritos"><span class="icon" data-icon="heart"></span><span class="count" id="favorite-count" hidden>0</span></button>
         <button class="icon-button cart-trigger" type="button" id="cart-open" aria-label="Abrir sacola"><span class="icon" data-icon="bag"></span><span class="count" id="cart-count" hidden>0</span></button>
@@ -124,7 +130,31 @@
     </section>
     <section class="closing-note wrap"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"><p>Seu brilho está nos detalhes.</p></section>
   </main>
-  <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Loja 100% online. Não possuímos estabelecimento físico para atendimento ao público.</p><p>O catálogo está em pré-lançamento; contato e confirmação de pedidos serão disponibilizados em breve.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · Feita com carinho</span></div></footer>
+  <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Loja 100% online. Não possuímos estabelecimento físico para atendimento ao público.</p><p>O catálogo está em pré-lançamento; contato e confirmação de pedidos serão disponibilizados em breve.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · <a href="./privacidade.html">Privacidade</a></span></div></footer>
+  <dialog id="account-dialog" class="account-dialog" aria-labelledby="account-title" aria-describedby="account-intro">
+    <button type="button" class="account-close" id="account-close" aria-label="Fechar janela de conta">×</button>
+    <img class="account-logo" src="./assets/margot-logo.webp" alt="Margot Acessórios" width="150" height="90" loading="lazy">
+    <p class="eyebrow account-kicker">MINHA MARGOT</p>
+    <h2 id="account-title">Entre ou crie sua conta</h2>
+    <p id="account-intro">Uma única entrada com sua conta Google. Não é necessário criar outra senha.</p>
+    <div id="account-signed-out">
+      <button class="google-signin" type="button" id="google-signin" disabled>
+        <span class="google-g" aria-hidden="true">G</span> Continuar com Google
+      </button>
+      <p id="account-auth-status" class="account-auth-status" role="status" aria-live="polite">Login com Google em preparação.</p>
+    </div>
+    <div id="account-signed-in" hidden>
+      <div class="account-profile">
+        <img id="account-photo" src="" alt="" width="52" height="52" referrerpolicy="no-referrer" hidden>
+        <span id="account-photo-fallback" aria-hidden="true">✦</span>
+        <div><strong id="account-name"></strong><span id="account-email"></span></div>
+      </div>
+      <p class="account-saved-note">Sua conta está conectada. Por enquanto, sacola e favoritos continuam salvos somente neste navegador, sem sincronização entre dispositivos.</p>
+      <button class="account-signout" type="button" id="google-signout">Sair da conta</button>
+      <p class="account-auth-status" id="account-signout-status" role="status" aria-live="polite"></p>
+    </div>
+    <p class="account-legal">Ao entrar, o Google e o Firebase processam dados básicos de identificação para autenticação. <a href="./privacidade.html">Como seus dados são usados</a>.</p>
+  </dialog>
   <div id="overlay" class="overlay" hidden></div>
   <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true" tabindex="-1">
     <div class="drawer-header"><div><p class="eyebrow">Margot Acessórios</p><h2 id="drawer-title">Sua sacola</h2></div><button class="icon-button" type="button" id="drawer-close" aria-label="Fechar painel"><span class="icon" data-icon="close"></span></button></div>

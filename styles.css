@@ -78,3 +78,35 @@
 .online-notice h2{font:normal 23px/1.2 var(--font-display);color:#7d4652;margin:0 0 5px}
 .online-notice p{font-size:13px;line-height:1.6;color:#715960;margin:0;max-width:850px}
 @media(max-width:700px){.online-notice{padding:16px 18px;gap:12px;align-items:flex-start;margin-top:14px}.online-notice-symbol{width:32px;min-width:32px;height:32px;font-size:18px}.online-notice h2{font-size:20px}.online-notice p{font-size:12px}.topnote{font-size:10px;line-height:1.5}}
+
+
+/* V1.7 — Conta Google */
+.account-trigger{flex:none}
+.account-trigger>svg{display:block}
+.account-trigger #account-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ddc4bd}
+.account-dialog{position:fixed;inset:0;margin:auto;width:min(420px,calc(100% - 28px));max-height:min(90dvh,760px);overflow-y:auto;border:1px solid #efd8d5;border-radius:24px;padding:26px 30px 24px;background:#fffaf8;color:var(--ink);box-shadow:0 24px 70px #33242942;text-align:center}
+.account-dialog::backdrop{background:rgba(41,28,32,.56);backdrop-filter:blur(3px)}
+.account-dialog:not([open]){display:none}
+.account-close{position:absolute;right:16px;top:10px;border:0;background:transparent;border-radius:50%;width:35px;height:35px;color:#7e5961;font-size:29px;line-height:1}
+.account-close:hover{background:#f8e8e5}
+.account-logo{width:140px;height:auto;max-height:88px;object-fit:contain;margin:0 auto 10px;display:block}
+.account-kicker{margin:2px 0 8px}
+.account-dialog h2{font:normal 31px/1.1 var(--font-display);color:#603e45;margin:0 0 13px}
+.account-dialog #account-intro{font-size:13px;color:#795f65;margin:0 auto 22px;max-width:300px;line-height:1.6}
+.google-signin{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:48px;padding:10px 18px;border:1px solid #e6c5c6;border-radius:12px;background:white;color:#3d3030;font-size:14px;font-weight:700}
+.google-signin:hover:not(:disabled){border-color:#ad6a78;box-shadow:0 4px 17px #a56b7e23}
+.google-signin:disabled{opacity:.67;cursor:not-allowed}
+.google-g{display:grid;place-items:center;width:24px;height:24px;font:bold 21px Arial,sans-serif;color:#4285f4}
+.account-auth-status{font-size:12px;line-height:1.55;color:#835f67;min-height:18px;margin:12px 0 0}
+.account-profile{display:flex;align-items:center;text-align:left;gap:13px;padding:14px;background:#fff0ec;border:1px solid #edd6d4;border-radius:14px;overflow-wrap:anywhere}
+.account-profile img,.account-profile #account-photo-fallback{display:grid;place-items:center;width:52px;height:52px;flex:none;border-radius:50%;background:#e1bfbd;color:#8a4f5c;font-size:28px;object-fit:cover}
+.account-profile strong{display:block;font-size:15px}
+.account-profile span#account-email{display:block;font-size:12px;color:#785f66}
+.account-saved-note{text-align:left;margin:15px 0;color:#795e64;font-size:12px;line-height:1.6}
+.account-signout{width:100%;padding:10px 14px;border:1px solid #bb8f96;border-radius:11px;background:transparent;color:#7e4852;font-weight:700}
+.account-signout:hover{background:#f9eae7}
+.account-legal{font-size:11px;line-height:1.55;color:#806f70;margin:22px auto 0;max-width:350px}
+.account-legal a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:700px){.header-main{grid-template-columns:40px minmax(100px,1fr) 136px}.header-actions .icon-button{width:33px}.header-actions{gap:0}.account-dialog{padding:21px 22px 19px}.account-dialog h2{font-size:28px}}
+@media(max-width:390px){.header-main{grid-template-columns:38px minmax(94px,1fr) 128px}.header-actions .icon-button{width:31px}.brand{max-width:110px}}
+@media(prefers-reduced-motion:reduce){.account-dialog::backdrop{backdrop-filter:none}}
