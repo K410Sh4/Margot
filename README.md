@@ -38,3 +38,8 @@ A página é um **template em pré-lançamento**, não uma loja operacional. Nã
 - Quando uma foto real estiver disponível, adicione ao produto em `STORE.products` o campo `image: './assets/products/nome-da-foto.webp'`. O site passará a mostrar a foto real nesse produto e manterá a imagem provisória nos demais.
 - Arquivos de imagem com caminho inválido voltam automaticamente para o placeholder.
 - Os dados do catálogo ainda são ilustrativos, e o site não processa pagamentos.
+
+
+## Carrossel V1.2
+
+As três imagens `assets/hero-1.webp`, `hero-2.webp`, `hero-3.webp` são os banners fornecidos. O carrossel tem controles, indicadores, pausa por interação e respeita movimento reduzido. Para publicar, envie todos os arquivos à raiz do repositório preservando os caminhos.

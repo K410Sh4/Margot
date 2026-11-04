@@ -21,3 +21,34 @@
  .gift-copy{max-width:none;padding:22px 22px 32px;text-align:center;background:linear-gradient(180deg,#ffece9,#f6d8d7)}
  .gift-copy p:not(.eyebrow){margin:12px auto 18px}
 }
+
+
+/* Margot V1.2 — carrossel editorial responsivo */
+.hero-carousel{position:relative;display:block;min-height:0;aspect-ratio:3/1;background:#f5d8d5;overflow:hidden}
+.hero-slides{position:absolute;inset:0}
+.hero-slide{position:absolute;inset:0;display:grid;grid-template-columns:1fr;align-items:center;opacity:0;visibility:hidden;transition:opacity .65s ease,visibility .65s;pointer-events:none}
+.hero-slide.is-active{opacity:1;visibility:visible;pointer-events:auto;z-index:1}
+.hero-slide>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.hero-slide .hero-copy{position:relative;z-index:2;width:min(1180px,calc(100% - 110px));max-width:1180px;margin:auto;padding:0 0 16px;min-height:0;display:flex;justify-content:center;align-items:flex-start}
+.hero-slide h1,.hero-slide h2{font-family:var(--font-display);font-weight:400;color:#823e4e;font-size:clamp(33px,4.4vw,69px);letter-spacing:-.045em;line-height:1.04;margin:0 0 12px}
+.hero-slide .hero-copy>p:not(.eyebrow){max-width:310px;font-size:clamp(13px,1.3vw,18px);line-height:1.5;margin:5px 0 18px}
+.hero-slide .hero-copy .eyebrow{margin-bottom:12px}
+.hero-arrow{position:absolute;z-index:4;top:50%;transform:translateY(-50%);border:1px solid #ffffffaa;background:#fff9;color:#7d4550;width:40px;height:40px;border-radius:50%;font-size:29px;line-height:1;display:grid;place-items:center;box-shadow:0 3px 15px #653c421a}
+.hero-arrow:hover{background:#fff}
+.hero-prev{left:14px}.hero-next{right:14px}
+.hero-pagination{position:absolute;z-index:4;bottom:13px;left:50%;transform:translateX(-50%);display:flex;gap:9px}
+.hero-pagination button{width:12px;height:12px;border:1px solid #a36d77;background:#ffffffb5;border-radius:50%;padding:0}
+.hero-pagination button.is-active{background:#a65b6c;border-color:#a65b6c;box-shadow:0 0 0 3px #fff8}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:700px){
+.hero-carousel{aspect-ratio:auto;height:clamp(350px,83vw,490px)}
+.hero-slide>img{object-position:66% center}
+.hero-slide:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#fff2eee8 0%,#fff2eeb5 48%,transparent 100%)}
+.hero-slide .hero-copy{width:calc(100% - 70px);padding:0 0 25px;justify-content:center}
+.hero-slide h1,.hero-slide h2{font-size:clamp(36px,8vw,54px)}
+.hero-slide .hero-copy>p:not(.eyebrow){font-size:14px;max-width:225px}
+.hero-arrow{width:30px;height:30px;font-size:23px}
+.hero-prev{left:5px}.hero-next{right:5px}
+.hero-pagination{bottom:12px}
+}
+@media(prefers-reduced-motion:reduce){.hero-slide{transition:none}}

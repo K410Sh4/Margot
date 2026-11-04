@@ -12,6 +12,7 @@
   <link rel="icon" type="image/svg+xml" href="./assets/pearl-mark.svg">
   <link rel="stylesheet" href="./styles.css">
   <script src="./store.js" defer></script>
+  <script src="./carousel.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -47,20 +48,44 @@
     </nav>
   </header>
   <main id="conteudo">
-    <section id="inicio" class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy wrap">
-        <p class="eyebrow">A delicadeza de ser você</p>
-        <h1 id="hero-title">Novas<br><em>Coleções</em><span class="mini-heart" aria-hidden="true">♡</span></h1>
-        <span class="ornament" aria-hidden="true">✧</span>
-        <p>Acessórios que realçam<br>a sua essência.</p>
-        <a class="button primary" href="#produtos">Conferir agora <span aria-hidden="true">→</span></a>
-        <span class="slide-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <section id="inicio" class="hero hero-carousel" aria-label="Destaques Margot" aria-roledescription="carrossel">
+      <div class="hero-slides">
+        <article class="hero-slide is-active" aria-label="1 de 3: Novas coleções">
+          <img src="./assets/hero-1.webp" alt="Modelo usando brincos de pérola e colar delicado" fetchpriority="high" width="2048" height="682">
+          <div class="hero-copy wrap">
+            <p class="eyebrow">A delicadeza de ser você</p>
+            <h1 id="hero-title">Novas<br><em>Coleções</em></h1>
+            <p>Acessórios que realçam a sua essência.</p>
+            <a class="button primary" href="#produtos">Conferir agora <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <article class="hero-slide" aria-label="2 de 3: Seus detalhes favoritos" aria-hidden="true" inert>
+          <img src="./assets/hero-2.webp" alt="Argolas, pulseira e anéis dourados sobre bandeja de cerâmica" loading="lazy" width="2048" height="682">
+          <div class="hero-copy wrap">
+            <p class="eyebrow">Para todos os momentos</p>
+            <h2>Seu estilo,<br>seus detalhes</h2>
+            <p>Peças delicadas para compor cada look.</p>
+            <a class="button primary" href="#categorias">Explorar categorias <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <article class="hero-slide" aria-label="3 de 3: O encanto das pérolas" aria-hidden="true" inert>
+          <img src="./assets/hero-3.webp" alt="Conjunto de colar e brincos de pérola em exposição sobre tecido rosé" loading="lazy" width="2048" height="682">
+          <div class="hero-copy wrap">
+            <p class="eyebrow">Elegância em cada detalhe</p>
+            <h2>O encanto<br>das pérolas</h2>
+            <p>Uma escolha especial para você ou para presentear.</p>
+            <a class="button primary" href="#presentes">Ver presentes <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
       </div>
-      <div class="hero-visual" role="img" aria-label="Ilustração editorial de uma pérola sobre tecido rosado; imagem substituível pela foto da coleção">
-        <div class="silk silk-one"></div><div class="silk silk-two"></div>
-        <div class="pearl-halo"></div><div class="pearl-large"></div>
-        <span class="hero-caption">MARGOT <small>acessórios</small></span>
+      <button class="hero-arrow hero-prev" type="button" aria-label="Slide anterior">‹</button>
+      <button class="hero-arrow hero-next" type="button" aria-label="Próximo slide">›</button>
+      <div class="hero-pagination" role="group" aria-label="Escolher destaque">
+        <button type="button" class="is-active" aria-label="Mostrar destaque 1" aria-current="true"></button>
+        <button type="button" aria-label="Mostrar destaque 2"></button>
+        <button type="button" aria-label="Mostrar destaque 3"></button>
       </div>
+      <span class="sr-only" id="hero-announcement" aria-live="polite"></span>
     </section>
     <section class="benefits" aria-label="Diferenciais da loja">
       <div class="wrap benefit-grid">
