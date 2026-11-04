@@ -20,7 +20,7 @@
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
-  <div class="topnote">Uma dose de delicadeza para cada dia <span aria-hidden="true">✦</span> <strong>Bem-vinda à Margot</strong></div>
+  <div class="topnote" role="status"><strong>Margot: loja 100% online</strong> <span aria-hidden="true">✦</span> Não possuímos loja física</div>
   <header class="site-header">
     <div class="header-main wrap">
       <button class="icon-button menu-toggle" type="button" id="menu-open" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-nav"><span class="icon" data-icon="menu"></span></button>
@@ -97,6 +97,13 @@
         <div><span class="icon" data-icon="gift"></span><strong>Presentes especiais</strong><small>Embalagem com cuidado</small></div>
       </div>
     </section>
+    <aside class="online-notice wrap" aria-labelledby="online-notice-title">
+      <span class="online-notice-symbol" aria-hidden="true">✦</span>
+      <div>
+        <h2 id="online-notice-title">A Margot é exclusivamente online</h2>
+        <p>Não temos loja física aberta ao público. Nossa vitrine e o futuro atendimento acontecem pela internet. No momento, o catálogo está em pré-lançamento e o site ainda não finaliza pedidos.</p>
+      </div>
+    </aside>
     <section class="section wrap" id="categorias" aria-labelledby="categories-heading">
       <div class="section-heading center"><p class="eyebrow">Encontre seu detalhe favorito</p><h2 id="categories-heading">Nossas Categorias <span class="line-heart" aria-hidden="true">♡</span></h2></div>
       <div class="categories" id="category-grid"></div>
@@ -117,7 +124,7 @@
     </section>
     <section class="closing-note wrap"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"><p>Seu brilho está nos detalhes.</p></section>
   </main>
-  <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Contato e horário de atendimento serão divulgados em breve.</p><p>Pedidos só serão confirmados após atendimento da loja.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · Feita com carinho</span></div></footer>
+  <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp" alt="Margot Acessórios" width="169" height="102" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Loja 100% online. Não possuímos estabelecimento físico para atendimento ao público.</p><p>O catálogo está em pré-lançamento; contato e confirmação de pedidos serão disponibilizados em breve.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · Feita com carinho</span></div></footer>
   <div id="overlay" class="overlay" hidden></div>
   <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true" tabindex="-1">
     <div class="drawer-header"><div><p class="eyebrow">Margot Acessórios</p><h2 id="drawer-title">Sua sacola</h2></div><button class="icon-button" type="button" id="drawer-close" aria-label="Fechar painel"><span class="icon" data-icon="close"></span></button></div>
