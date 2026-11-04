@@ -49,3 +49,8 @@ As três imagens `assets/hero-1.webp`, `hero-2.webp`, `hero-3.webp` são os bann
 - `assets/margot-logo.webp`: logo oficial fornecida, exibida no cabeçalho, na assinatura da página e no rodapé.
 - `assets/favicon-32.png`: ícone com pérola para a aba do navegador.
 - O SVG antigo `pearl-mark.svg` foi descontinuado. O carrossel, o catálogo e a seção de presentes permanecem iguais.
+
+
+## Atualização V1.4 — categorias com fotografias ilustrativas
+
+As cinco categorias agora usam imagens próprias em `assets/categories/` (brincos, colares, pulseiras, anéis e kits), recortadas da arte aprovada. Os cards continuam clicáveis e filtram os produtos. Textos já estão nas imagens; o botão também possui rótulo acessível. Em celulares a faixa pode rolar horizontalmente.

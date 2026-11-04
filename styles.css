@@ -52,3 +52,22 @@
 .hero-pagination{bottom:12px}
 }
 @media(prefers-reduced-motion:reduce){.hero-slide{transition:none}}
+
+/* Margot V1.4: categorias fotográficas */
+.categories {align-items:start}
+.category-card-photo {padding:0;border:0;background:transparent;min-width:0;gap:0;border-radius:22px;scroll-snap-align:start}
+.category-card-photo .category-photo {
+  display:block;width:100%;height:auto;aspect-ratio:300 / 404;object-fit:cover;
+  border:1px solid #f1d6d0;border-radius:22px;
+  box-shadow:0 9px 25px rgba(114,67,75,.10);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.category-card-photo:hover .category-photo,
+.category-card-photo:focus-visible .category-photo {transform:translateY(-4px);box-shadow:0 17px 34px rgba(114,67,75,.18)}
+@media(max-width:700px) {
+  .categories {grid-template-columns:repeat(5,minmax(158px,1fr));gap:11px;scroll-padding-inline:2px}
+  .category-card-photo .category-photo {border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .category-card-photo .category-photo {transition:none}
+}
