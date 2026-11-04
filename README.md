@@ -29,3 +29,12 @@ Para adicionar fotos reais numa próxima versão, acrescente `image: './assets/p
 4. Implementar pedidos via WhatsApp ou checkout e regras de estoque, se desejado.
 
 A página é um **template em pré-lançamento**, não uma loja operacional. Não armazena dados de pagamento.
+
+
+## Atualização V1.1 — imagens de produtos e presentes
+
+- `assets/foto-em-breve.webp`: imagem provisória padrão utilizada em **todos os cards de produtos** e nas miniaturas da sacola e favoritos. Categorias continuam com ícones vetoriais próprios.
+- `assets/presentes-margot.webp`: foto fornecida para a faixa **Presenteie com Elegância**. O layout adapta a imagem horizontal em celulares.
+- Quando uma foto real estiver disponível, adicione ao produto em `STORE.products` o campo `image: './assets/products/nome-da-foto.webp'`. O site passará a mostrar a foto real nesse produto e manterá a imagem provisória nos demais.
+- Arquivos de imagem com caminho inválido voltam automaticamente para o placeholder.
+- Os dados do catálogo ainda são ilustrativos, e o site não processa pagamentos.
