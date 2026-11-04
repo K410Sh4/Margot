@@ -43,3 +43,9 @@ A página é um **template em pré-lançamento**, não uma loja operacional. Nã
 ## Carrossel V1.2
 
 As três imagens `assets/hero-1.webp`, `hero-2.webp`, `hero-3.webp` são os banners fornecidos. O carrossel tem controles, indicadores, pausa por interação e respeita movimento reduzido. Para publicar, envie todos os arquivos à raiz do repositório preservando os caminhos.
+
+## Identidade da marca V1.3
+
+- `assets/margot-logo.webp`: logo oficial fornecida, exibida no cabeçalho, na assinatura da página e no rodapé.
+- `assets/favicon-32.png`: ícone com pérola para a aba do navegador.
+- O SVG antigo `pearl-mark.svg` foi descontinuado. O carrossel, o catálogo e a seção de presentes permanecem iguais.
