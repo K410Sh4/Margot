@@ -18,6 +18,7 @@
   <script src="./carousel.js" defer></script>
   <script src="./motion.js" defer></script>
   <script src="./header.js" defer></script>
+  <script src="./mobile-nav.js" defer></script>
   <script src="./firebase-config.js" defer></script>
   <script src="./account.js" type="module"></script>
 </head>
@@ -46,6 +47,7 @@
       </div>
     </div>
     <nav class="main-nav wrap" id="main-nav" aria-label="Navegação principal">
+      <div class="mobile-menu-title"><div><strong>Explorar Margot</strong><small>Encontre seu detalhe favorito</small></div><button type="button" class="mobile-menu-close" id="mobile-menu-close" aria-label="Fechar menu">×</button></div>
       <a class="active" href="#inicio">Início</a>
       <a href="#categorias">Coleções</a>
       <a href="#produtos" data-category-link="Brincos">Brincos</a>
@@ -132,6 +134,15 @@
     <section class="closing-note wrap"><img src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy"><p>Seu brilho está nos detalhes.</p></section>
   </main>
   <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Loja 100% online. Não possuímos estabelecimento físico para atendimento ao público.</p><p>O catálogo está em pré-lançamento; contato e confirmação de pedidos serão disponibilizados em breve.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · <a href="./privacidade.html">Privacidade</a></span></div></footer>
+
+  <button class="mobile-menu-backdrop" id="mobile-menu-backdrop" type="button" aria-label="Fechar menu de categorias" hidden></button>
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegação rápida">
+    <a class="mobile-nav-action is-active" id="mobile-nav-home" href="#inicio" aria-current="location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></a>
+    <a class="mobile-nav-action" id="mobile-nav-categories" href="#categorias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg><span>Coleções</span></a>
+    <button class="mobile-nav-action" id="mobile-nav-search" type="button" aria-label="Buscar produtos" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.9"/><path d="m16 16 5 5"/></svg><span>Buscar</span></button>
+    <button class="mobile-nav-action" id="mobile-nav-favorites" type="button" aria-label="Abrir favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 8.6c0 4.4-8.8 10.7-8.8 10.7S3.2 13 3.2 8.6a4.7 4.7 0 0 1 8.8-2.1 4.7 4.7 0 0 1 8.8 2.1Z"/></svg><span>Favoritos</span><span class="mobile-nav-count" id="mobile-favorites-count" hidden></span></button>
+    <button class="mobile-nav-action" id="mobile-nav-cart" type="button" aria-label="Abrir sacola"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16l-1.3 12H5.3L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><span>Sacola</span><span class="mobile-nav-count" id="mobile-cart-count" hidden></span></button>
+  </nav>
   <dialog id="account-dialog" class="account-dialog" aria-labelledby="account-title" aria-describedby="account-intro">
     <button type="button" class="account-close" id="account-close" aria-label="Fechar janela de conta">×</button>
     <img class="account-logo" src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy">

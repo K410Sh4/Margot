@@ -102,3 +102,8 @@ A antiga imagem de logo (169 × 102 px e letras pretas) foi substituída pela ve
 ## V1.10 — cabeçalho compacto com vidro fosco
 
 Quando a página é rolada, o cabeçalho reduz a logo e recolhe a navegação completa. O menu de categorias e a busca passam a ser abertos por ícones; conta Google, favoritos e sacola continuam acessíveis. O fundo utiliza transparência e backdrop-filter com opção opaca para navegadores incompatíveis. Em celulares a barra fica ainda menor. Sem GSAP, a lógica continua funcionando, e a preferência por movimento reduzido desativa transições.
+
+
+## V1.11 — Navegação mobile
+
+Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favoritos, Sacola), com indicadores de seção e contadores sincronizados com o catálogo existente. O cabeçalho mostra logo oficial, menu e conta Google, sem duplicar ícones. O menu de coleções funciona como painel acessível com fundo escurecido, fechamento por toque externo, Escape, botão fechar e gerenciamento de foco. A busca reutiliza o controle existente, e os atalhos acionam a mesma lógica dos favoritos e da sacola. Compatível com cabeçalho compacto, áreas seguras de celulares com notch e preferência por movimento reduzido. Desktop não é alterado.

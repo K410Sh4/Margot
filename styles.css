@@ -311,3 +311,189 @@ html.has-compact-header{scroll-padding-top:88px}
   .site-header,.site-header .header-main,.site-header .brand,
   .site-header .brand img,.site-header .main-nav{transition:none!important}
 }
+
+
+/* Margot V1.11 — navegação mobile ao alcance do polegar */
+.mobile-bottom-nav,.mobile-menu-backdrop,.mobile-menu-title{display:none}
+@media(max-width:700px){
+  html{scroll-padding-top:86px}
+  body{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  body.mobile-menu-open{overflow:hidden}
+  /* O topo mantém apenas menu, logomarca e conta; navegação passa à base. */
+  .site-header .header-main,
+  .site-header.is-compact .header-main{
+    grid-template-columns:44px minmax(84px,1fr) 44px;
+    gap:6px;
+    min-height:71px;
+  }
+  .site-header.is-compact .header-main{min-height:59px}
+  .site-header .menu-toggle{display:inline-grid;width:44px;height:44px;justify-self:start}
+  .site-header .brand{justify-self:center;margin:auto}
+  .site-header .header-actions{justify-self:end;gap:0}
+  .site-header .header-actions #search-open,
+  .site-header .header-actions #favorites-open,
+  .site-header .header-actions #cart-open{display:none!important}
+  .site-header .header-actions .account-trigger,
+  .site-header.is-compact .header-actions .account-trigger{
+    width:42px;height:42px;
+  }
+  .site-header.is-compact .header-actions .account-trigger{width:38px;height:38px}
+  .site-header.is-compact .menu-toggle{width:40px;height:40px}
+  .site-header .brand img{max-height:68px}
+  .site-header.is-compact .brand img{max-height:53px}
+  .site-header.searching,
+  .site-header.is-compact.searching{padding-bottom:0}
+  .site-header.searching .header-main>.search,
+  .site-header.is-compact.searching .header-main>.search{
+    display:flex;position:absolute;
+    top:calc(100% + 6px);
+    left:0;right:0;
+    min-height:46px;
+    z-index:20;
+    border-radius:14px;
+    background:rgba(255,250,248,.98);
+    box-shadow:0 12px 30px rgba(82,49,58,.16);
+  }
+  .mobile-bottom-nav{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:22;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:2px;
+    align-items:stretch;
+    height:calc(70px + env(safe-area-inset-bottom,0px));
+    padding:4px max(8px,env(safe-area-inset-left,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-right,0px));
+    border-top:1px solid rgba(187,120,130,.22);
+    border-radius:16px 16px 0 0;
+    background:rgba(255,250,248,.97);
+    box-shadow:0 -6px 24px rgba(83,47,58,.1);
+  }
+  @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+    .mobile-bottom-nav{
+      background:rgba(255,250,248,.80);
+      -webkit-backdrop-filter:blur(18px) saturate(1.18);
+      backdrop-filter:blur(18px) saturate(1.18);
+    }
+  }
+  .mobile-nav-action{
+    display:flex;
+    position:relative;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    min-height:48px;
+    min-width:0;
+    padding:4px 1px;
+    border:0;
+    border-radius:11px;
+    background:transparent;
+    color:#795f68;
+    font-family:inherit;
+    font-size:10px;
+    line-height:1.15;
+    font-weight:600;
+    letter-spacing:.005em;
+    text-decoration:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-nav-action svg{width:22px;height:22px;flex:none}
+  .mobile-nav-action.is-active{background:rgba(201,129,141,.12);color:#96505f}
+  .mobile-nav-action:active{background:rgba(201,129,141,.20)}
+  .mobile-nav-action[aria-pressed=true]{color:#96505f;background:rgba(201,129,141,.12)}
+  .mobile-nav-count{
+    position:absolute;top:2px;left:calc(50% + 8px);
+    min-width:17px;height:17px;padding:0 4px;
+    display:grid;place-items:center;
+    background:#b45466;border:2px solid #fffaf8;
+    border-radius:999px;color:white;
+    font-size:9px;line-height:1;
+  }
+  .mobile-nav-count[hidden]{display:none!important}
+  .mobile-menu-backdrop:not([hidden]){
+    display:block;
+    position:fixed;inset:0;
+    z-index:14;
+    width:100vw;height:100dvh;
+    background:rgba(39,26,34,.38);
+    border:0;
+    padding:0;
+    cursor:default;
+  }
+  .site-header .main-nav:not(.open),
+  .site-header.is-compact .main-nav:not(.open){
+    display:none;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .site-header .main-nav.open,
+  .site-header.is-compact .main-nav.open{
+    display:flex;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    z-index:18;
+    width:calc(100vw - 24px);
+    min-height:0;
+    max-height:min(72dvh,560px);
+    margin:0;
+    padding:10px 12px 14px;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    overflow-y:auto;
+    border:1px solid rgba(188,125,136,.28);
+    border-radius:18px;
+    background:#fffaf8;
+    box-shadow:0 16px 46px rgba(56,30,40,.22);
+    opacity:1;
+    visibility:visible;
+  }
+  .mobile-menu-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:8px 10px 12px;
+    margin-bottom:4px;
+    border-bottom:1px solid #f1deda;
+    color:#6e4651;
+  }
+  .mobile-menu-title strong{display:block;font:normal 23px/1.2 Georgia,serif}
+  .mobile-menu-title small{display:block;font-size:11px;color:#916f77;margin-top:5px}
+  .mobile-menu-close{
+    width:42px;height:42px;
+    border:0;border-radius:50%;
+    background:#f8e9e5;color:#804b58;
+    font-size:28px;line-height:1;
+  }
+  .site-header .main-nav.open a,
+  .site-header.is-compact .main-nav.open a{
+    display:flex;align-items:center;
+    min-height:46px;
+    padding:11px 15px;
+    margin:1px 0;
+    border-radius:9px;
+    border:0;
+    color:#554048;
+    font-size:14px;
+    font-weight:600;
+  }
+  .site-header .main-nav.open a:hover,
+  .site-header .main-nav.open a:focus-visible{
+    background:#f9e9e5;color:#8c5260;
+  }
+  .toast{bottom:calc(89px + env(safe-area-inset-bottom,0px))}
+}
+@media(max-width:360px){
+  .mobile-bottom-nav{gap:0;padding-left:3px;padding-right:3px}
+  .mobile-nav-action{font-size:9px}
+  .site-header .header-main,
+  .site-header.is-compact .header-main{grid-template-columns:40px minmax(72px,1fr) 40px;gap:2px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-nav-action,.mobile-bottom-nav,.site-header .main-nav{transition:none!important}
+}
