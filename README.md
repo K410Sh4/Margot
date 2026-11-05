@@ -172,10 +172,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - **Privacidade:** não monitora visitantes nem registra dados pessoais. É uma simulação em navegador de teste, não uma captura silenciosa de celulares reais.
 - **Limites:** efeitos de zoom por pinça em aparelhos físicos exigem validação complementar.
 
-## V1.19 — Correção do viewport mobile e barra inferior (05/11/2026)
+## V1.19 — Correção do overflow horizontal e barra inferior (05/11/2026)
 
-- O painel da sacola fechado deixa de ocupar espaço renderizado: `display:none`, removendo o `translateX(105%)` fora da tela que poderia interferir na largura do viewport durante a rolagem.
-- Quando a sacola abre, seu conteúdo aparece dentro dos limites da tela com animação de revelação por `clip-path`, sem posicionar o painel fisicamente fora da área visível.
-- O fechamento retira o painel imediatamente do layout, mantendo o atributo `inert` e o fluxo de acessibilidade existentes.
-- Testes de regressão para rolagem 0→230→520→430→0, limites móveis 320/360/390/430/700 px, largura da barra e abertura/fechamento da sacola.
-- Versão dos estilos atualizada para `v=1.19` para evitar cache antigo.
+- Os cards do carrossel de categorias já possuíam `aria-label`, mas incluíam também um `span.visually-hidden` com `position:absolute`, sem um ancestral posicionado.
+- Durante as animações de entrada do GSAP, esses spans podiam escapar do carrossel horizontal e ampliar o scrollWidth do documento; no rastreamento, suas coordenadas chegaram a aproximadamente 770 px em uma tela de 390 px.
+- Removidos os spans redundantes, sem perda dos nomes acessíveis, e aplicado `position:relative` nos cards como proteção adicional para futuros badges.
+- Preservada a animação lateral original do painel da sacola — a hipótese de que ele seria a causa foi descartada pelos testes de isolamento.
+- Testes com movimento ativado verificam rolagens 0→230→520→430→0, largura do documento e da barra inferior em 320/360/390/430/700 px, acessibilidade dos cards e abertura/fechamento da sacola.
+- CSS e store.js recebem `v=1.19` para impedir mistura de arquivos antigos em cache.
