@@ -96,6 +96,8 @@ for(const width of [320,360,390,430,700]){
 }
 
 test('catálogo continua visível em filtros, favoritos e rolagem rápida',async({page})=>{
+  // Exerce os efeitos GSAP; configuração padrão da suite usa movimento reduzido.
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await ready(page);
   const check=async()=>{
     const values=await page.locator('#product-grid .product-card').evaluateAll(cards=>cards.map(card=>({opacity:getComputedStyle(card).opacity,visibility:getComputedStyle(card).visibility})));
