@@ -192,7 +192,11 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await action('Limite mobile 700',()=>page.setViewportSize({width:700,height:844}),{transition:true});
    await action('Inicio desktop 701',()=>page.setViewportSize({width:701,height:844}),{transition:true,fullPage:true});
    await action('Desktop 1024',()=>page.setViewportSize({width:1024,height:800}));
-   await action('Desktop rolar 520',()=>page.evaluate(()=>scrollTo({top:520,behavior:'instant'})),{transition:true});
+   await action('Desktop rolar 520',async()=>{
+     await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+     await page.waitForTimeout(250);
+     await page.evaluate(()=>scrollTo({top:520,behavior:'instant'}));
+   },{transition:true});
    await action('Desktop abrir menu',()=>page.locator('#menu-open').click(),{transition:true});
    await action('Desktop restaurar',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
    await action('Voltar mobile 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
