@@ -217,3 +217,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Mantidos o título, a descrição e o link para #produtos, com ajuste local da paleta para verde e creme.
 - Animação GSAP discreta, sem ocultar conteúdo se CDN falhar e respeitando `prefers-reduced-motion`.
 - Testes em 320/390/700/900/1280 px, controle de overflow, carregamento da foto, ausência de logos duplicadas e navegação do CTA.
+
+## V1.24 — Harmonização cromática da assinatura com o rodapé (05/11/2026)
+
+- Mantém a fotografia de duas amigas no café e a composição mobile/desktop da V1.23, sem alterar os demais componentes da loja.
+- Marfim levemente rosado na área de texto e no gradiente sobre a foto; título e link em vinho Margot; descrição em taupe; verde-sálvia restrito a um detalhe de apoio.
+- Na entrada do rodapé, gradiente estático de creme para rosé, dispensando mudança de cores por JavaScript durante a rolagem.
+- Mantém animações e acessibilidade existentes; sem novos observadores de scroll e sem larguras em `100vw`.
+- Dois testes novos validam cores CSS, imagem, responsividade e ausência de overflow. Rastreio visual captura também a passagem para o rodapé no desktop e mobile.
