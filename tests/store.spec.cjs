@@ -5,6 +5,10 @@ async function ready(page) {
   await page.goto('/', {waitUntil: 'domcontentloaded'});
   await expect(page.locator('html')).toHaveClass(/mobile-nav-ready/);
 }
+async function catalog(page) {
+  await page.locator('#product-grid').scrollIntoViewIfNeeded();
+  await expect(page.locator('.product-card').first()).toBeVisible();
+}
 async function seed(page, value) {
   await page.addInitScript(value => {
     if (!sessionStorage.getItem('seeded')) {
@@ -25,6 +29,7 @@ test.beforeEach(async ({page}) => {
 test('limite de 99 unidades permanece na sacola após adicionar e recarregar', async ({page}) => {
   await seed(page, {[product]: 99});
   await ready(page);
+  await catalog(page);
   await page.locator(`[data-add="${product}"]`).click();
   await expect(page.locator('#toast')).toContainText('limite é de 99');
   await page.reload();
@@ -50,6 +55,7 @@ test('JSON corrompido e armazenamento indisponível não quebram a vitrine', asy
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await ready(page);
+  await catalog(page);
   await page.locator(`[data-add="${product}"]`).click();
   await openCart(page);
   await expect(page.locator('.quantity span')).toHaveText('1');
@@ -59,6 +65,8 @@ test('JSON corrompido e armazenamento indisponível não quebram a vitrine', asy
 test('favoritar com teclado mantém foco e estado após recarga', async ({page}) => {
   await ready(page);
   const heart = page.locator(`[data-favorite="${product}"]`);
+  await heart.scrollIntoViewIfNeeded();
+  await expect(heart).toBeVisible();
   await heart.focus();
   await heart.press('Space');
   await expect(heart).toBeFocused();
@@ -84,6 +92,7 @@ test('sacola bloqueia o fundo, mantém foco ao alterar quantidade e devolve ao a
   await seed(page, {[product]: 1});
   await ready(page);
   await openCart(page);
+  await expect(page.locator('#drawer-close')).toBeFocused();
   await expect(page.locator('main')).toHaveAttribute('inert', '');
   await expect(page.locator('#mobile-bottom-nav')).toHaveAttribute('inert', '');
   const plus = page.locator('[data-qty][data-delta="1"]');
@@ -173,6 +182,7 @@ test('catálogo e presentes aparecem com GSAP real após rolagem e recarga com h
 test('vitrine continua utilizável se as bibliotecas de animação falharem', async ({page}) => {
   await page.route('**/vendor/gsap/**', route => route.abort());
   await ready(page);
+  await catalog(page);
   await page.locator(`[data-add="${product}"]`).click();
   await openCart(page);
   await expect(page.locator('.quantity span')).toHaveText('1');
@@ -220,6 +230,7 @@ test('navegação e sacola permanecem funcionais no desktop', async ({page}) => 
   await ready(page);
   await page.locator('#search-input').fill('pérola');
   await expect(page.locator('.product-card')).toHaveCount(1);
+  await catalog(page);
   await page.locator('[data-add]').click();
   await page.locator('#cart-open').click();
   await expect(page.locator('.quantity span')).toHaveText('1');
