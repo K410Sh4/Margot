@@ -171,3 +171,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - **Manual:** `npm install`; `npx playwright install chromium`; `npm run test:trace`.
 - **Privacidade:** não monitora visitantes nem registra dados pessoais. É uma simulação em navegador de teste, não uma captura silenciosa de celulares reais.
 - **Limites:** efeitos de zoom por pinça em aparelhos físicos exigem validação complementar.
+
+## V1.19 — Correção do viewport mobile e barra inferior (05/11/2026)
+
+- O painel da sacola fechado deixa de ocupar espaço renderizado: `display:none`, removendo o `translateX(105%)` fora da tela que poderia interferir na largura do viewport durante a rolagem.
+- Quando a sacola abre, seu conteúdo aparece dentro dos limites da tela com animação de revelação por `clip-path`, sem posicionar o painel fisicamente fora da área visível.
+- O fechamento retira o painel imediatamente do layout, mantendo o atributo `inert` e o fluxo de acessibilidade existentes.
+- Testes de regressão para rolagem 0→230→520→430→0, limites móveis 320/360/390/430/700 px, largura da barra e abertura/fechamento da sacola.
+- Versão dos estilos atualizada para `v=1.19` para evitar cache antigo.
