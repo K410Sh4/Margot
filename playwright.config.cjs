@@ -1,5 +1,4 @@
-const { defineConfig } = require('@playwright/test');
-
+const {defineConfig} = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './tests',
   timeout: 35000,
@@ -8,16 +7,23 @@ module.exports = defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: process.env.CI ? 'list' : 'list',
+  reporter: [['list'], ['html', {open: 'never'}]],
   use: {
     baseURL: 'http://127.0.0.1:4173',
-    browserName: 'chromium',
     headless: true,
-    ignoreHTTPSErrors: true,
-    reducedMotion: 'reduce'
+    viewport: {width: 390, height: 844},
+    hasTouch: true,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure'
   },
+  projects: ['chromium', 'webkit', 'firefox'].flatMap(browserName =>
+    ['reduce', 'no-preference'].map(reducedMotion => ({
+      name: `${browserName}-${reducedMotion}`,
+      use: {browserName, reducedMotion, isMobile: browserName !== 'firefox'}
+    }))
+  ),
   webServer: {
-    command: 'python3 -m http.server 4173 --bind 127.0.0.1',
+    command: 'python3 -m http.server 4173 --bind 127.0.0.1 --directory dist',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 30000

@@ -1,9 +1,12 @@
 {
   "name": "margot-mobile-ui-tests",
   "private": true,
-  "version": "1.15.0",
+  "version": "1.16.0",
   "scripts": {
-    "test:mobile": "playwright test"
+    "test:mobile": "playwright test",
+    "build": "node scripts/build-static.cjs",
+    "test": "playwright test",
+    "check": "node scripts/check.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"

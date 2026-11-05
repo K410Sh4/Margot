@@ -311,3 +311,13 @@ html.has-compact-header{scroll-padding-top:88px}
   .site-header,.site-header .header-main,.site-header .brand,
   .site-header .brand img,.site-header .main-nav{transition:none!important}
 }
+
+/* V1.16 — interação e acesso aos painéis em telas baixas. */
+.hero-rotation{position:absolute;z-index:4;right:14px;bottom:12px;min-height:36px;padding:7px 12px;border:1px solid #b7808a;border-radius:99px;background:#fffaf8;color:#75424f;font-size:12px}
+.drawer{max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}
+.drawer-header,.drawer-footer{flex-shrink:0}
+.drawer-items{min-height:100px;overscroll-behavior:contain}
+.drawer-footer{padding-bottom:max(20px,env(safe-area-inset-bottom,0px))}
+.drawer-item>div{min-width:0}
+.drawer-item h3{overflow-wrap:anywhere}
+@media(max-height:500px){.drawer-header{padding:12px 20px}.drawer-footer{padding:12px 20px}.drawer-header h2{font-size:26px}}

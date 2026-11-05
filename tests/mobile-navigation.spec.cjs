@@ -1,6 +1,8 @@
 const {test,expect} = require('@playwright/test');
 
-test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+test.use({viewport:{width:390,height:844},hasTouch:true});
+
+test.beforeEach(async ({page}) => { await page.route('https://www.gstatic.com/firebasejs/**', route => route.abort()); });
 
 async function ready(page){
   await page.goto('/',{waitUntil:'domcontentloaded'});

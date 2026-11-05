@@ -10,18 +10,18 @@
   <meta property="og:description" content="Descubra a vitrine da Margot: brincos, colares, pulseiras, anéis e presentes especiais.">
   <title>Margot Acessórios | Delicadeza em cada detalhe</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=official-2">
-  <link rel="stylesheet" href="./styles.css?v=1.15">
-  <link rel="stylesheet" href="./mobile-navigation.css?v=1.15">
-  <!-- GSAP carrega antes dos scripts próprios; layout continua funcional sem CDN. -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
-  <script src="./store.js?v=1.15" defer></script>
-  <script src="./carousel.js?v=1.15" defer></script>
-  <script src="./motion.js?v=1.15" defer></script>
-  <script src="./header.js?v=1.15" defer></script>
-  <script src="./mobile-nav.js?v=1.15" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=1.16">
+  <link rel="stylesheet" href="./mobile-navigation.css?v=1.16">
+  <!-- Animações versionadas servidas pelo próprio site. -->
+  <script src="./vendor/gsap/gsap.min.js" defer></script>
+  <script src="./vendor/gsap/ScrollTrigger.min.js" defer></script>
+  <script src="./store.js?v=1.16" defer></script>
+  <script src="./carousel.js?v=1.16" defer></script>
+  <script src="./motion.js?v=1.16" defer></script>
+  <script src="./header.js?v=1.16" defer></script>
+  <script src="./mobile-nav.js?v=1.16" defer></script>
   <script src="./firebase-config.js" defer></script>
-  <script src="./account.js" type="module"></script>
+  <script src="./account.js?v=1.16" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -59,7 +59,7 @@
       <a href="#produtos" data-category-link="Todos">Destaques</a>
     </nav>
   </header>
-  <main id="conteudo">
+  <main id="conteudo" tabindex="-1">
     <section id="inicio" class="hero hero-carousel" aria-label="Destaques Margot" aria-roledescription="carrossel" tabindex="-1">
       <div class="hero-slides">
         <article class="hero-slide is-active" aria-label="1 de 3: Novas coleções">
@@ -97,6 +97,7 @@
         <button type="button" aria-label="Mostrar destaque 2"></button>
         <button type="button" aria-label="Mostrar destaque 3"></button>
       </div>
+      <button class="hero-rotation" id="hero-rotation" type="button" aria-label="Pausar destaques automáticos">Pausar</button>
       <span class="sr-only" id="hero-announcement" aria-live="polite"></span>
     </section>
     <section class="benefits" aria-label="Diferenciais da loja">
