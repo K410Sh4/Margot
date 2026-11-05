@@ -150,3 +150,13 @@ O menu e a barra mobile foram consolidados no arquivo mobile-navigation.css. O n
 - Contraste de textos e botões reforçado; setas do carrossel maiores no mobile.
 - Novos testes de regressão Playwright para os cenários anteriores.
 - Zoom e gesto de pinça permanecem acessíveis, sem bloqueio de escala.
+
+## V1.17 — Restauração responsiva sem estados residuais (05/11/2026)
+
+- Cabeçalho expande novamente ao subir 18 px; continua compacto ao descer após o limiar de 155 px.
+- Reconciliado o estado no carregamento, rotação, redimensionamento e retorno pelo cache do navegador.
+- Removidas regras de cabeçalho conflitantes do styles.css; controle visual unificado em mobile-navigation.css.
+- Menu mobile ancorado com margens do cabeçalho, sem 100vw nem translateX.
+- Busca, menu, fundo modal, foco e inert são restaurados ao cruzar o breakpoint 700/701 px.
+- Versão 1.17 nos recursos CSS e JS para invalidar caches anteriores.
+- Testes de ida e volta, de geometria e de alternância de breakpoint.
