@@ -441,9 +441,10 @@ test('fotografia da conexão carrega e substitui a logo da assinatura no desktop
   const layout=await page.evaluate(()=>{
     const panel=document.querySelector('.closing-note__panel').getBoundingClientRect();
     const copy=document.querySelector('.closing-note__copy').getBoundingClientRect();
-    const photo=document.querySelector('.closing-note__photo').getBoundingClientRect();
+    const photo=document.querySelector('.closing-note__photo');
     return {panelX:panel.x,panelWidth:panel.width,copyX:copy.x,
-      photoWidth:photo.width,doc:document.documentElement.scrollWidth,
+      // clientWidth é a largura do layout; getBoundingClientRect inclui o scale do GSAP.
+      photoWidth:photo.clientWidth,doc:document.documentElement.scrollWidth,
       viewport:document.documentElement.clientWidth};
   });
   expect(layout.copyX).toBeGreaterThan(layout.panelX+layout.panelWidth*.45);
