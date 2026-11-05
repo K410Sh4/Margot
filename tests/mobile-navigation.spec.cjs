@@ -314,3 +314,77 @@ test('categorias preservam nomes acessíveis sem elementos absolutos soltos',asy
     await expect(card.locator('.visually-hidden')).toHaveCount(0);
   }
 });
+
+
+test('desktop não pisca durante pequenas oscilações de rolagem',async({page})=>{
+  await page.setViewportSize({width:1100,height:800});
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await ready(page);
+  await page.evaluate(()=>{
+    window.__headerStateChanges=[];
+    const el=document.querySelector('.site-header');
+    new MutationObserver(()=>{
+      window.__headerStateChanges.push({
+        compact:el.classList.contains('is-compact'),
+        y:window.scrollY,
+        height:el.getBoundingClientRect().height,
+        logo:el.querySelector('.brand img').getBoundingClientRect().width
+      });
+    }).observe(el,{attributes:true,attributeFilter:['class']});
+  });
+
+  const jump=async y=>{
+    await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+    await page.waitForTimeout(65);
+  };
+  await jump(520);
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+
+  // Scroll anchoring e pequenos movimentos não devem expandir e recompactar.
+  for(const y of [510,518,499,513,505,520]){
+    await jump(y);
+    await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  }
+  await page.waitForTimeout(560);
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await jump(512);
+  await jump(520);
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+
+  await jump(410);
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await page.waitForTimeout(550);
+  await jump(525);
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  const history=await page.evaluate(()=>window.__headerStateChanges);
+  expect(history.map(e=>e.compact)).toEqual([true,false,true]);
+});
+
+test('desktop mantém tamanho estável após compactar e restaurar',async({page})=>{
+  await page.setViewportSize({width:1200,height:800});
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await ready(page);
+  const dimensions=()=>page.evaluate(()=>{
+    const head=document.querySelector('.header-main').getBoundingClientRect();
+    const logo=document.querySelector('.brand img').getBoundingClientRect();
+    return{header:head.height,logo:logo.width,scrollWidth:document.documentElement.scrollWidth,
+      viewport:document.documentElement.clientWidth};
+  });
+  const original=await dimensions();
+  await page.evaluate(()=>scrollTo({top:500,behavior:'instant'}));
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await page.waitForTimeout(560);
+  const compact=await dimensions();
+  expect(compact.header).toBeLessThan(original.header);
+  expect(compact.logo).toBeLessThan(original.logo);
+  expect(compact.scrollWidth).toBeLessThanOrEqual(compact.viewport+1);
+  await page.setViewportSize({width:1220,height:800});
+  await page.waitForTimeout(130);
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await page.waitForTimeout(150);
+  const restored=await dimensions();
+  expect(Math.abs(restored.header-original.header)).toBeLessThanOrEqual(1);
+  expect(Math.abs(restored.logo-original.logo)).toBeLessThanOrEqual(1);
+});

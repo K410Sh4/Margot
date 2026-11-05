@@ -208,6 +208,13 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      await page.waitForTimeout(250);
      await page.evaluate(()=>scrollTo({top:520,behavior:'instant'}));
    },{transition:true});
+   await action('Desktop oscilação de 12px',async()=>{
+     for(const y of [509,520,508,518]){
+       await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+       await page.waitForTimeout(50);
+     }
+   },{transition:true});
+   await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
    await action('Desktop abrir menu',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
    await action('Desktop restaurar',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
    await action('Voltar mobile 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
