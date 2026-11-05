@@ -117,3 +117,12 @@ Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favor
 - Início/Coleções só são destacados no trecho correspondente da página; produtos e rodapé não deixam Coleções permanentemente ativo.
 - Adicionado viewport-fit=cover para suportar safe-area-inset em iOS. Transições continuam respeitando movimento reduzido.
 - Nenhuma mudança em Firebase, dados de pedidos ou lógica de carrinho/favoritos.
+
+
+## V1.13 — correção de atualização de seção e filtro
+
+- A categoria selecionada passa a fazer parte da URL pública, por exemplo: ?categoria=Brincos#produtos.
+- Ao atualizar, compartilhar a URL ou usar Voltar/Avançar, os filtros do catálogo são restaurados.
+- Início, Coleções, Kits e Destaques recebem destaque dinâmico no menu superior conforme a seção visível. No catálogo, a categoria filtrada é destacada; "Destaques" redefine para Todos.
+- A barra inferior acompanha a mesma navegação. Pesquisa de texto não altera a URL nem cria entradas desnecessárias no histórico.
+- A correção não modifica os dados, o checkout ou a autenticação Google.

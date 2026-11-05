@@ -171,26 +171,50 @@
     }
     mirrorCounts();
 
-    // Destaque preciso: apenas a seção atualmente visível, não todas as seguintes.
+    // Uma única regra de seção e categoria para o menu do topo e a barra inferior.
+    function currentSection() {
+      const marker = window.scrollY + header.getBoundingClientRect().height + 28;
+      let current = 'inicio';
+      for (const id of ['inicio','categorias','produtos','presentes']) {
+        const section = get(id);
+        if (!section) continue;
+        if (marker >= section.getBoundingClientRect().top + window.scrollY) {
+          current = id;
+        }
+      }
+      return current;
+    }
     function updateActive() {
       ticking = false;
-      if (!mobile()) return;
-      const collections = get('categorias');
-      if (!collections) return;
-      const top = collections.getBoundingClientRect().top + window.scrollY;
-      const bottom = collections.getBoundingClientRect().bottom + window.scrollY;
-      const marker = window.scrollY + header.getBoundingClientRect().height + 24;
-      const homeActive = marker < top;
-      const collectionsActive = marker >= top && marker < bottom;
-      [
-        ['mobile-nav-home', homeActive],
-        ['mobile-nav-categories', collectionsActive]
-      ].forEach(([id, selected]) => {
-        const link = get(id);
-        link.classList.toggle('is-active', selected);
-        if (selected) link.setAttribute('aria-current', 'location');
+      const section = currentSection();
+      const selectedCategory = new URLSearchParams(window.location.search).get('categoria');
+      const categoryName = ['Brincos','Colares','Pulseiras','Anéis','Kits'].includes(selectedCategory)
+        ? selectedCategory : 'Todos';
+      // Nenhum link permanece marcado artificialmente fora da seção correspondente.
+      for (const link of nav.querySelectorAll('a[href]')) {
+        const selection = link.dataset.categoryLink;
+        const href = link.getAttribute('href');
+        const active = section === 'inicio' ? href === '#inicio'
+          : section === 'categorias' ? href === '#categorias'
+          : section === 'produtos' ? (categoryName === 'Todos'
+              ? selection === 'Todos' : selection === categoryName)
+          : section === 'presentes' ? href === '#presentes'
+          : false;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current','location');
         else link.removeAttribute('aria-current');
-      });
+      }
+      if (mobile()) {
+        [
+          ['mobile-nav-home', section === 'inicio'],
+          ['mobile-nav-categories', section === 'categorias']
+        ].forEach(([id, active]) => {
+          const link = get(id);
+          link.classList.toggle('is-active', active);
+          if (active) link.setAttribute('aria-current','location');
+          else link.removeAttribute('aria-current');
+        });
+      }
       syncSearch();
     }
 
@@ -206,6 +230,11 @@
       queueActive();
     }, {passive: true});
     window.addEventListener('pageshow', queueActive);
+    window.addEventListener('popstate', queueActive);
+    window.addEventListener('hashchange', queueActive);
+    window.addEventListener('margot:categorychange', queueActive);
+    // Um hash restaurado pelo navegador pode alterar a rolagem após DOMContentLoaded.
+    requestAnimationFrame(queueActive);
 
     // Controle de foco do diálogo de categorias (teclado e leitores de tela).
     document.addEventListener('focusin', event => {

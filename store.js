@@ -40,6 +40,34 @@ const favoriteList=readStorage('favorites',[]);
 const favorites=new Set(Array.isArray(favoriteList)?favoriteList.filter(id=>getItem(id)):[]);
 let category='Todos',query='',drawerMode='cart',previousFocus=null,toastTimer;
 const categories=['Brincos','Colares','Pulseiras','Anéis','Kits'];
+// A categoria da URL é a fonte de verdade para recarregamento, links e voltar/avançar.
+function categoryFromUrl(){
+  const selected=new URLSearchParams(window.location.search).get('categoria');
+  return categories.includes(selected) ? selected : 'Todos';
+}
+category=categoryFromUrl();
+function writeCategoryUrl(selected){
+  const url=new URL(window.location.href);
+  if(selected==='Todos')url.searchParams.delete('categoria');
+  else url.searchParams.set('categoria',selected);
+  url.hash='produtos';
+  const next=url.pathname+url.search+url.hash;
+  const current=window.location.pathname+window.location.search+window.location.hash;
+  if(next!==current)window.history.pushState({margotCategory:selected},'',next);
+}
+function notifyCategoryChange(){
+  window.dispatchEvent(new CustomEvent('margot:categorychange',{detail:{category}}));
+}
+function restoreCategoryFromUrl(){
+  const restored=categoryFromUrl();
+  if(restored!==category){
+    category=restored;
+    renderFilters();
+    renderProducts();
+  }
+  notifyCategoryChange();
+}
+window.addEventListener('popstate',restoreCategoryFromUrl);
 const ornaments={
   'heart-earrings':`<g transform="translate(0,8)"><path d="M80 87c-9-16-38-12-34 8 3 14 25 30 34 39 10-9 32-25 34-39 4-20-25-24-34-8Z"/><path d="M160 87c-9-16-38-12-34 8 3 14 25 30 34 39 10-9 32-25 34-39 4-20-25-24-34-8Z"/></g>`,
   'pearl-necklace':`<path d="M52 34c8 56 34 83 68 83s60-27 68-83" fill="none" stroke-width="4"/><path d="M108 121l12 12 12-12" fill="none" stroke-width="3"/><circle cx="120" cy="146" r="25" fill="url(#pearl)" stroke="#d2b89f" stroke-width="2"/>`,
@@ -74,7 +102,16 @@ function applyProductPhotoFallback(root){
   }, true);
 }
 function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag">Foto em breve</span>${productImage(p)}<button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3>${p.name}</h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
-function chooseCategory(c,scroll=true){category=c;renderFilters();renderProducts();closeMobileMenu();if(scroll)$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'})}
+function chooseCategory(c,scroll=true){
+  if(c!=='Todos'&&!categories.includes(c))return;
+  category=c;
+  renderFilters();
+  renderProducts();
+  writeCategoryUrl(category);
+  closeMobileMenu();
+  notifyCategoryChange();
+  if(scroll)$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+}
 function updateCounts(){const num=Object.values(cart).reduce((a,n)=>a+n,0);$('cart-count').textContent=num;$('cart-count').hidden=!num;$('favorite-count').textContent=favorites.size;$('favorite-count').hidden=!favorites.size}
 function addToCart(id){cart[id]=(cart[id]||0)+1;saveStorage('cart',cart);updateCounts();notify('Peça adicionada à sacola');if($('drawer').classList.contains('open'))renderDrawer()}
 function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
@@ -87,5 +124,5 @@ function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classLi
 function copyOrder(){const lines=Object.keys(cart).map(id=>`• ${getItem(id).name} — ${cart[id]} un. × ${money(getItem(id).price)}`);const subtotal=Object.keys(cart).reduce((s,id)=>s+getItem(id).price*cart[id],0);const msg=`Olá! Tenho interesse nestas peças da Margot Acessórios:\n${lines.join('\n')}\nSubtotal demonstrativo: ${money(subtotal)}\nGostaria de confirmar disponibilidade, valores e entrega.`;const fallback=()=>{const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('Falha ao copiar')};Promise.resolve(navigator.clipboard?.writeText?navigator.clipboard.writeText(msg).catch(fallback):fallback()).then(()=>notify('Lista copiada. Cole no atendimento da loja quando estiver disponível.')).catch(()=>notify('Não foi possível copiar automaticamente.'))}
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function closeMobileMenu(){$('main-nav').classList.remove('open');$('menu-open').setAttribute('aria-expanded','false')}
-function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();renderProducts();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;chooseCategory('Todos')});$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;chooseCategory(category,false)});$('search-form').addEventListener('submit',e=>{e.preventDefault();$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('menu-open').addEventListener('click',()=>{const on=$('main-nav').classList.toggle('open');$('menu-open').setAttribute('aria-expanded',String(on))});$('search-open').addEventListener('click',()=>{const active=document.querySelector('.site-header').classList.toggle('searching');if(active)$('search-input').focus()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));$('main-nav').querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMobileMenu));document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('drawer').classList.contains('open'))closeDrawer();else{closeMobileMenu();document.querySelector('.site-header').classList.remove('searching')}}if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
+function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();renderProducts();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;chooseCategory('Todos')});$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;renderProducts()});$('search-form').addEventListener('submit',e=>{e.preventDefault();$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('menu-open').addEventListener('click',()=>{const on=$('main-nav').classList.toggle('open');$('menu-open').setAttribute('aria-expanded',String(on))});$('search-open').addEventListener('click',()=>{const active=document.querySelector('.site-header').classList.toggle('searching');if(active)$('search-input').focus()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));$('main-nav').querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMobileMenu));document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('drawer').classList.contains('open'))closeDrawer();else{closeMobileMenu();document.querySelector('.site-header').classList.remove('searching')}}if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
 document.addEventListener('DOMContentLoaded',init);
