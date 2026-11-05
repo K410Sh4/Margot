@@ -174,9 +174,9 @@
   transition:width .24s ease,max-height .24s ease;
 }
 .site-header .main-nav{
-  max-height:100px;
   transition:max-height .2s ease,opacity .18s ease;
 }
+.site-header:not(.is-compact) .main-nav:not(.open){max-height:100px}
 .site-header.is-compact{
   background:rgba(255,250,248,.93);
   border-bottom:1px solid rgba(185,126,137,.27);
