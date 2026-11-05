@@ -205,7 +205,8 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await action('Desktop 1024',()=>page.setViewportSize({width:1024,height:800}));
    await action('Desktop rolar 520',async()=>{
      await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
-     await page.waitForTimeout(250);
+     // Aguardar 480 ms de estabilização após expandir no desktop.
+     await page.waitForTimeout(570);
      await page.evaluate(()=>scrollTo({top:520,behavior:'instant'}));
    },{transition:true});
    await action('Desktop oscilação de 12px',async()=>{
