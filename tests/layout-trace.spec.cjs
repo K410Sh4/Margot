@@ -87,6 +87,7 @@ function reports(dir,snapshots,errors){
 }
 test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>{
  test.setTimeout(180000);
+ page.setDefaultTimeout(6000);
  const dir=path.resolve('test-results/layout-trace');
  fs.mkdirSync(dir,{recursive:true});
  const snapshots=[],errors=[];
@@ -145,6 +146,16 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      ' zoom='+data.viewport.scale+' header='+data.elements['Grid cabeçalho']?.width+
      ' logo='+data.elements['Imagem logo']?.width);
  }
+ async function clickForTrace(locator,description){
+   try{
+     await locator.click({timeout:3000});
+   }catch(error){
+     errors.push('CLIQUE INTERCEPTADO: '+description+'; '+String(error.message||error).split('\n')[0]+
+       ' — ação acionada por JavaScript para concluir a medição.');
+     await capture('Clique bloqueado '+description,'bloqueio');
+     await locator.evaluate(element=>element.click());
+   }
+ }
  async function action(label,fn,options={}){
    try{
      await fn();
@@ -168,16 +179,16 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await action('Descer 520',()=>page.evaluate(()=>scrollTo({top:520,behavior:'instant'})),{transition:true});
    await action('Subir 430',()=>page.evaluate(()=>scrollTo({top:430,behavior:'instant'})),{transition:true});
    await action('Voltar topo',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
-   await action('Abrir menu mobile',()=>page.locator('#menu-open').click(),{transition:true});
-   await action('Selecionar brincos',()=>page.locator('#main-nav [data-category-link="Brincos"]').click());
-   await action('Mostrar todos',()=>page.locator('#show-all').click());
-   await action('Abrir busca',()=>page.locator('#mobile-nav-search').click(),{transition:true});
+   await action('Abrir menu mobile',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
+   await action('Selecionar brincos',()=>clickForTrace(page.locator('#main-nav [data-category-link="Brincos"]'),'categoria Brincos'));
+   await action('Mostrar todos',()=>clickForTrace(page.locator('#show-all'),'Ver todos'));
+   await action('Abrir busca',()=>clickForTrace(page.locator('#mobile-nav-search'),'busca mobile'),{transition:true});
    await action('Pesquisar colar',()=>page.locator('#search-input').fill('colar'));
-   await action('Fechar busca',()=>page.locator('#mobile-nav-search').click());
-   await action('Favoritar primeiro',()=>page.locator('#product-grid .heart-btn').first().click());
-   await action('Adicionar sacola',()=>page.locator('#product-grid .add-to-cart').first().click());
-   await action('Abrir sacola',()=>page.locator('#mobile-nav-cart').click(),{transition:true});
-   await action('Fechar sacola',()=>page.locator('#drawer-close').click(),{transition:true});
+   await action('Fechar busca',()=>clickForTrace(page.locator('#mobile-nav-search'),'busca mobile'));
+   await action('Favoritar primeiro',()=>clickForTrace(page.locator('#product-grid .heart-btn').first(),'favorito'));
+   await action('Adicionar sacola',()=>clickForTrace(page.locator('#product-grid .add-to-cart').first(),'adicionar sacola'));
+   await action('Abrir sacola',()=>clickForTrace(page.locator('#mobile-nav-cart'),'abrir sacola'),{transition:true});
+   await action('Fechar sacola',()=>clickForTrace(page.locator('#drawer-close'),'fechar sacola'),{transition:true});
    await action('Rolar categorias',()=>page.evaluate(()=>{
      const el=document.querySelector('#category-grid');
      el.scrollIntoView({block:'center',behavior:'instant'});el.scrollLeft=170;
@@ -197,12 +208,12 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      await page.waitForTimeout(250);
      await page.evaluate(()=>scrollTo({top:520,behavior:'instant'}));
    },{transition:true});
-   await action('Desktop abrir menu',()=>page.locator('#menu-open').click(),{transition:true});
+   await action('Desktop abrir menu',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
    await action('Desktop restaurar',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
    await action('Voltar mobile 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
    await action('Landscape 844',()=>page.setViewportSize({width:844,height:390}),{transition:true});
    await action('Portrait 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
-   await action('Proximo banner',()=>page.locator('.hero-next').click(),{transition:true});
+   await action('Proximo banner',()=>clickForTrace(page.locator('.hero-next'),'próximo banner'),{transition:true});
    await action('Recarregar',async()=>{
      await page.reload({waitUntil:'domcontentloaded'});
      await expect(page.locator('html')).toHaveClass(/mobile-nav-ready/);
