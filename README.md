@@ -92,3 +92,8 @@ IMPORTANTE: autenticação ainda não está ativa até configurar um projeto Fir
 Não publique service-account JSON, chaves privadas, Google OAuth client_secret, tokens ou senhas. A configuração Firebase Web é pública, não confere acesso administrativo. Caso seja acrescentado backend/Firestore, ele exigirá verificação de tokens e regras de acesso independentes.
 
 Tecnologia: Firebase JavaScript SDK 13.2.0, carregado da origem oficial gstatic somente quando o Firebase estiver configurado. Autenticação por janela Google aberta por clique, sem exigir cadastro para ver o catálogo. O site não sincroniza sacola, favoritos ou pedidos e não processa pagamento.
+
+
+## Logo oficial — atualização
+
+A antiga imagem de logo (169 × 102 px e letras pretas) foi substituída pela versão oficial fornecida pela marca, com letras douradas, pérola e ornamentos. O arquivo assets/margot-logo.webp foi produzido por recorte e transparência da arte original (sem redesenhar símbolo ou texto). Ele aparece no cabeçalho, rodapé, assinatura e janela de login. O favicon foi recortado da arte original do emblema.

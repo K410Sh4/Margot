@@ -144,3 +144,18 @@
   .account-trigger > #account-avatar{width:29px;height:29px}
   .account-trigger > #account-icon{width:21px;height:21px}
 }
+
+
+/* Identidade Margot — logo original com pérola e tipografia dourada. */
+@media(min-width:701px){
+  .header-main{min-height:122px}
+  .brand{width:184px}
+  .brand img{display:block;width:184px;height:auto;max-height:126px;object-fit:contain}
+}
+.closing-note img{width:205px;max-height:none}
+.footer-brand{width:208px}
+.footer-brand img{display:block;width:100%;height:auto;max-height:none;object-fit:contain}
+.account-logo{width:170px;height:auto;max-height:130px;object-fit:contain}
+@media(max-width:700px){
+  .brand img{width:120px;height:auto;max-height:73px;object-fit:contain}
+}
