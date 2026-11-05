@@ -122,6 +122,10 @@
     window.addEventListener('pageshow',queueLocation);
     updateLocation();
     updateMenuState();
+    const account = byId('account-open');
+    if (account) account.addEventListener('click', () => closeMenu());
+    // Só substitui os atalhos do topo quando todos os controles estiverem prontos.
+    document.documentElement.classList.add('mobile-nav-ready');
 
     // Fechamento por teclado e contenção do foco enquanto o menu móvel está aberto.
     document.addEventListener('keydown', event => {

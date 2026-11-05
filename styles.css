@@ -317,22 +317,22 @@ html.has-compact-header{scroll-padding-top:88px}
 .mobile-bottom-nav,.mobile-menu-backdrop,.mobile-menu-title{display:none}
 @media(max-width:700px){
   html{scroll-padding-top:86px}
-  body{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  html.mobile-nav-ready body{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
   body.mobile-menu-open{overflow:hidden}
   /* O topo mantém apenas menu, logomarca e conta; navegação passa à base. */
-  .site-header .header-main,
-  .site-header.is-compact .header-main{
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
     grid-template-columns:44px minmax(84px,1fr) 44px;
     gap:6px;
     min-height:71px;
   }
-  .site-header.is-compact .header-main{min-height:59px}
+  html.mobile-nav-ready .site-header.is-compact .header-main{min-height:59px}
   .site-header .menu-toggle{display:inline-grid;width:44px;height:44px;justify-self:start}
   .site-header .brand{justify-self:center;margin:auto}
   .site-header .header-actions{justify-self:end;gap:0}
-  .site-header .header-actions #search-open,
-  .site-header .header-actions #favorites-open,
-  .site-header .header-actions #cart-open{display:none!important}
+  html.mobile-nav-ready .site-header .header-actions #search-open,
+  html.mobile-nav-ready .site-header .header-actions #favorites-open,
+  html.mobile-nav-ready .site-header .header-actions #cart-open{display:none!important}
   .site-header .header-actions .account-trigger,
   .site-header.is-compact .header-actions .account-trigger{
     width:42px;height:42px;
@@ -354,7 +354,7 @@ html.has-compact-header{scroll-padding-top:88px}
     background:rgba(255,250,248,.98);
     box-shadow:0 12px 30px rgba(82,49,58,.16);
   }
-  .mobile-bottom-nav{
+  html.mobile-nav-ready .mobile-bottom-nav{
     position:fixed;
     left:0;right:0;bottom:0;
     z-index:22;
@@ -491,8 +491,8 @@ html.has-compact-header{scroll-padding-top:88px}
 @media(max-width:360px){
   .mobile-bottom-nav{gap:0;padding-left:3px;padding-right:3px}
   .mobile-nav-action{font-size:9px}
-  .site-header .header-main,
-  .site-header.is-compact .header-main{grid-template-columns:40px minmax(72px,1fr) 40px;gap:2px}
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{grid-template-columns:40px minmax(72px,1fr) 40px;gap:2px}
 }
 @media(prefers-reduced-motion:reduce){
   .mobile-nav-action,.mobile-bottom-nav,.site-header .main-nav{transition:none!important}
