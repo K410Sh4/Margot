@@ -262,6 +262,8 @@ test('drawer abre e fecha sem causar overflow após fechar',async({page})=>{
   await expect(page.locator('#drawer')).toHaveAttribute('aria-hidden','true');
   await page.locator('#mobile-nav-cart').click();
   await expect(page.locator('#drawer')).toBeVisible();
+  // Mede após o término dos 250 ms da animação original de abertura.
+  await page.waitForTimeout(350);
   const opened=await page.evaluate(()=>{
     const r=document.getElementById('drawer').getBoundingClientRect();
     return{x:r.x,right:r.right,width:r.width,viewport:document.documentElement.clientWidth};
