@@ -153,3 +153,29 @@
 @media(prefers-reduced-motion:reduce){
   .mobile-nav-action,.mobile-bottom-nav,.mobile-menu-backdrop{transition:none!important}
 }
+
+
+/* Garantir dimensões estáveis do cabeçalho mobile também durante a transição. */
+@media(max-width:700px){
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    height:68px;
+    min-height:68px;
+    max-height:68px;
+    transition:none!important;
+  }
+  html.mobile-nav-ready .site-header .brand,
+  html.mobile-nav-ready .site-header.is-compact .brand,
+  html.mobile-nav-ready .site-header .brand img,
+  html.mobile-nav-ready .site-header.is-compact .brand img{
+    transition:none!important;
+  }
+}
+@media(max-width:360px){
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    height:64px;
+    min-height:64px;
+    max-height:64px;
+  }
+}

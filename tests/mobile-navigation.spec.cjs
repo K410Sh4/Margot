@@ -38,6 +38,8 @@ test('categoria, histórico e atualização preservam filtro',async({page})=>{
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
   await page.reload({waitUntil:'domcontentloaded'});
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
+  // O destaque representa a seção visível, não uma categoria oculta no topo.
+  await page.locator('#produtos').scrollIntoViewIfNeeded();
   await expect(page.locator('#main-nav [data-category-link="Brincos"]')).toHaveClass(/active/);
 });
 
@@ -69,8 +71,11 @@ test('cabeçalho não muda de altura no mobile ao rolar',async({page})=>{
   const before=await page.locator('.header-main').boundingBox();
   await page.evaluate(()=>window.scrollTo(0,440));
   await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await expect.poll(async()=>{
+    const after=await page.locator('.header-main').boundingBox();
+    return Math.abs(before.height-after.height);
+  }).toBeLessThanOrEqual(1);
   const after=await page.locator('.header-main').boundingBox();
-  expect(Math.abs(before.height-after.height)).toBeLessThanOrEqual(1);
   expect(Math.abs(before.width-after.width)).toBeLessThanOrEqual(1);
 });
 

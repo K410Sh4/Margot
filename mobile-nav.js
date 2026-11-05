@@ -226,6 +226,7 @@
       queueActive();
     }, {passive: true});
     window.addEventListener('pageshow',()=>{if(menuOpen)closeMenu(true);queueActive()});
+    window.addEventListener('load',queueActive);
     window.addEventListener('popstate', queueActive);
     window.addEventListener('hashchange', queueActive);
     window.addEventListener('margot:categorychange', queueActive);
