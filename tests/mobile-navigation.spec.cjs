@@ -491,3 +491,61 @@ test('link do encerramento retorna para produtos',async({page})=>{
   await link.click();
   await expect(page).toHaveURL(/#produtos$/);
 });
+
+test('paleta de encerramento conecta marfim e vinho com o rodapé rosé',async({page})=>{
+  await page.setViewportSize({width:1280,height:800});
+  await ready(page);
+  await page.locator('.closing-note').scrollIntoViewIfNeeded();
+  const colors=await page.evaluate(()=>{
+    const cs=selector=>getComputedStyle(document.querySelector(selector));
+    return{
+      panel:cs('.closing-note__panel').backgroundColor,
+      title:cs('.closing-note__title').color,
+      message:cs('.closing-note__message').color,
+      eyebrow:cs('.closing-note__eyebrow').color,
+      link:cs('.closing-note__link').color,
+      fade:cs('.closing-note__panel').getPropertyValue('background-color'),
+      overlay:getComputedStyle(document.querySelector('.closing-note__panel'),'::after').backgroundImage,
+      footer:cs('.footer').backgroundImage,
+      documentWidth:document.documentElement.scrollWidth,
+      viewportWidth:document.documentElement.clientWidth
+    };
+  });
+  expect(colors.panel).toBe('rgb(249, 245, 240)');
+  expect(colors.title).toBe('rgb(117, 74, 85)');
+  expect(colors.message).toBe('rgb(100, 92, 84)');
+  expect(colors.eyebrow).toBe('rgb(95, 117, 94)');
+  expect(colors.link).toBe('rgb(117, 74, 85)');
+  expect(colors.overlay).toContain('rgba(249, 245, 240, 0.98)');
+  expect(colors.footer).toContain('linear-gradient');
+  expect(colors.footer).toContain('rgb(242, 222, 219)');
+  expect(colors.documentWidth).toBeLessThanOrEqual(colors.viewportWidth+1);
+});
+
+test('mobile mantém foto livre e contraste no texto com paleta rosé',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await ready(page);
+  await page.locator('.closing-note').scrollIntoViewIfNeeded();
+  const state=await page.evaluate(()=>{
+    const copy=document.querySelector('.closing-note__copy');
+    const photo=document.querySelector('.closing-note__photo');
+    const media=document.querySelector('.closing-note__media');
+    const footer=document.querySelector('.footer');
+    return{
+      background:getComputedStyle(copy).backgroundColor,
+      title:getComputedStyle(document.querySelector('.closing-note__title')).color,
+      imgLoaded:photo.complete&&photo.naturalWidth>0,
+      imageBottom:media.getBoundingClientRect().bottom,
+      copyTop:copy.getBoundingClientRect().top,
+      footerGradient:getComputedStyle(footer).backgroundImage,
+      pageWidth:document.documentElement.scrollWidth,
+      viewport:document.documentElement.clientWidth
+    };
+  });
+  expect(state.background).toBe('rgb(249, 245, 240)');
+  expect(state.title).toBe('rgb(117, 74, 85)');
+  expect(state.imgLoaded).toBe(true);
+  expect(state.copyTop).toBeGreaterThanOrEqual(state.imageBottom-2);
+  expect(state.footerGradient).toContain('linear-gradient');
+  expect(state.pageWidth).toBeLessThanOrEqual(state.viewport+1);
+});
