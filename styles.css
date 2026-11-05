@@ -159,3 +159,155 @@
 @media(max-width:700px){
   .brand img{width:120px;height:auto;max-height:73px;object-fit:contain}
 }
+
+
+/* Margot V1.10 — compactação de cabeçalho e efeito vidro fosco */
+.site-header{
+  transition:background-color .26s ease,box-shadow .26s ease,border-color .26s ease;
+}
+.site-header .header-main{
+  position:relative;
+  transition:min-height .24s ease,grid-template-columns .24s ease;
+}
+.site-header .brand,
+.site-header .brand img{
+  transition:width .24s ease,max-height .24s ease;
+}
+.site-header .main-nav{
+  max-height:100px;
+  transition:max-height .2s ease,opacity .18s ease;
+}
+.site-header.is-compact{
+  background:rgba(255,250,248,.93);
+  border-bottom:1px solid rgba(185,126,137,.27);
+  box-shadow:0 8px 30px rgba(78,40,51,.11);
+}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .site-header.is-compact{
+    background:rgba(255,250,248,.70);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    backdrop-filter:blur(18px) saturate(1.2);
+  }
+}
+.site-header.is-compact .header-main{
+  min-height:68px;
+  grid-template-columns:44px minmax(85px,1fr) auto;
+  gap:12px;
+}
+.site-header.is-compact .menu-toggle,
+.site-header.is-compact .search-mobile{display:inline-grid}
+.site-header.is-compact .brand{
+  width:100px;
+  justify-self:start;
+  margin:0;
+}
+.site-header.is-compact .brand img{
+  width:100px;
+  height:auto;
+  max-height:67px;
+  object-fit:contain;
+}
+.site-header.is-compact .header-actions{
+  gap:5px;
+  justify-self:end;
+}
+.site-header.is-compact .header-actions .icon-button,
+.site-header.is-compact .header-actions .account-trigger{
+  width:36px;
+  height:36px;
+}
+.site-header.is-compact .account-trigger > #account-avatar{
+  width:30px;
+  height:30px;
+}
+.site-header.is-compact .header-main>.search{display:none}
+.site-header.is-compact.searching{padding-bottom:0}
+.site-header.is-compact.searching .header-main>.search{
+  display:flex;
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  right:0;
+  z-index:19;
+  min-height:46px;
+  border-radius:13px;
+  background:rgba(255,249,247,.97);
+  box-shadow:0 10px 25px rgba(77,44,52,.17);
+}
+.site-header.is-compact .main-nav:not(.open){
+  display:flex;
+  min-height:0;
+  max-height:0;
+  height:0;
+  margin:0;
+  padding:0;
+  opacity:0;
+  visibility:hidden;
+  overflow:hidden;
+  pointer-events:none;
+}
+.site-header.is-compact .main-nav.open{
+  display:flex;
+  position:absolute;
+  top:calc(100% + 7px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:18;
+  width:min(1180px,calc(100% - 40px));
+  min-height:0;
+  max-height:min(70dvh,530px);
+  margin:0;
+  padding:9px 14px;
+  flex-direction:column;
+  align-items:stretch;
+  gap:0;
+  overflow-y:auto;
+  opacity:1;
+  visibility:visible;
+  border:1px solid rgba(190,140,145,.35);
+  border-radius:15px;
+  background:rgba(255,250,248,.96);
+  box-shadow:0 16px 42px rgba(78,40,51,.16);
+}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .site-header.is-compact .main-nav.open{
+    background:rgba(255,250,248,.88);
+    -webkit-backdrop-filter:blur(16px);
+    backdrop-filter:blur(16px);
+  }
+}
+.site-header.is-compact .main-nav.open a{
+  padding:11px 15px;
+  border-bottom:1px solid rgba(191,140,144,.16);
+  white-space:normal;
+}
+.site-header.is-compact .main-nav.open a:last-child{border-bottom:0}
+html.has-compact-header{scroll-padding-top:88px}
+@media(max-width:700px){
+  .site-header.is-compact .header-main{
+    min-height:59px;
+    grid-template-columns:33px minmax(68px,1fr) auto;
+    gap:5px;
+  }
+  .site-header.is-compact .brand{width:82px}
+  .site-header.is-compact .brand img{width:82px;max-height:53px}
+  .site-header.is-compact .header-actions{gap:0}
+  .site-header.is-compact .header-actions .icon-button,
+  .site-header.is-compact .header-actions .account-trigger{width:29px;height:34px}
+  .site-header.is-compact .account-trigger > #account-avatar{width:26px;height:26px}
+  .site-header.is-compact .main-nav.open{
+    width:calc(100% - 20px);
+    top:calc(100% + 5px);
+    max-height:calc(100dvh - 86px);
+  }
+  .site-header.is-compact.searching .header-main>.search{
+    top:calc(100% + 5px);
+    left:0;
+    right:0;
+  }
+  html.has-compact-header{scroll-padding-top:72px}
+}
+@media(prefers-reduced-motion:reduce){
+  .site-header,.site-header .header-main,.site-header .brand,
+  .site-header .brand img,.site-header .main-nav{transition:none!important}
+}

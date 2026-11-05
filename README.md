@@ -97,3 +97,8 @@ Tecnologia: Firebase JavaScript SDK 13.2.0, carregado da origem oficial gstatic 
 ## Logo oficial — atualização
 
 A antiga imagem de logo (169 × 102 px e letras pretas) foi substituída pela versão oficial fornecida pela marca, com letras douradas, pérola e ornamentos. O arquivo assets/margot-logo.webp foi produzido por recorte e transparência da arte original (sem redesenhar símbolo ou texto). Ele aparece no cabeçalho, rodapé, assinatura e janela de login. O favicon foi recortado da arte original do emblema.
+
+
+## V1.10 — cabeçalho compacto com vidro fosco
+
+Quando a página é rolada, o cabeçalho reduz a logo e recolhe a navegação completa. O menu de categorias e a busca passam a ser abertos por ícones; conta Google, favoritos e sacola continuam acessíveis. O fundo utiliza transparência e backdrop-filter com opção opaca para navegadores incompatíveis. Em celulares a barra fica ainda menor. Sem GSAP, a lógica continua funcionando, e a preferência por movimento reduzido desativa transições.
