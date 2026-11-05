@@ -93,11 +93,11 @@
     // store.js abre o menu alterando a classe; este observer gerencia o modal.
     const observeMenu = new MutationObserver(syncMenu);
     observeMenu.observe(nav, {attributes: true, attributeFilter: ['class']});
-    menu.addEventListener('click',()=>{const opened=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(opened));syncMenu()});
+    toggle.addEventListener('click',()=>{const opened=nav.classList.toggle('open');toggle.setAttribute('aria-expanded',String(opened));syncMenu()});
     window.addEventListener('margot:menu-close',()=>closeMenu(false));
     const observeSearch = new MutationObserver(syncSearch);
     observeSearch.observe(header, {attributes: true, attributeFilter: ['class']});
-    get('search-open')?.addEventListener('click',()=>{const opened=header.classList.toggle('searching');syncSearch();if(opened&&input)input.focus({preventScroll:true})});
+    get('search-open')?.addEventListener('click',()=>{const opened=header.classList.toggle('searching');syncSearch();if(opened&&searchInput)searchInput.focus({preventScroll:true})});
     window.addEventListener('margot:search-close',()=>{header.classList.remove('searching');syncSearch()});
     backdrop.addEventListener('click', () => closeMenu(true));
     closeButton.addEventListener('click', () => closeMenu(true));
