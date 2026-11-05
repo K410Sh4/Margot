@@ -10,14 +10,14 @@
   <meta property="og:description" content="Descubra a vitrine da Margot: brincos, colares, pulseiras, anéis e presentes especiais.">
   <title>Margot Acessórios | Delicadeza em cada detalhe</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=official-2">
-  <link rel="stylesheet" href="./styles.css?v=1.21">
+  <link rel="stylesheet" href="./styles.css?v=1.22">
   <link rel="stylesheet" href="./mobile-navigation.css?v=1.20">
   <!-- GSAP carrega antes dos scripts próprios; layout continua funcional sem CDN. -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
   <script src="./store.js?v=1.19" defer></script>
   <script src="./carousel.js?v=1.17" defer></script>
-  <script src="./motion.js?v=1.17" defer></script>
+  <script src="./motion.js?v=1.22" defer></script>
   <script src="./header.js?v=1.20" defer></script>
   <script src="./mobile-nav.js?v=1.17" defer></script>
   <script src="./firebase-config.js" defer></script>
@@ -133,7 +133,24 @@
         <div class="gift-copy"><p class="eyebrow">Momentos que merecem carinho</p><h2 id="gift-title">Presenteie<br>com Elegância</h2><p>Pequenos detalhes transformam momentos em lembranças especiais.</p><a class="button primary" href="#produtos" data-category-link="Kits">Conhecer kits <span aria-hidden="true">→</span></a></div>
       </div>
     </section>
-    <section class="closing-note wrap"><img src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy"><p>Seu brilho está nos detalhes.</p></section>
+    <section class="closing-note wrap" aria-labelledby="closing-note-title">
+      <div class="closing-note__panel">
+        <span class="closing-note__halo closing-note__halo--left" aria-hidden="true"></span>
+        <span class="closing-note__halo closing-note__halo--right" aria-hidden="true"></span>
+        <span class="closing-note__sparkle closing-note__sparkle--left" aria-hidden="true">✦</span>
+        <span class="closing-note__sparkle closing-note__sparkle--right" aria-hidden="true">✦</span>
+        <div class="closing-note__ornament" aria-hidden="true">
+          <span class="closing-note__line"></span>
+          <span class="closing-note__pearl"></span>
+          <span class="closing-note__line"></span>
+        </div>
+        <p class="closing-note__eyebrow">O encanto mora nos pequenos gestos</p>
+        <img class="closing-note__logo" src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy" decoding="async">
+        <h2 class="closing-note__title" id="closing-note-title">Seu brilho está nos <em>detalhes.</em></h2>
+        <p class="closing-note__message">Um acessório pode carregar uma lembrança, marcar uma conquista ou simplesmente celebrar quem você é.</p>
+        <a class="closing-note__link" href="#produtos">Explorar acessórios <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
   </main>
   <footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="footer-brand" aria-label="Margot Acessórios, voltar ao início"><img src="./assets/margot-logo.webp?v=official-2" alt="Margot Acessórios" width="800" height="606" loading="lazy"></a><p>Delicadeza em cada detalhe.</p></div><div><h3>Explore</h3><a href="#categorias">Categorias</a><a href="#produtos">Vitrine</a><a href="#presentes">Presentes</a></div><div><h3>Atendimento</h3><p>Loja 100% online. Não possuímos estabelecimento físico para atendimento ao público.</p><p>O catálogo está em pré-lançamento; contato e confirmação de pedidos serão disponibilizados em breve.</p></div></div><div class="footer-bottom wrap"><span>© <span id="year"></span> Margot Acessórios</span><span>Vitrine demonstrativa · <a href="./privacidade.html">Privacidade</a></span></div></footer>
 

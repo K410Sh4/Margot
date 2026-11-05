@@ -198,3 +198,12 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - No desktop, fotografia à esquerda e transição suave para o fundo rosé à direita; no mobile, enquadramento 8:5 para não cortar a caixa e o laço de forma agressiva.
 - Foram adicionados dois testes Playwright que validam carregamento da imagem, dimensões, presença do texto e do botão e ausência de overflow horizontal.
 - CSS atualizado para `?v=1.21` e nova imagem com versão para contornar cache.
+
+## V1.22 — Assinatura editorial Margot (05/11/2026)
+
+- Seção final antes do rodapé aprimorada com painel delicado de fundo rosé, círculos ornamentais, pérola central, linhas finas e brilhos discretos.
+- Logo oficial preservada, porém reduzida para 136 px no desktop e 118 px no mobile, evitando excesso de repetição visual.
+- Destaque editorial para `Seu brilho está nos detalhes.`, texto complementar e link `Explorar acessórios` ao catálogo, mantendo a navegação funcional.
+- Entrada animada via GSAP/ScrollTrigger com deslocamentos mínimos; apenas ornamentos brilham suavemente em CSS, com desativação quando o usuário prefere movimento reduzido.
+- Conteúdo permanece visível mesmo sem JavaScript/CDN. Nenhum elemento animado altera largura ou altura do documento.
+- Novos testes Playwright cobrem desktop, mobile 320/390/700 px e redução de movimento; rastreador visual inclui capturas específicas da assinatura em ambos os modos.

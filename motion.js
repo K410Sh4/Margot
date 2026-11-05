@@ -1,4 +1,4 @@
-/* Margot Acessórios | V1.5
+/* Margot Acessórios | V1.22
  * Motion progressivo: GSAP 3.15 + ScrollTrigger.
  * Se o CDN falhar, toda a vitrine permanece visível e utilizável.
  */
@@ -129,7 +129,10 @@
           scrollTrigger: { trigger: '#presentes', start: 'top 89%', once: true }
         });
       }
-      // Assinatura da marca permanece visível sem depender do ScrollTrigger.
+      // Entrada da assinatura editorial: anima somente deslocamento vertical,
+      // sem esconder os textos se o CDN/ScrollTrigger falhar ou houver movimento reduzido.
+      reveal('.closing-note__ornament, .closing-note__eyebrow, .closing-note__logo, .closing-note__title, .closing-note__message, .closing-note__link',
+        '.closing-note', {y: 13, stagger: 0.07, duration: 0.62});
       // Rodapé deliberadamente estático: evita conteúdo invisível após saltos/refresh.
 
       // O menu e o drawer preservam toda sua lógica original, só animamos o conteúdo.
