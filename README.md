@@ -207,3 +207,13 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Entrada animada via GSAP/ScrollTrigger com deslocamentos mínimos; apenas ornamentos brilham suavemente em CSS, com desativação quando o usuário prefere movimento reduzido.
 - Conteúdo permanece visível mesmo sem JavaScript/CDN. Nenhum elemento animado altera largura ou altura do documento.
 - Novos testes Playwright cobrem desktop, mobile 320/390/700 px e redução de movimento; rastreador visual inclui capturas específicas da assinatura em ambos os modos.
+
+## V1.23 — Fotografia humana na assinatura editorial (05/11/2026)
+
+- Substituída a logo da seção final por fotografia aprovada: duas mulheres em um café, com atmosfera de amizade e tons verde-sálvia.
+- Imagem otimizada em JPEG de 2016×1152 (~378 KB), sem texto incorporado, preservando a qualidade e a composição originais.
+- Removidos ornamentos de pérola, círculos e brilhos que repetiam a identidade de outras seções.
+- Desktop: imagem ocupando o painel com contraste suave para posicionar o texto real do lado direito; mobile e telas médias (até 900 px): imagem em cima e texto abaixo, sem sobreposição nas pessoas.
+- Mantidos o título, a descrição e o link para #produtos, com ajuste local da paleta para verde e creme.
+- Animação GSAP discreta, sem ocultar conteúdo se CDN falhar e respeitando `prefers-reduced-motion`.
+- Testes em 320/390/700/900/1280 px, controle de overflow, carregamento da foto, ausência de logos duplicadas e navegação do CTA.
