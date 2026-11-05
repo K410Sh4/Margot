@@ -1,0 +1,31 @@
+name: Testes Mobile Margot
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'mobile-navigation.css'
+      - 'store.js'
+      - 'header.js'
+      - 'mobile-nav.js'
+      - 'motion.js'
+      - 'tests/**'
+      - 'playwright.config.cjs'
+      - 'package.json'
+      - '.github/workflows/mobile-ui.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-package-lock --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:mobile

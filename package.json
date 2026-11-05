@@ -1,0 +1,11 @@
+{
+  "name": "margot-mobile-ui-tests",
+  "private": true,
+  "version": "1.15.0",
+  "scripts": {
+    "test:mobile": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
