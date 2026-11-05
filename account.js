@@ -28,7 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
     signedIn.hidden=!isIn;
     const hasImage=isIn&&typeof user.photoURL==='string'&&user.photoURL.startsWith('https://');
     avatar.hidden=!hasImage;
-    accountIcon.hidden=hasImage;
+    // SVGElement não reflete a propriedade .hidden como um HTMLElement.
+    // Alterar o atributo explicitamente impede que o ícone e a foto apareçam juntos.
+    accountIcon.toggleAttribute('hidden',hasImage);
+    accountButton.classList.toggle('has-avatar',hasImage);
     if(!isIn){avatar.removeAttribute('src');photo.removeAttribute('src');accountButton.title='Entrar com Google';accountButton.setAttribute('aria-label','Entrar ou criar conta');return}
     get('account-name').textContent=user.displayName||'Cliente Margot';
     get('account-email').textContent=user.email||'Conta Google';
@@ -38,7 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     accountButton.setAttribute('aria-label','Abrir minha conta');
     if(hasImage){avatar.src=user.photoURL;photo.src=user.photoURL}
   }
-  avatar.addEventListener('error',()=>{avatar.hidden=true;accountIcon.hidden=false});
+  avatar.addEventListener('error',()=>{
+    avatar.hidden=true;
+    accountIcon.removeAttribute('hidden');
+    accountButton.classList.remove('has-avatar');
+  });
   photo.addEventListener('error',()=>{photo.hidden=true;photoFallback.hidden=false});
   render(null);
   if(!configured){say('Login com Google em preparação. A ativação depende da configuração oficial da loja.');return}

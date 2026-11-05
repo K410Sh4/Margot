@@ -110,3 +110,37 @@
 @media(max-width:700px){.header-main{grid-template-columns:40px minmax(100px,1fr) 136px}.header-actions .icon-button{width:33px}.header-actions{gap:0}.account-dialog{padding:21px 22px 19px}.account-dialog h2{font-size:28px}}
 @media(max-width:390px){.header-main{grid-template-columns:38px minmax(94px,1fr) 128px}.header-actions .icon-button{width:31px}.brand{max-width:110px}}
 @media(prefers-reduced-motion:reduce){.account-dialog::backdrop{backdrop-filter:none}}
+
+
+/* V1.8 — avatar Google centralizado, sem sobreposição do ícone padrão */
+.header-actions .account-trigger{
+  display:inline-grid;
+  place-items:center;
+  grid-template-columns:1fr;
+  grid-template-rows:1fr;
+  width:44px;
+  height:44px;
+  padding:0;
+  border-radius:50%;
+  overflow:hidden;
+}
+.account-trigger > #account-icon,
+.account-trigger > #account-avatar{grid-area:1 / 1;align-self:center;justify-self:center}
+.account-trigger > #account-icon{width:23px;height:23px}
+.account-trigger.has-avatar{border:1px solid #b77985;background:#fff7f5}
+.account-trigger.has-avatar > #account-icon{display:none!important}
+.account-trigger > #account-avatar{
+  display:block;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  object-fit:cover;
+  object-position:center;
+}
+.account-trigger > #account-avatar[hidden]{display:none!important}
+@media(max-width:700px){
+  .header-actions .account-trigger{width:34px;height:36px}
+  .account-trigger > #account-avatar{width:29px;height:29px}
+  .account-trigger > #account-icon{width:21px;height:21px}
+}
