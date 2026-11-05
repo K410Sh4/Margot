@@ -190,3 +190,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Mobile mantém o limiar anterior de rolagem e suas dimensões fixas de 64/68 px.
 - Dois testes regressivos verificam alternâncias sem piscar, largura da logo, altura e estabilidade ao redimensionar. Rastreio visual passou a incluir oscilação proposital de scroll desktop.
 - Recursos atualizados para `v=1.20` para invalidar cache de scripts e estilos antigos.
+
+## V1.21 — Fotografia premium na seção de presentes (05/11/2026)
+
+- Substituída a imagem `assets/presentes-margot.webp` pela nova `assets/presentes-margot-premium.jpg` (1021×724), derivada da arte de alta definição aprovada, mantendo somente a fotografia da caixa rosé e joias.
+- Título, descrição e botão `Conhecer kits` permanecem HTML acessível e clicável; não há textos ou botões duplicados dentro da imagem.
+- No desktop, fotografia à esquerda e transição suave para o fundo rosé à direita; no mobile, enquadramento 8:5 para não cortar a caixa e o laço de forma agressiva.
+- Foram adicionados dois testes Playwright que validam carregamento da imagem, dimensões, presença do texto e do botão e ausência de overflow horizontal.
+- CSS atualizado para `?v=1.21` e nova imagem com versão para contornar cache.
