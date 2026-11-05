@@ -223,3 +223,79 @@ test('desktop abre menu compacto e retorna à navegação normal',async({page})=
   const restored=await page.locator('.header-main').boundingBox();
   expect(Math.abs(restored.width-initial.width)).toBeLessThanOrEqual(1);
 });
+
+
+test('barra inferior e viewport não crescem após rolagem e retorno ao topo',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await ready(page);
+  // Regressão do diagnóstico: largura 390 → 602 → 772 px com barra fixa.
+  const assertViewport = async (targetWidth) => {
+    const metrics = await page.evaluate(() => {
+      const bar=document.querySelector('#mobile-bottom-nav').getBoundingClientRect();
+      const doc=document.documentElement;
+      return {
+        clientWidth:doc.clientWidth,innerWidth:window.innerWidth,
+        documentWidth:doc.scrollWidth,barX:bar.x,barRight:bar.right,
+        barWidth:bar.width,drawerDisplay:getComputedStyle(document.querySelector('#drawer')).display,
+        visualWidth:window.visualViewport?.width
+      };
+    });
+    expect(metrics.clientWidth).toBe(targetWidth);
+    expect(metrics.innerWidth).toBeLessThanOrEqual(targetWidth+1);
+    expect(metrics.documentWidth).toBeLessThanOrEqual(targetWidth+1);
+    expect(Math.abs(metrics.barWidth-targetWidth)).toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.barX)).toBeLessThanOrEqual(1);
+    expect(metrics.barRight).toBeLessThanOrEqual(targetWidth+1);
+    expect(metrics.drawerDisplay).toBe('none');
+  };
+  for(const y of [0,230,520,430,0,520,0]){
+    await page.evaluate(y=>window.scrollTo({top:y,behavior:'instant'}),y);
+    await page.waitForTimeout(520);
+    await assertViewport(390);
+  }
+});
+
+test('drawer só aparece aberto e não causa overflow após fechar',async({page})=>{
+  await ready(page);
+  await expect(page.locator('#drawer')).toBeHidden();
+  await expect(page.locator('#drawer')).toHaveCSS('display','none');
+  await page.locator('#mobile-nav-cart').click();
+  await expect(page.locator('#drawer')).toBeVisible();
+  const opened=await page.evaluate(()=>{
+    const r=document.getElementById('drawer').getBoundingClientRect();
+    return{x:r.x,right:r.right,width:r.width,viewport:document.documentElement.clientWidth};
+  });
+  expect(opened.right).toBeLessThanOrEqual(opened.viewport+1);
+  expect(opened.x).toBeGreaterThanOrEqual(-1);
+  await page.locator('#drawer-close').click();
+  await expect(page.locator('#drawer')).toHaveCSS('display','none');
+  await page.evaluate(()=>window.scrollTo({top:520,behavior:'instant'}));
+  await page.waitForTimeout(500);
+  const values=await page.evaluate(()=>({
+    document:document.documentElement.scrollWidth,
+    viewport:document.documentElement.clientWidth,
+    bar:document.querySelector('#mobile-bottom-nav').getBoundingClientRect().width
+  }));
+  expect(values.document).toBeLessThanOrEqual(values.viewport+1);
+  expect(values.bar).toBeLessThanOrEqual(values.viewport+1);
+});
+
+for(const width of [320,360,430,700]){
+  test('barra e documento não ultrapassam viewport depois do scroll em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:844});
+    await ready(page);
+    for(const y of [260,520,0]){
+      await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+      await page.waitForTimeout(350);
+      const v=await page.evaluate(()=>({
+        clientWidth:document.documentElement.clientWidth,
+        documentWidth:document.documentElement.scrollWidth,
+        innerWidth:innerWidth,
+        barWidth:document.querySelector('#mobile-bottom-nav').getBoundingClientRect().width
+      }));
+      expect(v.documentWidth).toBeLessThanOrEqual(v.clientWidth+1);
+      expect(v.innerWidth).toBeLessThanOrEqual(v.clientWidth+1);
+      expect(v.barWidth).toBeLessThanOrEqual(v.clientWidth+1);
+    }
+  });
+}
