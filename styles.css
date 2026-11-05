@@ -497,3 +497,49 @@ html.has-compact-header{scroll-padding-top:88px}
 @media(prefers-reduced-motion:reduce){
   .mobile-nav-action,.mobile-bottom-nav,.site-header .main-nav{transition:none!important}
 }
+
+
+/* V1.12 — correção de camadas, área segura e foco do menu mobile */
+@media(max-width:700px){
+  /* Barra inferior permanece visível no site, mas não atravessa o menu modal. */
+  body.mobile-menu-open .mobile-bottom-nav{
+    pointer-events:none;
+  }
+  body.mobile-menu-open .site-header{
+    z-index:27;
+  }
+  .mobile-menu-backdrop:not([hidden]){
+    z-index:25;
+    background:rgba(41,27,36,.44);
+    touch-action:none;
+  }
+  .site-header .main-nav.open,
+  .site-header.is-compact .main-nav.open{
+    z-index:28;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* Espaço adicional para teclado virtual e para gestos do iOS. */
+  .site-header .main-nav.open{
+    padding-bottom:max(16px,env(safe-area-inset-bottom,0px));
+  }
+  .mobile-bottom-nav{
+    padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));
+  }
+  /* Pesquisa aparece acima do conteúdo, sem alterar a altura da barra inferior. */
+  .site-header.searching .header-main>.search,
+  .site-header.is-compact.searching .header-main>.search{
+    width:100%;
+    box-sizing:border-box;
+  }
+  .mobile-nav-action:focus-visible{
+    outline:2px solid #96505f;
+    outline-offset:-3px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-menu-backdrop,
+  .mobile-bottom-nav{
+    transition:none!important;
+  }
+}

@@ -107,3 +107,13 @@ Quando a página é rolada, o cabeçalho reduz a logo e recolhe a navegação co
 ## V1.11 — Navegação mobile
 
 Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favoritos, Sacola), com indicadores de seção e contadores sincronizados com o catálogo existente. O cabeçalho mostra logo oficial, menu e conta Google, sem duplicar ícones. O menu de coleções funciona como painel acessível com fundo escurecido, fechamento por toque externo, Escape, botão fechar e gerenciamento de foco. A busca reutiliza o controle existente, e os atalhos acionam a mesma lógica dos favoritos e da sacola. Compatível com cabeçalho compacto, áreas seguras de celulares com notch e preferência por movimento reduzido. Desktop não é alterado.
+
+
+## V1.12 — Auditoria e correções mobile
+
+- O menu de categorias é um diálogo modal apenas no mobile, com semântica acessível e foco isolado. Os elementos atrás do menu ficam temporariamente inertes, e seus estados anteriores são restaurados ao fechar.
+- A barra inferior é bloqueada e coberta pelo fundo escurecido enquanto o menu estiver aberto. O cabeçalho e o painel ficam acima desse fundo.
+- O botão Buscar espelha o estado real do cabeçalho, inclusive quando outras ações fecham a pesquisa. O campo também fecha ao tocar fora.
+- Início/Coleções só são destacados no trecho correspondente da página; produtos e rodapé não deixam Coleções permanentemente ativo.
+- Adicionado viewport-fit=cover para suportar safe-area-inset em iOS. Transições continuam respeitando movimento reduzido.
+- Nenhuma mudança em Firebase, dados de pedidos ou lógica de carrinho/favoritos.
