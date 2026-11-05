@@ -59,7 +59,7 @@
     </nav>
   </header>
   <main id="conteudo">
-    <section id="inicio" class="hero hero-carousel" aria-label="Destaques Margot" aria-roledescription="carrossel">
+    <section id="inicio" class="hero hero-carousel" aria-label="Destaques Margot" aria-roledescription="carrossel" tabindex="-1">
       <div class="hero-slides">
         <article class="hero-slide is-active" aria-label="1 de 3: Novas coleções">
           <img src="./assets/hero-1.webp" alt="Modelo usando brincos de pérola e colar delicado" fetchpriority="high" width="2048" height="682">
@@ -113,18 +113,19 @@
         <p>Não temos loja física aberta ao público. Nossa vitrine e o futuro atendimento acontecem pela internet. No momento, o catálogo está em pré-lançamento e o site ainda não finaliza pedidos.</p>
       </div>
     </aside>
-    <section class="section wrap" id="categorias" aria-labelledby="categories-heading">
+    <section class="section wrap" id="categorias" aria-labelledby="categories-heading" tabindex="-1">
       <div class="section-heading center"><p class="eyebrow">Encontre seu detalhe favorito</p><h2 id="categories-heading">Nossas Categorias <span class="line-heart" aria-hidden="true">♡</span></h2></div>
       <div class="categories" id="category-grid"></div>
     </section>
-    <section class="section products-section wrap" id="produtos" aria-labelledby="products-heading">
+    <section class="section products-section wrap" id="produtos" aria-labelledby="products-heading" tabindex="-1">
       <div class="section-heading"><div><p class="eyebrow">Escolhas especiais para você</p><h2 id="products-heading">Destaques da Margot</h2></div><button class="text-link" type="button" id="show-all">Ver todos <span aria-hidden="true">→</span></button></div>
       <div class="catalog-tools"><p id="catalog-status" aria-live="polite"></p><div class="category-chips" id="category-chips" aria-label="Filtrar produtos"></div></div>
+      <div class="active-search" id="active-search" role="status" aria-live="polite" hidden><span>Pesquisa ativa: <strong data-search-term></strong></span><button id="clear-active-search" type="button">Limpar busca</button></div>
       <div id="product-grid" class="products"></div>
       <p class="empty-results" id="empty-results" hidden>Nenhuma peça encontrada. Experimente outra busca ou categoria.</p>
       <p class="catalog-disclaimer">Catálogo demonstrativo: produtos, disponibilidade e valores serão confirmados antes da abertura das vendas. Os cards sem fotografia exibem a identidade provisória da Margot; preços e disponibilidade são ilustrativos.</p>
     </section>
-    <section class="gift-feature" id="presentes" aria-labelledby="gift-title">
+    <section class="gift-feature" id="presentes" aria-labelledby="gift-title" tabindex="-1">
       <img class="gift-photo" src="./assets/presentes-margot.webp" alt="Conjunto de colar e brincos com pérolas em caixa rosé de presente" loading="lazy" decoding="async" width="1280" height="428">
       <div class="wrap gift-inner">
         <div class="gift-image-spacer" aria-hidden="true"></div>

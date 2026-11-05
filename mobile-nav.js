@@ -93,13 +93,15 @@
     // store.js abre o menu alterando a classe; este observer gerencia o modal.
     const observeMenu = new MutationObserver(syncMenu);
     observeMenu.observe(nav, {attributes: true, attributeFilter: ['class']});
+    menu.addEventListener('click',()=>{const opened=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(opened));syncMenu()});
+    window.addEventListener('margot:menu-close',()=>closeMenu(false));
     const observeSearch = new MutationObserver(syncSearch);
     observeSearch.observe(header, {attributes: true, attributeFilter: ['class']});
+    get('search-open')?.addEventListener('click',()=>{const opened=header.classList.toggle('searching');syncSearch();if(opened&&input)input.focus({preventScroll:true})});
+    window.addEventListener('margot:search-close',()=>{header.classList.remove('searching');syncSearch()});
     backdrop.addEventListener('click', () => closeMenu(true));
     closeButton.addEventListener('click', () => closeMenu(true));
-    nav.addEventListener('click', event => {
-      if (event.target.closest('a')) closeMenu();
-    });
+    nav.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link)return;const dest=link.getAttribute('href');closeMenu(false);if(!link.dataset.categoryLink&&dest?.startsWith('#'))requestAnimationFrame(()=>get(dest.slice(1))?.focus({preventScroll:true}));});
     if (account) account.addEventListener('click', () => closeMenu());
 
     // Barra inferior usa os botões existentes do catálogo e drawer.
@@ -130,13 +132,7 @@
       trigger('cart-open');
     });
 
-    for (const id of ['mobile-nav-home', 'mobile-nav-categories']) {
-      get(id).addEventListener('click', () => {
-        closeMenu();
-        header.classList.remove('searching');
-        syncSearch();
-      });
-    }
+    for(const id of ['mobile-nav-home','mobile-nav-categories']){get(id).addEventListener('click',()=>{closeMenu(false);header.classList.remove('searching');syncSearch();requestAnimationFrame(()=>get(id==='mobile-nav-home'?'inicio':'categorias')?.focus({preventScroll:true}))})}
 
     // Fechar busca ao tocar fora do campo evita que ela fique sobre as seções.
     document.addEventListener('pointerdown', event => {
@@ -207,7 +203,7 @@
       if (mobile()) {
         [
           ['mobile-nav-home', section === 'inicio'],
-          ['mobile-nav-categories', section === 'categorias']
+          ['mobile-nav-categories', section === 'categorias' || section === 'produtos']
         ].forEach(([id, active]) => {
           const link = get(id);
           link.classList.toggle('is-active', active);
@@ -229,7 +225,7 @@
       syncMenu();
       queueActive();
     }, {passive: true});
-    window.addEventListener('pageshow', queueActive);
+    window.addEventListener('pageshow',()=>{if(menuOpen)closeMenu(true);queueActive()});
     window.addEventListener('popstate', queueActive);
     window.addEventListener('hashchange', queueActive);
     window.addEventListener('margot:categorychange', queueActive);
