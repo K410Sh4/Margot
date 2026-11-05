@@ -15,8 +15,10 @@
   }
 }
 @media(min-width:701px){
-  .site-header .header-main{transition:min-height .24s ease,grid-template-columns .24s ease}
-  .site-header .brand,.site-header .brand img{transition:width .24s ease,max-height .24s ease}
+  /* Dimensões de layout não são interpoladas: evita reflow/scroll anchoring
+     em cascata e a alternância rápida entre 122 e 68 px. */
+  .site-header .header-main{transition:none}
+  .site-header .brand,.site-header .brand img{transition:none}
   .site-header.is-compact .header-main{
     min-height:68px;grid-template-columns:44px minmax(105px,1fr) auto;gap:12px;
   }

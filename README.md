@@ -180,3 +180,13 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Preservada a animação lateral original do painel da sacola — a hipótese de que ele seria a causa foi descartada pelos testes de isolamento.
 - Testes com movimento ativado verificam rolagens 0→230→520→430→0, largura do documento e da barra inferior em 320/360/390/430/700 px, acessibilidade dos cards e abertura/fechamento da sacola.
 - CSS e store.js recebem `v=1.19` para impedir mistura de arquivos antigos em cache.
+
+## V1.20 — Estabilização da compactação desktop (05/11/2026)
+
+- Cabeçalho desktop usa mudança de estado controlada: acumula 80 px reais de subida para expandir e 100 px de descida para compactar (após o limiar de 155 px).
+- Janela de estabilização de 480 ms ignora pequenas mudanças de scroll causadas pelo redimensionamento do próprio header `sticky`.
+- Redimensionamentos dentro do mesmo breakpoint não recalculam compulsoriamente o estado; mudança efetiva mobile/desktop e retorno do histórico continuam sincronizados.
+- Removidas transições de `min-height`, `grid-template-columns` e `width` do cabeçalho desktop; permanecem efeitos suaves de fundo e vidro.
+- Mobile mantém o limiar anterior de rolagem e suas dimensões fixas de 64/68 px.
+- Dois testes regressivos verificam alternâncias sem piscar, largura da logo, altura e estabilidade ao redimensionar. Rastreio visual passou a incluir oscilação proposital de scroll desktop.
+- Recursos atualizados para `v=1.20` para invalidar cache de scripts e estilos antigos.
