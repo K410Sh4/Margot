@@ -423,3 +423,52 @@ test('foto de presentes continua nítida e proporcional no mobile',async({page})
   const metrics=await page.evaluate(()=>({documentWidth:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth}));
   expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewport+1);
 });
+
+test('assinatura editorial desktop conserva texto, logo discreta e CTA',async({page})=>{
+  await page.setViewportSize({width:1280,height:800});
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await ready(page);
+  const section=page.locator('.closing-note');
+  await section.scrollIntoViewIfNeeded();
+  await expect(section.locator('.closing-note__panel')).toBeVisible();
+  await expect(section.locator('.closing-note__logo')).toHaveCount(1);
+  await expect(section.locator('.closing-note__title')).toHaveText('Seu brilho está nos detalhes.');
+  await expect(section.locator('.closing-note__link')).toHaveAttribute('href','#produtos');
+  const box=await section.locator('.closing-note__logo').boundingBox();
+  expect(box.width).toBeLessThanOrEqual(140);
+  const sizes=await page.evaluate(()=>({
+    page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth,
+    panel:document.querySelector('.closing-note__panel').getBoundingClientRect().width
+  }));
+  expect(sizes.page).toBeLessThanOrEqual(sizes.viewport+1);
+  expect(sizes.panel).toBeLessThanOrEqual(sizes.viewport);
+});
+
+for(const width of [320,390,700]){
+  test('assinatura editorial mantém geometria estável em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:780});
+    await ready(page);
+    await page.locator('.closing-note').scrollIntoViewIfNeeded();
+    await expect(page.locator('.closing-note__title')).toBeVisible();
+    await expect(page.locator('.closing-note__link')).toBeVisible();
+    const dimensions=await page.evaluate(()=>{
+      const el=document.querySelector('.closing-note__panel').getBoundingClientRect();
+      const logo=document.querySelector('.closing-note__logo').getBoundingClientRect();
+      return{page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth,
+        left:el.left,right:el.right,logoWidth:logo.width};
+    });
+    expect(dimensions.page).toBeLessThanOrEqual(dimensions.viewport+1);
+    expect(dimensions.left).toBeGreaterThanOrEqual(0);
+    expect(dimensions.right).toBeLessThanOrEqual(dimensions.viewport+1);
+    expect(dimensions.logoWidth).toBeLessThanOrEqual(120);
+  });
+}
+
+test('assinatura respeita redução de movimento e mantém informação visível',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await ready(page);
+  await page.locator('.closing-note').scrollIntoViewIfNeeded();
+  await expect(page.locator('.closing-note__sparkle').first()).toHaveCSS('animation-name','none');
+  await expect(page.locator('.closing-note__link')).toBeVisible();
+  await expect(page.locator('.closing-note__title')).toBeVisible();
+});

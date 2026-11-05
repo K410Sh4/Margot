@@ -218,7 +218,9 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
    await action('Desktop abrir menu',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
    await action('Desktop restaurar',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
+   await action('Assinatura editorial desktop',()=>page.locator('.closing-note').scrollIntoViewIfNeeded(),{transition:true});
    await action('Voltar mobile 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
+   await action('Assinatura editorial mobile',()=>page.locator('.closing-note').scrollIntoViewIfNeeded(),{transition:true});
    await action('Landscape 844',()=>page.setViewportSize({width:844,height:390}),{transition:true});
    await action('Portrait 390',()=>page.setViewportSize({width:390,height:844}),{transition:true});
    await action('Proximo banner',()=>clickForTrace(page.locator('.hero-next'),'próximo banner'),{transition:true});
