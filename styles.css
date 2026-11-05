@@ -55,7 +55,8 @@
 
 /* Margot V1.4: categorias fotográficas */
 .categories {align-items:start}
-.category-card-photo {padding:0;border:0;background:transparent;min-width:0;gap:0;border-radius:22px;scroll-snap-align:start}
+/* Positioned card contains any future screen-reader text or badges. */
+.category-card-photo {position:relative;padding:0;border:0;background:transparent;min-width:0;gap:0;border-radius:22px;scroll-snap-align:start}
 .category-card-photo .category-photo {
   display:block;width:100%;height:auto;aspect-ratio:300 / 404;object-fit:cover;
   border:1px solid #f1d6d0;border-radius:22px;

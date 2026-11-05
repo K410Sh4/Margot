@@ -80,9 +80,10 @@ const ornaments={
 };
 function jewelrySvg(art){return `<svg viewBox="0 0 240 230" role="img" aria-label="Ilustração vetorial provisória" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="metal" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#946539"/><stop offset=".27" stop-color="#f4da91"/><stop offset=".52" stop-color="#b98549"/><stop offset=".75" stop-color="#f4d58d"/><stop offset="1" stop-color="#9f6637"/></linearGradient><radialGradient id="pearl" cx="32%" cy="22%" r="74%"><stop stop-color="#fff"/><stop offset=".44" stop-color="#fff8f0"/><stop offset=".82" stop-color="#e8d1cd"/><stop offset="1" stop-color="#b48b84"/></radialGradient></defs><g stroke="url(#metal)" fill="url(#metal)" stroke-linejoin="round" stroke-linecap="round">${ornaments[art]||ornaments.gift}</g></svg>`}
 function populateIcons(root=document){root.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=icon(el.dataset.icon)})}
+// Botões de categoria já têm aria-label; evitar filhos posicionados absolutamente que escapem do scroll horizontal.
 function renderCategories(){
   const images={Brincos:'brincos',Colares:'colares',Pulseiras:'pulseiras','Anéis':'aneis',Kits:'kits'};
-  $('category-grid').innerHTML=categories.map(c=>`<button class="category-card category-card-photo" type="button" data-cat="${c}" aria-label="Ver ${c}"><img class="category-photo" src="./assets/categories/${images[c]}.webp" alt="" width="300" height="404" loading="lazy" decoding="async"><span class="visually-hidden">${c}</span></button>`).join('');
+  $('category-grid').innerHTML=categories.map(c=>`<button class="category-card category-card-photo" type="button" data-cat="${c}" aria-label="Ver ${c}"><img class="category-photo" src="./assets/categories/${images[c]}.webp" alt="" width="300" height="404" loading="lazy" decoding="async"></button>`).join('');
   $('category-grid').querySelectorAll('[data-cat]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.cat)))
 }
 function renderFilters(){ $('category-chips').innerHTML=['Todos',...categories].map(c=>`<button type="button" class="chip" data-filter="${c}" aria-pressed="${category===c}">${c}</button>`).join('');$('category-chips').querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.filter,false)))}

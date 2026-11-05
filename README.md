@@ -171,3 +171,12 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - **Manual:** `npm install`; `npx playwright install chromium`; `npm run test:trace`.
 - **Privacidade:** não monitora visitantes nem registra dados pessoais. É uma simulação em navegador de teste, não uma captura silenciosa de celulares reais.
 - **Limites:** efeitos de zoom por pinça em aparelhos físicos exigem validação complementar.
+
+## V1.19 — Correção do overflow horizontal e barra inferior (05/11/2026)
+
+- Os cards do carrossel de categorias já possuíam `aria-label`, mas incluíam também um `span.visually-hidden` com `position:absolute`, sem um ancestral posicionado.
+- Durante as animações de entrada do GSAP, esses spans podiam escapar do carrossel horizontal e ampliar o scrollWidth do documento; no rastreamento, suas coordenadas chegaram a aproximadamente 770 px em uma tela de 390 px.
+- Removidos os spans redundantes, sem perda dos nomes acessíveis, e aplicado `position:relative` nos cards como proteção adicional para futuros badges.
+- Preservada a animação lateral original do painel da sacola — a hipótese de que ele seria a causa foi descartada pelos testes de isolamento.
+- Testes com movimento ativado verificam rolagens 0→230→520→430→0, largura do documento e da barra inferior em 320/360/390/430/700 px, acessibilidade dos cards e abertura/fechamento da sacola.
+- CSS e store.js recebem `v=1.19` para impedir mistura de arquivos antigos em cache.
