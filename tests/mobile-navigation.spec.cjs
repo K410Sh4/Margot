@@ -354,7 +354,9 @@ test('desktop não pisca durante pequenas oscilações de rolagem',async({page})
   await jump(410);
   await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
   await page.waitForTimeout(550);
-  await jump(525);
+  // A expansão acrescenta altura ao sticky: a descida precisa ser efetiva,
+  // independentemente do ajuste automático de scroll anchoring.
+  await jump(760);
   await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
   const history=await page.evaluate(()=>window.__headerStateChanges);
   expect(history.map(e=>e.compact)).toEqual([true,false,true]);
