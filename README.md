@@ -135,3 +135,8 @@ Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favor
 - Rodapé e assinatura da marca não dependem mais do ScrollTrigger para se tornarem visíveis após atualização da página, salto por âncora ou rolagem rápida.
 - CSS e scripts locais recebem um identificador de versão para evitar misturas de arquivos antigos em cache no navegador.
 - Zoom do usuário continua habilitado; não são impostas restrições de escala ou viewport.
+
+
+## V1.15 — CSS responsivo isolado
+
+O menu e a barra mobile foram consolidados no arquivo mobile-navigation.css. O novo componente preserva o cabeçalho estável, os atalhos, a área segura do aparelho, a pesquisa em fonte 16px e a acessibilidade por toque. O arquivo styles.css mantém o tema geral sem os blocos mobile duplicados das versões 1.11–1.14.

@@ -1,0 +1,155 @@
+/* V1.15 — Margot: navigation-specific CSS, isolated from global theme. */
+.active-search{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:9px;padding:11px 13px;margin:0 0 16px;border:1px solid #edcfcc;border-radius:13px;background:#fff1ed;color:#754957;font-size:13px}
+.active-search[hidden]{display:none!important}
+.active-search strong{overflow-wrap:anywhere}
+.active-search button{border:1px solid #ba818b;border-radius:99px;background:#fffaf8;padding:8px 12px;color:#804b58;font-weight:700;font-size:12px}
+.mobile-bottom-nav,.mobile-menu-backdrop,.mobile-menu-title{display:none}
+@media(max-width:700px){
+  html{scroll-padding-top:84px}
+  html,body{max-width:100%;overflow-x:clip}
+  body.mobile-menu-open{overflow:hidden}
+  html.mobile-nav-ready body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .wrap{width:calc(100% - 30px);max-width:1180px}
+  .site-header,.topnote,main,.footer{width:100%;min-width:0}
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    position:relative;display:grid;min-height:68px;
+    grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px
+  }
+  html.mobile-nav-ready .site-header .brand,
+  html.mobile-nav-ready .site-header.is-compact .brand{width:112px;max-width:100%;justify-self:center;margin:auto}
+  html.mobile-nav-ready .site-header .brand img,
+  html.mobile-nav-ready .site-header.is-compact .brand img{
+    display:block;width:112px;max-width:100%;height:auto;max-height:65px;object-fit:contain
+  }
+  html.mobile-nav-ready .site-header .menu-toggle,
+  html.mobile-nav-ready .site-header.is-compact .menu-toggle{
+    display:inline-grid;width:44px;height:44px;justify-self:start
+  }
+  html.mobile-nav-ready .site-header .header-actions,
+  html.mobile-nav-ready .site-header.is-compact .header-actions{
+    justify-self:end;min-width:0;gap:0
+  }
+  html.mobile-nav-ready .site-header .header-actions .account-trigger,
+  html.mobile-nav-ready .site-header.is-compact .header-actions .account-trigger{
+    width:42px;height:42px
+  }
+  html.mobile-nav-ready .site-header .account-trigger > #account-avatar,
+  html.mobile-nav-ready .site-header.is-compact .account-trigger > #account-avatar{width:32px;height:32px}
+  html.mobile-nav-ready .site-header .header-actions #search-open,
+  html.mobile-nav-ready .site-header .header-actions #favorites-open,
+  html.mobile-nav-ready .site-header .header-actions #cart-open{display:none!important}
+  html.mobile-nav-ready .site-header.searching,
+  html.mobile-nav-ready .site-header.is-compact.searching{padding-bottom:0}
+  html.mobile-nav-ready .site-header .header-main>.search{display:none}
+  html.mobile-nav-ready .site-header.searching .header-main>.search,
+  html.mobile-nav-ready .site-header.is-compact.searching .header-main>.search{
+    display:flex;position:absolute;top:calc(100% + 5px);left:0;right:0;
+    z-index:20;min-height:48px;padding:0 13px;border-radius:13px;
+    background:#fffaf8;box-shadow:0 11px 30px rgba(75,42,53,.22)
+  }
+  .site-header .search input{font-size:16px}
+  html.mobile-nav-ready .mobile-bottom-nav{
+    position:fixed;inset:auto 0 0;z-index:22;
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;
+    width:100%;max-width:100%;height:calc(70px + env(safe-area-inset-bottom,0px));
+    padding:4px max(5px,env(safe-area-inset-left,0px))
+      calc(6px + env(safe-area-inset-bottom,0px))
+      max(5px,env(safe-area-inset-right,0px));
+    gap:2px;box-sizing:border-box;border-top:1px solid rgba(187,120,130,.22);
+    border-radius:16px 16px 0 0;background:rgba(255,250,248,.97);
+    box-shadow:0 -6px 24px rgba(83,47,58,.1)
+  }
+  @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+    html.mobile-nav-ready .mobile-bottom-nav{
+      background:rgba(255,250,248,.84);
+      -webkit-backdrop-filter:blur(18px) saturate(1.18);
+      backdrop-filter:blur(18px) saturate(1.18)
+    }
+  }
+  html.mobile-nav-ready .mobile-nav-action{
+    display:flex;position:relative;min-width:0;max-width:100%;min-height:46px;
+    flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:3px 1px;border:0;border-radius:11px;background:transparent;
+    color:#795d66;font:600 11px/1.2 Arial,Helvetica,sans-serif;text-decoration:none
+  }
+  .mobile-nav-action svg{width:22px;height:22px;flex:none}
+  .mobile-nav-action > span:not(.mobile-nav-count){
+    display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  }
+  .mobile-nav-action.is-active,.mobile-nav-action[aria-pressed=true]{
+    color:#90515e;background:rgba(201,129,141,.13)
+  }
+  .mobile-nav-action:active{background:rgba(201,129,141,.23)}
+  .mobile-nav-action:focus-visible{outline:2px solid #96505f;outline-offset:-2px}
+  .mobile-nav-count{
+    position:absolute;top:1px;left:calc(50% + 8px);
+    min-width:18px;height:18px;padding:0 3px;display:grid;place-items:center;
+    border:2px solid #fffaf8;border-radius:99px;background:#b45466;
+    color:#fff;font:700 10px/1 Arial,sans-serif
+  }
+  .mobile-nav-count[hidden]{display:none!important}
+  body.mobile-menu-open .mobile-bottom-nav{pointer-events:none}
+  .mobile-menu-backdrop:not([hidden]){
+    display:block;position:fixed;inset:0;z-index:25;
+    width:100%;height:100dvh;border:0;padding:0;
+    background:rgba(41,27,36,.44);touch-action:none
+  }
+  body.mobile-menu-open .site-header{z-index:27}
+  html.mobile-nav-ready .site-header .main-nav:not(.open),
+  html.mobile-nav-ready .site-header.is-compact .main-nav:not(.open){
+    display:none;visibility:hidden;pointer-events:none
+  }
+  html.mobile-nav-ready .site-header .main-nav.open,
+  html.mobile-nav-ready .site-header.is-compact .main-nav.open{
+    display:flex;position:absolute;top:calc(100% + 5px);left:50%;right:auto;
+    transform:translateX(-50%);z-index:28;width:calc(100vw - 24px);
+    max-width:calc(100% + 6px);min-height:0;max-height:min(72dvh,560px);
+    flex-direction:column;align-items:stretch;gap:0;margin:0;
+    padding:10px 12px max(16px,env(safe-area-inset-bottom,0px));
+    overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+    border:1px solid rgba(188,125,136,.28);border-radius:18px;
+    background:#fffaf8;box-shadow:0 16px 46px rgba(56,30,40,.22);
+    opacity:1;visibility:visible
+  }
+  .mobile-menu-title{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 10px 12px;margin:0 0 4px;
+    border-bottom:1px solid #f1deda;color:#6e4651
+  }
+  .mobile-menu-title strong{display:block;font:normal 23px/1.2 Georgia,serif}
+  .mobile-menu-title small{display:block;margin-top:5px;font-size:11px;color:#916f77}
+  .mobile-menu-close{
+    flex:none;width:44px;height:44px;border:0;border-radius:50%;
+    background:#f8e9e5;color:#804b58;font-size:28px
+  }
+  html.mobile-nav-ready .site-header .main-nav.open a,
+  html.mobile-nav-ready .site-header.is-compact .main-nav.open a{
+    display:flex;align-items:center;min-height:46px;padding:11px 15px;
+    margin:1px 0;border:0;border-radius:9px;white-space:normal;
+    color:#554048;font-size:14px;font-weight:600
+  }
+  html.mobile-nav-ready .site-header .main-nav.open a:hover,
+  html.mobile-nav-ready .site-header .main-nav.open a:focus-visible,
+  html.mobile-nav-ready .site-header .main-nav.open a.active{
+    background:#f9e9e5;color:#8c5260
+  }
+  .toast{bottom:calc(89px + env(safe-area-inset-bottom,0px))}
+  .footer-inner{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 15px}
+  .footer-inner>div{min-width:0;overflow-wrap:anywhere}
+  .footer-inner>div:first-child{grid-column:1/-1}
+}
+@media(max-width:360px){
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    grid-template-columns:40px minmax(0,1fr) 40px;gap:3px;min-height:64px
+  }
+  html.mobile-nav-ready .site-header .brand,
+  html.mobile-nav-ready .site-header.is-compact .brand,
+  html.mobile-nav-ready .site-header .brand img,
+  html.mobile-nav-ready .site-header.is-compact .brand img{width:105px}
+  html.mobile-nav-ready .mobile-nav-action{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobile-nav-action,.mobile-bottom-nav,.mobile-menu-backdrop{transition:none!important}
+}
