@@ -88,8 +88,9 @@ function renderCategories(){
 function renderFilters(){ $('category-chips').innerHTML=['Todos',...categories].map(c=>`<button type="button" class="chip" data-filter="${c}" aria-pressed="${category===c}">${c}</button>`).join('');$('category-chips').querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.filter,false)))}
 function filteredProducts(){return STORE.products.filter(p=>(category==='Todos'||p.category===category)&&`${p.name} ${p.category}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR')))}
 const PRODUCT_PLACEHOLDER = './assets/foto-em-breve.webp';
+const hasProductPhoto = p => typeof p.image === 'string' && p.image.trim().length > 0;
 function productImage(p){
-  const hasPhoto = typeof p.image === 'string' && p.image.trim().length > 0;
+  const hasPhoto = hasProductPhoto(p);
   return `<img class="product-photo" src="${hasPhoto ? p.image : PRODUCT_PLACEHOLDER}" alt="${hasPhoto ? `Foto de ${p.name}` : `Foto de ${p.name} em breve`}" loading="lazy" decoding="async">`;
 }
 function applyProductPhotoFallback(root){
@@ -99,10 +100,12 @@ function applyProductPhotoFallback(root){
     if (img.getAttribute('src') === PRODUCT_PLACEHOLDER) return;
     img.src = PRODUCT_PLACEHOLDER;
     img.alt = 'Foto em breve';
+    const tag = img.closest('.product-visual')?.querySelector('.demo-tag');
+    if (tag) tag.hidden = false;
   }, true);
 }
 function syncSearchBadge(){const el=$('active-search');if(el){el.hidden=!query;el.querySelector('[data-search-term]').textContent=query}}
-function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag">Foto em breve</span>${productImage(p)}<button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3>${p.name}</h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;syncSearchBadge();document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
+function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag"${hasProductPhoto(p)?' hidden':''}>Foto em breve</span>${productImage(p)}<button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3>${p.name}</h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;syncSearchBadge();document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
 function chooseCategory(c,scroll=true){
   if(c!=='Todos'&&!categories.includes(c))return;
   query='';$('search-input').value='';$('clear-search').hidden=true;
@@ -116,7 +119,7 @@ function chooseCategory(c,scroll=true){
   if(scroll){$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 }
 function updateCounts(){const num=Object.values(cart).reduce((a,n)=>a+n,0);$('cart-count').textContent=num;$('cart-count').hidden=!num;$('favorite-count').textContent=favorites.size;$('favorite-count').hidden=!favorites.size}
-function addToCart(id){cart[id]=(cart[id]||0)+1;saveStorage('cart',cart);updateCounts();notify('Peça adicionada à sacola');if($('drawer').classList.contains('open'))renderDrawer()}
+function addToCart(id){if(!getItem(id))return;if((cart[id]||0)>=99){notify('Limite de 99 unidades por peça.');return}cart[id]=(cart[id]||0)+1;saveStorage('cart',cart);updateCounts();notify('Peça adicionada à sacola');if($('drawer').classList.contains('open'))renderDrawer()}
 function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
 function changeQuantity(id,delta){const next=(cart[id]||0)+delta;if(next<=0)delete cart[id];else cart[id]=Math.min(99,next);saveStorage('cart',cart);updateCounts();renderDrawer()}
 function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}">+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}

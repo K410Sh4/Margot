@@ -30,11 +30,11 @@
         if (!elements.length) return;
         return gsap.from(elements, {
           y: opts.y ?? 20,
-          autoAlpha: 0,
+          // Sem ocultar o conteúdo durante rolagens rápidas e recarregamentos.
           duration: opts.duration ?? 0.65,
           stagger: opts.stagger ?? 0,
           ease: 'power2.out',
-          clearProps: 'transform,opacity,visibility',
+          clearProps: 'transform',
           scrollTrigger: { trigger, start: 'top 88%', once: true }
         });
       };
@@ -78,27 +78,19 @@
       reveal('.category-card-photo', '#category-grid', { y: 25, stagger: 0.075, duration: 0.63 });
       reveal('#produtos .section-heading', '#produtos', { y: 16 });
 
-      // O catálogo é recriado por filtros e pesquisa: anima cada nova lista sem acumular triggers.
+      // Renderização imediata: sem autoAlpha e sem reiniciar a entrada por filtro/favorito.
       const grid = document.getElementById('product-grid');
       let productTween = null;
-      const animateProducts = () => {
-        if (productTween) {
-          if (productTween.scrollTrigger) productTween.scrollTrigger.kill();
-          productTween.kill();
-        }
-        if (!grid) return;
-        const cards = Array.from(grid.querySelectorAll('.product-card'));
-        if (!cards.length) return;
-        productTween = gsap.from(cards, {
-          y: 21, autoAlpha: 0, duration: 0.48,
-          stagger: Math.min(0.065, 0.4 / cards.length), ease: 'power2.out',
-          clearProps: 'transform,opacity,visibility',
-          scrollTrigger: { trigger: grid, start: 'top 93%', once: true }
-        });
-      };
       if (grid) {
-        animateProducts();
-        watched(grid, animateProducts, { childList: true });
+        const cards = Array.from(grid.querySelectorAll('.product-card'));
+        if (cards.length) {
+          productTween = gsap.from(cards, {
+            y: 12, duration: 0.36,
+            stagger: Math.min(0.035, 0.22 / cards.length),
+            ease: 'power2.out', clearProps: 'transform',
+            scrollTrigger: { trigger: grid, start: 'top 93%', once: true }
+          });
+        }
       }
 
       // Feedback sutil para mouse e teclado; não depende de hover em telas sensíveis ao toque.
