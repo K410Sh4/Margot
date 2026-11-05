@@ -1,4 +1,4 @@
-/* Margot Acessórios | V1.22
+/* Margot Acessórios | V1.23
  * Motion progressivo: GSAP 3.15 + ScrollTrigger.
  * Se o CDN falhar, toda a vitrine permanece visível e utilizável.
  */
@@ -129,10 +129,16 @@
           scrollTrigger: { trigger: '#presentes', start: 'top 89%', once: true }
         });
       }
-      // Entrada da assinatura editorial: anima somente deslocamento vertical,
-      // sem esconder os textos se o CDN/ScrollTrigger falhar ou houver movimento reduzido.
-      reveal('.closing-note__ornament, .closing-note__eyebrow, .closing-note__logo, .closing-note__title, .closing-note__message, .closing-note__link',
-        '.closing-note', {y: 13, stagger: 0.07, duration: 0.62});
+      // Cena humana de encerramento, preservada quando GSAP estiver indisponível.
+      reveal('.closing-note__eyebrow, .closing-note__title, .closing-note__message, .closing-note__link',
+        '.closing-note', {y: 12, stagger: 0.07, duration: 0.62});
+      const closingPhoto = document.querySelector('.closing-note__photo');
+      if (closingPhoto) {
+        gsap.from(closingPhoto, {
+          scale: 1.03, duration: 1, ease: 'power1.out', clearProps: 'transform',
+          scrollTrigger: {trigger: '.closing-note', start: 'top 89%', once: true}
+        });
+      }
       // Rodapé deliberadamente estático: evita conteúdo invisível após saltos/refresh.
 
       // O menu e o drawer preservam toda sua lógica original, só animamos o conteúdo.

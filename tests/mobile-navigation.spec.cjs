@@ -424,51 +424,69 @@ test('foto de presentes continua nítida e proporcional no mobile',async({page})
   expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewport+1);
 });
 
-test('assinatura editorial desktop conserva texto, logo discreta e CTA',async({page})=>{
+
+test('fotografia da conexão carrega e substitui a logo da assinatura no desktop',async({page})=>{
   await page.setViewportSize({width:1280,height:800});
-  await page.emulateMedia({reducedMotion:'no-preference'});
   await ready(page);
+  await page.locator('.closing-note').scrollIntoViewIfNeeded();
   const section=page.locator('.closing-note');
-  await section.scrollIntoViewIfNeeded();
-  await expect(section.locator('.closing-note__panel')).toBeVisible();
-  await expect(section.locator('.closing-note__logo')).toHaveCount(1);
-  await expect(section.locator('.closing-note__title')).toHaveText('Seu brilho está nos detalhes.');
-  await expect(section.locator('.closing-note__link')).toHaveAttribute('href','#produtos');
-  const box=await section.locator('.closing-note__logo').boundingBox();
-  expect(box.width).toBeLessThanOrEqual(140);
-  const sizes=await page.evaluate(()=>({
-    page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth,
-    panel:document.querySelector('.closing-note__panel').getBoundingClientRect().width
-  }));
-  expect(sizes.page).toBeLessThanOrEqual(sizes.viewport+1);
-  expect(sizes.panel).toBeLessThanOrEqual(sizes.viewport);
+  const photo=section.locator('.closing-note__photo');
+  await expect(photo).toHaveAttribute('src',/margot-conexao-feminina\.jpg\?v=1\.23$/);
+  await expect.poll(()=>photo.evaluate(el=>el.complete&&el.naturalWidth)).toBe(2016);
+  await expect(section.locator('.closing-note__logo')).toHaveCount(0);
+  await expect(section.locator('.closing-note__pearl')).toHaveCount(0);
+  await expect(section.locator('.closing-note__sparkle')).toHaveCount(0);
+  await expect(section.locator('h2')).toHaveText('Seu brilho está nos detalhes.');
+  await expect(section.locator('.closing-note__link')).toBeVisible();
+  const layout=await page.evaluate(()=>{
+    const panel=document.querySelector('.closing-note__panel').getBoundingClientRect();
+    const copy=document.querySelector('.closing-note__copy').getBoundingClientRect();
+    const photo=document.querySelector('.closing-note__photo').getBoundingClientRect();
+    return {panelX:panel.x,panelWidth:panel.width,copyX:copy.x,
+      photoWidth:photo.width,doc:document.documentElement.scrollWidth,
+      viewport:document.documentElement.clientWidth};
+  });
+  expect(layout.copyX).toBeGreaterThan(layout.panelX+layout.panelWidth*.45);
+  expect(Math.abs(layout.photoWidth-layout.panelWidth)).toBeLessThanOrEqual(2);
+  expect(layout.doc).toBeLessThanOrEqual(layout.viewport+1);
 });
 
-for(const width of [320,390,700]){
-  test('assinatura editorial mantém geometria estável em '+width+'px',async({page})=>{
-    await page.setViewportSize({width,height:780});
+for(const width of [320,390,700,900,1280]){
+  test('cena de encerramento responsiva sem overflow em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:800});
     await ready(page);
     await page.locator('.closing-note').scrollIntoViewIfNeeded();
+    await expect(page.locator('.closing-note__photo')).toBeVisible();
     await expect(page.locator('.closing-note__title')).toBeVisible();
     await expect(page.locator('.closing-note__link')).toBeVisible();
-    const dimensions=await page.evaluate(()=>{
-      const el=document.querySelector('.closing-note__panel').getBoundingClientRect();
-      const logo=document.querySelector('.closing-note__logo').getBoundingClientRect();
-      return{page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth,
-        left:el.left,right:el.right,logoWidth:logo.width};
+    const geometry=await page.evaluate(()=>{
+      const panel=document.querySelector('.closing-note__panel').getBoundingClientRect();
+      const media=document.querySelector('.closing-note__media').getBoundingClientRect();
+      const copy=document.querySelector('.closing-note__copy').getBoundingClientRect();
+      return{viewport:document.documentElement.clientWidth,
+        doc:document.documentElement.scrollWidth, panelLeft:panel.left,panelRight:panel.right,
+        mediaBottom:media.bottom,copyTop:copy.top,photoWidth:media.width};
     });
-    expect(dimensions.page).toBeLessThanOrEqual(dimensions.viewport+1);
-    expect(dimensions.left).toBeGreaterThanOrEqual(0);
-    expect(dimensions.right).toBeLessThanOrEqual(dimensions.viewport+1);
-    expect(dimensions.logoWidth).toBeLessThanOrEqual(120);
+    expect(geometry.doc).toBeLessThanOrEqual(geometry.viewport+1);
+    expect(geometry.panelLeft).toBeGreaterThanOrEqual(0);
+    expect(geometry.panelRight).toBeLessThanOrEqual(geometry.viewport+1);
+    if(width<=900)expect(geometry.copyTop).toBeGreaterThanOrEqual(geometry.mediaBottom-2);
   });
 }
 
-test('assinatura respeita redução de movimento e mantém informação visível',async({page})=>{
+test('cena sem movimento conserva imagem, título e link',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   await ready(page);
   await page.locator('.closing-note').scrollIntoViewIfNeeded();
-  await expect(page.locator('.closing-note__sparkle').first()).toHaveCSS('animation-name','none');
-  await expect(page.locator('.closing-note__link')).toBeVisible();
+  await expect(page.locator('.closing-note__photo')).toHaveCSS('transform','none');
   await expect(page.locator('.closing-note__title')).toBeVisible();
+  await expect(page.locator('.closing-note__link')).toBeVisible();
+});
+
+test('link do encerramento retorna para produtos',async({page})=>{
+  await ready(page);
+  const link=page.locator('.closing-note__link');
+  await link.scrollIntoViewIfNeeded();
+  await link.click();
+  await expect(page).toHaveURL(/#produtos$/);
 });
