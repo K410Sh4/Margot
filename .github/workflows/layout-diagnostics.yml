@@ -1,0 +1,55 @@
+name: Margot — Rastreio de layout por ação
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'mobile-navigation.css'
+      - 'store.js'
+      - 'header.js'
+      - 'mobile-nav.js'
+      - 'carousel.js'
+      - 'motion.js'
+      - 'tests/layout-trace.spec.cjs'
+      - 'playwright.config.cjs'
+      - 'package.json'
+      - '.github/workflows/layout-diagnostics.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'mobile-navigation.css'
+      - 'store.js'
+      - 'header.js'
+      - 'mobile-nav.js'
+      - 'carousel.js'
+      - 'motion.js'
+      - 'tests/layout-trace.spec.cjs'
+      - 'playwright.config.cjs'
+      - 'package.json'
+      - '.github/workflows/layout-diagnostics.yml'
+permissions:
+  contents: read
+jobs:
+  visual-trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-package-lock --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Executar ações e registrar screenshots e medidas
+        run: npm run test:trace
+      - name: Salvar prints, CSV, JSON, relatório HTML e trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: margot-rastreio-layout-${{ github.run_number }}
+          path: test-results/layout-trace/
+          if-no-files-found: warn
+          retention-days: 14

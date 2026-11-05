@@ -1,9 +1,10 @@
 {
   "name": "margot-mobile-ui-tests",
   "private": true,
-  "version": "1.15.0",
+  "version": "1.18.0",
   "scripts": {
-    "test:mobile": "playwright test"
+    "test:mobile": "playwright test --grep-invert @visual-trace",
+    "test:trace": "playwright test tests/layout-trace.spec.cjs --workers=1"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"

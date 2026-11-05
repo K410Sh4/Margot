@@ -160,3 +160,14 @@ O menu e a barra mobile foram consolidados no arquivo mobile-navigation.css. O n
 - Busca, menu, fundo modal, foco e inert são restaurados ao cruzar o breakpoint 700/701 px.
 - Versão 1.17 nos recursos CSS e JS para invalidar caches anteriores.
 - Testes de ida e volta, de geometria e de alternância de breakpoint.
+
+## Diagnóstico visual automatizado — prints e coordenadas por ação
+
+O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chromium em ambiente de teste. Para cada ação simulada, salva um PNG e as medidas X/Y, largura e altura de logo, cabeçalho, menu, banner, categorias, produtos e sacola. Em transições importantes, salva dois prints: durante o movimento e após estabilizar.
+
+- **Ações cobertas:** rolagem para baixo e para cima, menu, filtros, busca, favorito, sacola, carrosséis horizontais, larguras 320/360/390/430/700/701/1024, rotação simulada, banner e recarregamento.
+- **Arquivos:** `relatorio.html`, `medicoes.csv`, `medicoes.json`, `playwright-trace.zip`, PNGs da tela e capturas completas nos pontos principais.
+- **Download:** GitHub → Actions → Margot — Rastreio de layout por ação → execução → Artifacts → `margot-rastreio-layout-*`. Extraia o ZIP e abra `relatorio.html`.
+- **Manual:** `npm install`; `npx playwright install chromium`; `npm run test:trace`.
+- **Privacidade:** não monitora visitantes nem registra dados pessoais. É uma simulação em navegador de teste, não uma captura silenciosa de celulares reais.
+- **Limites:** efeitos de zoom por pinça em aparelhos físicos exigem validação complementar.
