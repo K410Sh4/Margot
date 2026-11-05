@@ -138,3 +138,88 @@ test('imagem real esconde etiqueta provisória',async({page})=>{
   await expect(first.locator('.demo-tag')).toBeHidden();
   await expect(first.locator('img.product-photo')).toHaveAttribute('src','./assets/hero-1.webp');
 });
+
+test('mobile restaura geometria e classes após compactar e descompactar',async({page})=>{
+  await ready(page);
+  const measure=()=>page.evaluate(()=>{
+    const selectors=['.header-main','.brand','#menu-open','#account-open','#mobile-bottom-nav'];
+    return Object.fromEntries(selectors.map(selector=>{
+      const rect=document.querySelector(selector).getBoundingClientRect();
+      return[selector,{x:rect.x,width:rect.width,height:rect.height}];
+    }));
+  });
+  const initial=await measure();
+  await page.evaluate(()=>window.scrollTo({top:520,behavior:'instant'}));
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await expect(page.locator('html')).toHaveClass(/has-compact-header/);
+  await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await expect(page.locator('html')).not.toHaveClass(/has-compact-header/);
+  const restored=await measure();
+  for(const selector of Object.keys(initial)){
+    for(const key of ['x','width','height']){
+      expect(Math.abs(restored[selector][key]-initial[selector][key])).toBeLessThanOrEqual(1);
+    }
+  }
+});
+
+test('rolagem para cima restaura o cabeçalho mesmo longe do topo',async({page})=>{
+  await ready(page);
+  await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await page.evaluate(()=>window.scrollTo({top:430,behavior:'instant'}));
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+});
+
+test('mobile e desktop restauram menu, busca, foco e inert ao alternar',async({page})=>{
+  await ready(page);
+  await page.locator('#menu-open').click();
+  await expect(page.locator('#main-nav')).toHaveClass(/open/);
+  await expect(page.locator('main')).toHaveAttribute('inert','');
+  await page.setViewportSize({width:1024,height:800});
+  await expect(page.locator('#main-nav')).not.toHaveClass(/open/);
+  await expect(page.locator('main')).not.toHaveAttribute('inert','');
+  await expect(page.locator('#mobile-menu-backdrop')).toBeHidden();
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator('#mobile-bottom-nav')).toBeVisible();
+  await page.locator('#mobile-nav-search').click();
+  await expect(page.locator('.site-header')).toHaveClass(/searching/);
+  await page.setViewportSize({width:1024,height:800});
+  await expect(page.locator('.site-header')).not.toHaveClass(/searching/);
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator('.site-header')).not.toHaveClass(/searching/);
+  await expect(page.locator('#mobile-nav-search')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#main-nav')).not.toHaveClass(/open/);
+  await expect(page.locator('body')).not.toHaveClass(/mobile-menu-open/);
+  const layout=await page.evaluate(()=>({
+    viewport:document.documentElement.clientWidth,
+    scroll:document.documentElement.scrollWidth,
+    x:window.scrollX
+  }));
+  expect(layout.scroll).toBeLessThanOrEqual(layout.viewport+1);
+  expect(layout.x).toBe(0);
+});
+
+test('desktop abre menu compacto e retorna à navegação normal',async({page})=>{
+  await page.setViewportSize({width:1100,height:800});
+  await ready(page);
+  const initial=await page.locator('.header-main').boundingBox();
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
+  await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
+  await page.locator('#menu-open').click();
+  await expect(page.locator('#main-nav')).toHaveClass(/open/);
+  await expect(page.locator('#menu-open')).toHaveAttribute('aria-expanded','true');
+  await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await expect(page.locator('#main-nav')).not.toHaveClass(/open/);
+  await expect(page.locator('#main-nav')).toBeVisible();
+  await expect.poll(async()=>{
+    const rect=await page.locator('.header-main').boundingBox();
+    return Math.abs(rect.height-initial.height);
+  }).toBeLessThanOrEqual(1);
+  const restored=await page.locator('.header-main').boundingBox();
+  expect(Math.abs(restored.width-initial.width)).toBeLessThanOrEqual(1);
+});

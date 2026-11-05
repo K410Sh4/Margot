@@ -50,14 +50,15 @@
     }
 
     function syncMenu() {
-      const opened = mobile() && nav.classList.contains('open');
+      const opened = nav.classList.contains('open');
+      const mobileDialog = mobile() && opened;
 
-      backdrop.hidden = !opened;
-      document.body.classList.toggle('mobile-menu-open', opened);
+      backdrop.hidden = !mobileDialog;
+      document.body.classList.toggle('mobile-menu-open', mobileDialog);
       toggle.setAttribute('aria-expanded', String(opened));
       toggle.setAttribute('aria-label', opened ? 'Menu de categorias aberto' : 'Abrir menu');
 
-      if (opened) {
+      if (mobileDialog) {
         nav.setAttribute('role', 'dialog');
         nav.setAttribute('aria-modal', 'true');
         nav.setAttribute('aria-labelledby', 'mobile-menu-heading');
@@ -220,12 +221,23 @@
       requestAnimationFrame(updateActive);
     }
     window.addEventListener('scroll', queueActive, {passive: true});
-    window.addEventListener('resize', () => {
-      if (!mobile()) closeMenu();
+    // Limpar estados temporários ao cruzar o breakpoint em qualquer direção.
+    let lastMobile = mobile();
+    function syncViewport() {
+      const nowMobile = mobile();
+      if (nowMobile !== lastMobile) {
+        closeMenu(false);
+        header.classList.remove('searching');
+        if (document.activeElement === searchInput) searchInput.blur();
+        lastMobile = nowMobile;
+      }
+      if (!nowMobile && menuOpen) closeMenu(false);
       syncMenu();
       queueActive();
-    }, {passive: true});
-    window.addEventListener('pageshow',()=>{if(menuOpen)closeMenu(true);queueActive()});
+    }
+    window.addEventListener('resize', syncViewport, {passive: true});
+    matchMobile.addEventListener('change', syncViewport);
+    window.addEventListener('pageshow',()=>{closeMenu(false);header.classList.remove('searching');syncViewport()});
     window.addEventListener('load',queueActive);
     window.addEventListener('popstate', queueActive);
     window.addEventListener('hashchange', queueActive);
