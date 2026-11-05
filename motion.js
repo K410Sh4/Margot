@@ -137,8 +137,8 @@
           scrollTrigger: { trigger: '#presentes', start: 'top 89%', once: true }
         });
       }
-      reveal('.closing-note > *', '.closing-note', { y: 15, stagger: 0.07 });
-      reveal('.footer-inner > div', '.footer', { y: 14, stagger: 0.09, duration: 0.58 });
+      // Assinatura da marca permanece visível sem depender do ScrollTrigger.
+      // Rodapé deliberadamente estático: evita conteúdo invisível após saltos/refresh.
 
       // O menu e o drawer preservam toda sua lógica original, só animamos o conteúdo.
       const navigation = document.getElementById('main-nav');

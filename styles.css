@@ -543,3 +543,102 @@ html.has-compact-header{scroll-padding-top:88px}
     transition:none!important;
   }
 }
+
+
+/* V1.14 — estabilidade de renderização no celular.
+ * A compactação altera apenas o vidro fosco, não desloca a marca nem os atalhos.
+ */
+@media(max-width:700px){
+  html,body{
+    max-width:100%;
+    overflow-x:clip;
+  }
+  .site-header, main, .footer, .topnote{
+    width:100%;
+    min-width:0;
+  }
+  .wrap{
+    width:calc(100% - 30px);
+    max-width:1180px;
+  }
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    min-height:68px;
+    grid-template-columns:44px minmax(0,1fr) 44px;
+    gap:6px;
+    align-items:center;
+  }
+  html.mobile-nav-ready .site-header .brand,
+  html.mobile-nav-ready .site-header.is-compact .brand{
+    width:112px;
+    max-width:100%;
+    justify-self:center;
+    margin-inline:auto;
+  }
+  html.mobile-nav-ready .site-header .brand img,
+  html.mobile-nav-ready .site-header.is-compact .brand img{
+    display:block;
+    width:112px;
+    max-width:100%;
+    height:auto;
+    max-height:65px;
+    object-fit:contain;
+  }
+  html.mobile-nav-ready .site-header .menu-toggle,
+  html.mobile-nav-ready .site-header.is-compact .menu-toggle{
+    width:44px;height:44px;
+    justify-self:start;
+  }
+  html.mobile-nav-ready .site-header .header-actions,
+  html.mobile-nav-ready .site-header.is-compact .header-actions{
+    justify-self:end;
+    min-width:0;
+  }
+  html.mobile-nav-ready .site-header .header-actions .account-trigger,
+  html.mobile-nav-ready .site-header.is-compact .header-actions .account-trigger{
+    width:40px;height:40px;
+  }
+  html.mobile-nav-ready .site-header .account-trigger > #account-avatar,
+  html.mobile-nav-ready .site-header.is-compact .account-trigger > #account-avatar{
+    width:32px;height:32px;
+  }
+  html.mobile-nav-ready .mobile-bottom-nav{
+    left:0;right:0;bottom:0;
+    width:100%;max-width:100%;min-width:0;
+    box-sizing:border-box;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    overflow:visible;
+  }
+  html.mobile-nav-ready .mobile-nav-action{
+    max-width:100%;
+    min-width:0;
+  }
+  html.mobile-nav-ready .mobile-nav-action > span:not(.mobile-nav-count){
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .footer-inner{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px 15px;
+  }
+  .footer-inner > div{min-width:0;overflow-wrap:anywhere}
+  .footer-inner > div:first-child{grid-column:1/-1}
+}
+@media(max-width:360px){
+  html.mobile-nav-ready .site-header .header-main,
+  html.mobile-nav-ready .site-header.is-compact .header-main{
+    min-height:64px;
+    grid-template-columns:40px minmax(0,1fr) 40px;
+    gap:3px;
+  }
+  html.mobile-nav-ready .site-header .brand,
+  html.mobile-nav-ready .site-header.is-compact .brand,
+  html.mobile-nav-ready .site-header .brand img,
+  html.mobile-nav-ready .site-header.is-compact .brand img{width:105px}
+  html.mobile-nav-ready .site-header .menu-toggle,
+  html.mobile-nav-ready .site-header.is-compact .menu-toggle{
+    width:40px;height:40px;
+  }
+}

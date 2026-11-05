@@ -126,3 +126,12 @@ Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favor
 - Início, Coleções, Kits e Destaques recebem destaque dinâmico no menu superior conforme a seção visível. No catálogo, a categoria filtrada é destacada; "Destaques" redefine para Todos.
 - A barra inferior acompanha a mesma navegação. Pesquisa de texto não altera a URL nem cria entradas desnecessárias no histórico.
 - A correção não modifica os dados, o checkout ou a autenticação Google.
+
+
+## V1.14 — estabilidade visual mobile
+
+- Cabeçalho mobile mantém largura, altura e posição de logo, menu e perfil durante toda a rolagem. Somente o fundo translúcido do estado compacto muda.
+- Barra inferior e conteúdo limitados à largura disponível, com colunas que podem encolher sem recortar os atalhos.
+- Rodapé e assinatura da marca não dependem mais do ScrollTrigger para se tornarem visíveis após atualização da página, salto por âncora ou rolagem rápida.
+- CSS e scripts locais recebem um identificador de versão para evitar misturas de arquivos antigos em cache no navegador.
+- Zoom do usuário continua habilitado; não são impostas restrições de escala ou viewport.
