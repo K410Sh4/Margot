@@ -94,3 +94,47 @@ for(const width of [320,360,390,430,700]){
     expect(bounds.right).toBeLessThanOrEqual(width+1);
   });
 }
+
+test('catálogo continua visível em filtros, favoritos e rolagem rápida',async({page})=>{
+  // Exerce os efeitos GSAP; configuração padrão da suite usa movimento reduzido.
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await ready(page);
+  const check=async()=>{
+    const values=await page.locator('#product-grid .product-card').evaluateAll(cards=>cards.map(card=>({opacity:getComputedStyle(card).opacity,visibility:getComputedStyle(card).visibility})));
+    expect(values.length).toBeGreaterThan(0);
+    for(const value of values){expect(Number(value.opacity)).toBeGreaterThan(0.9);expect(value.visibility).toBe('visible')}
+  };
+  await check();
+  await page.locator('#product-grid [data-favorite]').first().click();
+  await check();
+  await page.locator('#mobile-nav-search').click();
+  await page.locator('#search-input').fill('colar');
+  await check();
+  await page.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
+  await check();
+});
+
+test('texto do slide anterior fica oculto imediatamente ao avançar',async({page})=>{
+  await ready(page);
+  await page.locator('.hero-next').click();
+  await expect(page.locator('.hero-slide:not(.is-active) .hero-copy').first()).toHaveCSS('visibility','hidden');
+  await expect(page.locator('.hero-slide.is-active .hero-copy')).toBeVisible();
+});
+
+test('sacola limita a 99 unidades e mantém quantidade após atualizar',async({page})=>{
+  await ready(page);
+  await page.evaluate(()=>{for(let i=0;i<105;i++) document.querySelector('[data-add="brinco-coracao"]').click()});
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('margot-cart'))['brinco-coracao'])).toBe(99);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await expect(page.locator('#mobile-cart-count')).toHaveText('99');
+  await page.locator('#mobile-nav-cart').click();
+  await expect(page.locator('.quantity span')).toHaveText('99');
+});
+
+test('imagem real esconde etiqueta provisória',async({page})=>{
+  await ready(page);
+  await page.evaluate(()=>{STORE.products[0].image='./assets/hero-1.webp';renderProducts()});
+  const first=page.locator('#product-grid .product-card').first();
+  await expect(first.locator('.demo-tag')).toBeHidden();
+  await expect(first.locator('img.product-photo')).toHaveAttribute('src','./assets/hero-1.webp');
+});

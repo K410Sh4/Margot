@@ -78,7 +78,7 @@ As cinco categorias agora usam imagens próprias em `assets/categories/` (brinco
 
 A navegação e sacola continuam acessíveis sem cadastro. Há um botão de conta no cabeçalho, janela de entrada/cadastro Google, visualização do perfil e logout. O primeiro acesso via Google cria a conta no Firebase; os demais restauram a sessão.
 
-IMPORTANTE: autenticação ainda não está ativa até configurar um projeto Firebase Web. Atualmente firebase-config.js contém null e a interface informa que o login está em preparação.
+IMPORTANTE: firebase-config.js contém configuração pública de um projeto Firebase Web. Para o login funcionar, o provedor Google e o domínio precisam estar autorizados no Firebase Console; valide a autenticação no navegador.
 
 ### Ativação pelo responsável da loja
 
@@ -140,3 +140,13 @@ Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favor
 ## V1.15 — CSS responsivo isolado
 
 O menu e a barra mobile foram consolidados no arquivo mobile-navigation.css. O novo componente preserva o cabeçalho estável, os atalhos, a área segura do aparelho, a pesquisa em fonte 16px e a acessibilidade por toque. O arquivo styles.css mantém o tema geral sem os blocos mobile duplicados das versões 1.11–1.14.
+
+## V1.16 — Estabilidade visual e catálogo (05/11/2026)
+
+- Conteúdo da página e cards sempre visíveis durante rolagem, recarregamento e trocas de filtro.
+- Títulos de banners anteriores ocultados imediatamente, evitando sobreposição no crossfade.
+- Sacola limitada a 99 unidades por item, coerente com a persistência local.
+- Etiquetas de fotografia provisória aparecem apenas sem imagem real ou em caso de erro de carregamento.
+- Contraste de textos e botões reforçado; setas do carrossel maiores no mobile.
+- Novos testes de regressão Playwright para os cenários anteriores.
+- Zoom e gesto de pinça permanecem acessíveis, sem bloqueio de escala.
