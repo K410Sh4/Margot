@@ -238,7 +238,7 @@ test('barra inferior e viewport não crescem após rolagem e retorno ao topo',as
       return {
         clientWidth:doc.clientWidth,innerWidth:window.innerWidth,
         documentWidth:doc.scrollWidth,barX:bar.x,barRight:bar.right,
-        barWidth:bar.width,drawerDisplay:getComputedStyle(document.querySelector('#drawer')).display,
+        barWidth:bar.width,drawerHidden:document.querySelector('#drawer').getAttribute('aria-hidden')==='true',
         visualWidth:window.visualViewport?.width
       };
     });
@@ -248,7 +248,7 @@ test('barra inferior e viewport não crescem após rolagem e retorno ao topo',as
     expect(Math.abs(metrics.barWidth-targetWidth)).toBeLessThanOrEqual(1);
     expect(Math.abs(metrics.barX)).toBeLessThanOrEqual(1);
     expect(metrics.barRight).toBeLessThanOrEqual(targetWidth+1);
-    expect(metrics.drawerDisplay).toBe('none');
+    expect(metrics.drawerHidden).toBe(true);
   };
   for(const y of [0,230,520,430,0,520,0]){
     await page.evaluate(y=>window.scrollTo({top:y,behavior:'instant'}),y);
@@ -257,7 +257,7 @@ test('barra inferior e viewport não crescem após rolagem e retorno ao topo',as
   }
 });
 
-test('drawer só aparece aberto e não causa overflow após fechar',async({page})=>{
+test('drawer abre e fecha sem causar overflow após fechar',async({page})=>{
   await ready(page);
   await expect(page.locator('#drawer')).toHaveAttribute('aria-hidden','true');
   await page.locator('#mobile-nav-cart').click();
