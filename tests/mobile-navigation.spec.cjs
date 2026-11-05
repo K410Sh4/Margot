@@ -299,3 +299,52 @@ for(const width of [320,360,430,700]){
     }
   });
 }
+
+
+test('ISOLAMENTO TEMPORÁRIO: identificar causa da expansão do layout viewport',async({page})=>{
+  test.setTimeout(120000);
+  const cases=[
+    ['baseline',''],
+    ['ocultar-barra','.mobile-bottom-nav{display:none!important}'],
+    ['barra-absoluta','.mobile-bottom-nav{position:absolute!important}'],
+    ['ocultar-categorias','#category-grid{display:none!important}'],
+    ['ocultar-filtros','#category-chips{display:none!important}'],
+    ['ocultar-categorias-filtros','#category-grid,#category-chips{display:none!important}'],
+    ['conter-categorias','#category-grid{contain:layout paint!important}'],
+    ['categorias-overflow-clip','#category-grid{overflow-x:clip!important}'],
+    ['ocultar-todos-fixed','.mobile-bottom-nav,.toast,.overlay,.drawer,.account-dialog,.mobile-menu-backdrop{display:none!important}'],
+    ['overflow-hidden','html,body{overflow-x:hidden!important}'],
+    ['overflow-visible','html,body{overflow-x:visible!important}'],
+    ['overflow-root-hidden','html{overflow-x:hidden!important}body{overflow-x:clip!important}'],
+    ['sem-gsap-transform','*{transform:none!important}'],
+    ['ocultar-presentes','#presentes{display:none!important}'],
+    ['ocultar-produtos','#produtos{display:none!important}'],
+    ['ocultar-main','main{display:none!important}'],
+    ['remover-sticky','.site-header{position:relative!important}'],
+    ['barra-width-vw','.mobile-bottom-nav{width:100vw!important;max-width:100vw!important;right:auto!important;left:0!important}']
+  ];
+  const observations=[];
+  for(let i=0;i<cases.length;i++){
+    const [name,css]=cases[i];
+    await page.goto('/?viewport-isolation='+i,{waitUntil:'domcontentloaded'});
+    await expect(page.locator('html')).toHaveClass(/mobile-nav-ready/);
+    if(css)await page.addStyleTag({content:css});
+    await page.evaluate(()=>window.scrollTo({top:520,behavior:'instant'}));
+    await page.waitForTimeout(440);
+    const dimensions=await page.evaluate(()=>{
+      const root=document.documentElement;
+      const bar=document.getElementById('mobile-bottom-nav').getBoundingClientRect();
+      const category=document.getElementById('category-grid');
+      return{
+        css:root.clientWidth,inner:innerWidth,height:innerHeight,document:root.scrollWidth,
+        body:document.body.scrollWidth,bar:bar.width,barY:bar.y,
+        vv:visualViewport?.width,scrollY:scrollY,
+        categoryScrollWidth:category?.scrollWidth,categoryClientWidth:category?.clientWidth
+      };
+    });
+    observations.push({case:name,...dimensions});
+  }
+  console.log('VIEWPORT_ISOLATION_JSON_START');
+  console.log(JSON.stringify(observations));
+  console.log('VIEWPORT_ISOLATION_JSON_END');
+});
