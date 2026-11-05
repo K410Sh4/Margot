@@ -390,3 +390,36 @@ test('desktop mantém tamanho estável após compactar e restaurar',async({page}
   expect(Math.abs(restored.header-original.header)).toBeLessThanOrEqual(1);
   expect(Math.abs(restored.logo-original.logo)).toBeLessThanOrEqual(1);
 });
+
+test('foto premium de presentes carrega no desktop sem duplicar o texto HTML',async({page})=>{
+  await page.setViewportSize({width:1280,height:800});
+  await ready(page);
+  await page.locator('#presentes').scrollIntoViewIfNeeded();
+  const photo=page.locator('#presentes .gift-photo');
+  await expect(photo).toHaveAttribute('src',/presentes-margot-premium\.jpg\?v=1\.21$/);
+  await expect.poll(()=>photo.evaluate(el=>el.complete&&el.naturalWidth)).toBe(1021);
+  await expect(page.locator('#gift-title')).toHaveCount(1);
+  await expect(page.locator('#presentes .gift-copy .button')).toBeVisible();
+  await expect(page.locator('#presentes .gift-photo')).toHaveCSS('object-fit','contain');
+  const dimension=await page.evaluate(()=>{
+    const photo=document.querySelector('#presentes .gift-photo').getBoundingClientRect();
+    const section=document.querySelector('#presentes').getBoundingClientRect();
+    return{imageWidth:photo.width,sectionWidth:section.width,documentWidth:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth};
+  });
+  expect(dimension.imageWidth).toBeLessThan(dimension.sectionWidth);
+  expect(dimension.documentWidth).toBeLessThanOrEqual(dimension.viewport+1);
+});
+
+test('foto de presentes continua nítida e proporcional no mobile',async({page})=>{
+  await ready(page);
+  await page.locator('#presentes').scrollIntoViewIfNeeded();
+  const photo=page.locator('#presentes .gift-photo');
+  await expect.poll(()=>photo.evaluate(el=>el.complete&&el.naturalWidth)).toBe(1021);
+  await expect(photo).toHaveCSS('object-fit','cover');
+  const dimensions=await photo.boundingBox();
+  expect(dimensions.width).toBeGreaterThan(300);
+  expect(dimensions.height).toBeGreaterThan(200);
+  await expect(page.locator('#presentes .gift-copy .button')).toBeVisible();
+  const metrics=await page.evaluate(()=>({documentWidth:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth}));
+  expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewport+1);
+});
