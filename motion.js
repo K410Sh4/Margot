@@ -1,6 +1,6 @@
 /* Margot Acessórios | V1.5
  * Motion progressivo: GSAP 3.15 + ScrollTrigger.
- * Se o CDN falhar, toda a vitrine permanece visível e utilizável.
+ * Se a biblioteca falhar, toda a vitrine permanece visível e utilizável.
  */
 (() => {
   'use strict';
@@ -154,7 +154,7 @@
       const drawer = document.getElementById('drawer');
       watched(drawer, () => {
         if (drawer?.classList.contains('open')) {
-          gsap.fromTo(drawer.querySelectorAll('.drawer-header > *'),
+          gsap.fromTo(drawer.querySelectorAll('.drawer-header > div'),
             { y: 9, autoAlpha: 0 },
             { y: 0, autoAlpha: 1, stagger: 0.04, duration: 0.3,
               ease: 'power2.out', clearProps: 'transform,opacity,visibility' }

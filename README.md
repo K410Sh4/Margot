@@ -1,24 +1,24 @@
-# Margot Acessórios — Vitrine V1
+# Margot Acessórios — Vitrine V1.16
 
-Template responsivo inspirado no layout delicado escolhido para a Margot: tons rosados, dourado e pérola. Publicação estática pelo **GitHub Pages**; sem servidor, API paga, biblioteca ou build obrigatório.
+Template responsivo inspirado no layout delicado escolhido para a Margot: tons rosados, dourado e pérola. Publicação estática pelo **GitHub Pages**; sem backend próprio ou checkout. GSAP 3.15.0 é servido localmente para animações; Google/Firebase é usado no login. Um empacotamento simples copia apenas os arquivos públicos para `dist/`.
 
 ## Abrir e publicar
 
 - Abra `index.html` no navegador para conferir o layout.
-- GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions** (configuração única). O workflow `.github/workflows/pages.yml` publica a branch `main` quando atualizado.
+- GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions** (configuração única). O workflow `.github/workflows/pages.yml` testa a branch `main` nos três motores de navegador antes de publicar. Uma falha impede o deploy.
 - Endereço previsto depois do deploy: `https://k410sh4.github.io/Margot/`.
 
 ## Como trocar os produtos
 
-Em `store.js`, edite a lista `STORE.products`. Cada item possui `id` (único e estável), `name`, `category`, `price` e `art`. Os artigos são **fictícios, com preços ilustrativos**; confirme todos antes de permitir pedidos comerciais.
+Em `store.js`, edite a lista `STORE.products`. Cada item possui `id` (único e estável), `name`, `category`, `price` e, opcionalmente, `image`. Os artigos são **fictícios, com preços ilustrativos**; confirme todos antes de permitir pedidos comerciais.
 
-Para adicionar fotos reais numa próxima versão, acrescente `image: './assets/products/arquivo.webp'` aos produtos e adapte `renderProducts()` e a miniatura da sacola para usar `<img>` com `alt` apropriado e fallback para `jewelrySvg(...)`. Guarde arquivos dentro de `assets/products/`, preferindo WebP/AVIF, proporção quadrada, boa resolução e tamanho otimizado.
+Para adicionar fotos reais, acrescente `image: './assets/products/arquivo.webp'` aos produtos; o catálogo e os painéis já usam essa imagem com fallback para `assets/foto-em-breve.webp`. Guarde arquivos dentro de `assets/products/`, preferindo WebP/AVIF, proporção quadrada, boa resolução e tamanho otimizado.
 
 ## Comportamento atual
 
 - Busca, filtros, favoritos e sacola funcionam em navegador; favoritos e sacola usam `localStorage`.
 - Botão **Copiar lista de interesse** prepara uma mensagem, mas **não envia WhatsApp, confirma pedido, cobra pagamento nem sincroniza estoque**. Esses recursos serão conectados somente com dados reais de atendimento.
-- Ilustrações vetoriais são provisórias; o banner é uma composição CSS, não uma foto real.
+- Banners e categorias utilizam imagens WebP; produtos sem foto usam a identidade provisória “foto em breve”.
 - Sem promessas de frete grátis, parcelamento ou políticas que ainda não foram definidas.
 
 ## Próximos passos antes de abrir as vendas
@@ -30,6 +30,10 @@ Para adicionar fotos reais numa próxima versão, acrescente `image: './assets/p
 
 A página é um **template em pré-lançamento**, não uma loja operacional. Não armazena dados de pagamento.
 
+
+## Histórico de versões
+
+As seções abaixo registram o comportamento de cada versão; o estado atual é o descrito acima e na V1.16.
 
 ## Atualização V1.1 — imagens de produtos e presentes
 
@@ -78,14 +82,14 @@ As cinco categorias agora usam imagens próprias em `assets/categories/` (brinco
 
 A navegação e sacola continuam acessíveis sem cadastro. Há um botão de conta no cabeçalho, janela de entrada/cadastro Google, visualização do perfil e logout. O primeiro acesso via Google cria a conta no Firebase; os demais restauram a sessão.
 
-IMPORTANTE: autenticação ainda não está ativa até configurar um projeto Firebase Web. Atualmente firebase-config.js contém null e a interface informa que o login está em preparação.
+Estado atual: `firebase-config.js` contém a configuração pública do projeto Firebase Web. O funcionamento real depende dos domínios autorizados e do provedor Google no console. A auditoria do repositório não certifica essas configurações remotas.
 
 ### Ativação pelo responsável da loja
 
 1. Acesse https://console.firebase.google.com e crie um projeto para a Margot. Adicione um aplicativo Web e copie a configuração Web pública.
 2. No Firebase Console, em Authentication > Sign-in method, habilite Google, escolha o e-mail de suporte solicitado e salve.
 3. Em Authentication > Settings > Authorized domains, adicione k410sh4.github.io (sem https:// e sem o caminho /Margot). Adicione também qualquer domínio próprio, caso mude futuramente.
-4. Em firebase-config.js, substitua null pelo objeto firebaseConfig do projeto, com apiKey, authDomain, projectId, appId e demais campos opcionais fornecidos pelo console.
+4. Para trocar de projeto, atualize firebase-config.js com o objeto firebaseConfig correspondente, com apiKey, authDomain, projectId, appId e demais campos opcionais fornecidos pelo console.
 5. Antes de ativar para clientes, finalize privacidade.html com contato oficial para solicitações sobre dados, e revise as informações de privacidade e consentimento.
 6. Publique na branch main. Teste criação de conta, login, persistência de sessão e logout em computador e celular.
 
@@ -140,3 +144,25 @@ Até 700 px: barra inferior de cinco atalhos (Início, Coleções, Buscar, Favor
 ## V1.15 — CSS responsivo isolado
 
 O menu e a barra mobile foram consolidados no arquivo mobile-navigation.css. O novo componente preserva o cabeçalho estável, os atalhos, a área segura do aparelho, a pesquisa em fonte 16px e a acessibilidade por toque. O arquivo styles.css mantém o tema geral sem os blocos mobile duplicados das versões 1.11–1.14.
+
+
+## V1.16 — auditoria e correções
+
+- Sacola limitada a 99 unidades por peça; recuperação de valores antigos maiores, sem descartar o produto.
+- Cópia com tratamento de erro nos dois caminhos, remoção garantida do campo temporário e preservação do foco.
+- Foco mantido em favoritos, filtros e quantidades; fundo inerte com o painel aberto e retorno ao botão correto no mobile.
+- Busca fecha com Escape; controle de pausa persistente do carrossel; clique no espaço interno da conta não a fecha.
+- GSAP local, lockfile, publicação somente de `dist/` e testes obrigatórios antes do deploy.
+- Testes em Chromium, WebKit e Firefox, cada um com movimento normal e reduzido. O WebKit automatizado não substitui um iPhone físico.
+
+### Verificar localmente
+
+```sh
+npm ci
+npm run check
+npm run build
+npx playwright install --with-deps chromium webkit firefox
+npm test
+```
+
+`npm run check` confere sintaxe, IDs, âncoras e recursos. Os testes servem e exercitam o conteúdo de `dist/`, o mesmo conjunto destinado à publicação. Firebase externo é bloqueado nos testes de interface: sucesso de login real e regras do projeto exigem verificação separada. Em falhas, o Actions guarda relatório HTML, screenshots e traces por sete dias.

@@ -123,13 +123,13 @@
       closeMenu();
       header.classList.remove('searching');
       syncSearch();
-      trigger('favorites-open');
+      window.dispatchEvent(new CustomEvent('margot:drawer-open', {detail: {mode: 'favorites', opener: get('mobile-nav-favorites')}}));
     });
     get('mobile-nav-cart').addEventListener('click', () => {
       closeMenu();
       header.classList.remove('searching');
       syncSearch();
-      trigger('cart-open');
+      window.dispatchEvent(new CustomEvent('margot:drawer-open', {detail: {mode: 'cart', opener: get('mobile-nav-cart')}}));
     });
 
     for(const id of ['mobile-nav-home','mobile-nav-categories']){get(id).addEventListener('click',()=>{closeMenu(false);header.classList.remove('searching');syncSearch();requestAnimationFrame(()=>get(id==='mobile-nav-home'?'inicio':'categorias')?.focus({preventScroll:true}))})}
@@ -240,7 +240,14 @@
       }
     });
     document.addEventListener('keydown', event => {
-      if (!menuOpen) return;
+      if (!menuOpen) {
+        if (event.key === 'Escape' && header.classList.contains('searching')) {
+          header.classList.remove('searching');
+          syncSearch();
+          (mobile() ? searchAction : get('search-open')).focus({preventScroll: true});
+        }
+        return;
+      }
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();

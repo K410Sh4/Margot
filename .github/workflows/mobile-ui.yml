@@ -1,31 +1,35 @@
-name: Testes Mobile Margot
+name: Testes Margot
 on:
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - 'index.html'
-      - 'styles.css'
-      - 'mobile-navigation.css'
-      - 'store.js'
-      - 'header.js'
-      - 'mobile-nav.js'
-      - 'motion.js'
-      - 'tests/**'
-      - 'playwright.config.cjs'
-      - 'package.json'
-      - '.github/workflows/mobile-ui.yml'
+  workflow_call:
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  chromium-mobile:
+  browsers:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit, firefox]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-package-lock --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:mobile
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npm run build
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm test -- --project=${{ matrix.browser }}-reduce --project=${{ matrix.browser }}-no-preference
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: falhas-${{ matrix.browser }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

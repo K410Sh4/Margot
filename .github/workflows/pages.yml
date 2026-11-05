@@ -5,25 +5,34 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: github-pages
   cancel-in-progress: true
 jobs:
+  test:
+    uses: ./.github/workflows/mobile-ui.yml
   deploy:
+    needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run build
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Enviar arquivos estáticos
+      - name: Enviar somente arquivos do site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
-      - name: Publicar site
+          path: dist
+      - name: Publicar site aprovado
         id: deployment
         uses: actions/deploy-pages@v4

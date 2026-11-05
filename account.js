@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const say=s=>{status.textContent=s};
   accountButton.addEventListener('click',()=>{if(!dialog.open)dialog.showModal()});
   get('account-close').addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right ||
+        event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  });
   dialog.addEventListener('close',()=>accountButton.focus({preventScroll:true}));
   function render(user){
     const isIn=Boolean(user);
