@@ -53,6 +53,20 @@ for(const [id,name,price] of items){
   });
 }
 
+test('detalhes oferecem WhatsApp com contexto da peça selecionada',async({page})=>{
+  await openProduct(page,'colar-perola');
+  const contact=page.locator('#pd-contact-whatsapp');
+  await expect(contact).toBeVisible();
+  await expect(contact).toHaveAttribute('target','_blank');
+  const href=await contact.getAttribute('href');
+  const url=new URL(href);
+  expect(url.origin).toBe('https://wa.me');
+  expect(url.pathname).toBe('/5535997450100');
+  expect(url.searchParams.get('text')).toContain('Colar Pérola Delicada');
+  expect(url.searchParams.get('text')).toContain('disponibilidade');
+  await expect(page.locator('.pd-help')).toContainText('Fale com a Margot pelo WhatsApp');
+});
+
 test('link inválido mostra estado vazio sem falha de JavaScript',async({page})=>{
   await page.goto('/produto.html?id=desconhecido',{waitUntil:'domcontentloaded'});
   await expect(page.locator('#pd-not-found')).toBeVisible();
