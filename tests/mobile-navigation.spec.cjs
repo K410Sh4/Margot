@@ -123,8 +123,17 @@ test('texto do slide anterior fica oculto imediatamente ao avançar',async({page
 
 test('sacola limita a 99 unidades e mantém quantidade após atualizar',async({page})=>{
   await ready(page);
-  await page.evaluate(()=>{for(let i=0;i<105;i++) document.querySelector('[data-add="brinco-coracao"]').click()});
+  await page.locator('#product-grid [data-add="brinco-coracao"]').click();
+  await page.locator('#mobile-nav-cart').click();
+  await page.evaluate(()=>{
+    for(let i=0;i<105;i++){
+      const plus=document.querySelector('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]');
+      if(!plus||plus.disabled)break;
+      plus.click();
+    }
+  });
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('margot-cart'))['brinco-coracao'])).toBe(99);
+  await expect(page.locator('#drawer-items [data-delta="1"]')).toBeDisabled();
   await page.reload({waitUntil:'domcontentloaded'});
   await expect(page.locator('#mobile-cart-count')).toHaveText('99');
   await page.locator('#mobile-nav-cart').click();
