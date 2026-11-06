@@ -152,11 +152,13 @@ for(const width of [320,390,640,768,1024,1280]){
         buttonText:button.querySelector('.product-cart-label').getBoundingClientRect().width,
         width:root.width};
     });
-    expect(dims.columns).toBe(width<=640?1:width<=1120?2:3);
-    expect(dims.cardWidth).toBeGreaterThan(200);
+    expect(dims.columns).toBe(width<=359?1:width<=800?2:width<=1120?3:4);
+    expect(dims.cardWidth).toBeGreaterThan(width<=359?200:140);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
     expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
-    expect(dims.buttonText).toBeGreaterThan(100);
+    expect(dims.buttonText).toBeGreaterThan(width>=360&&width<=640?70:90);
+    if(width===1280)expect(dims.cardWidth).toBeLessThan(315);
+    if(width===390)expect(dims.cardWidth).toBeLessThan(200);
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
     const artifact=path.join('test-results','product-cards-v131');
