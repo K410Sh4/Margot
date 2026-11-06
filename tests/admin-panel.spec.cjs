@@ -71,6 +71,11 @@ test('regras: somente Google verificado da administradora pode gravar',()=>{
     expect(rules).toContain('email_verified == true');
     expect(rules).toContain("sign_in_provider == 'google.com'");
     expect(rules).not.toMatch(/allow\s+(?:write|create|update)[^;]*:\s*if\s+true/);
+    if(name==='firestore.rules'){
+      expect(rules.match(/match \/products\/\{productId\}/g)).toHaveLength(1);
+      expect(rules.match(/match \/productMedia\/\{mediaId\}/g)).toHaveLength(1);
+      expect(rules).toContain("request.resource.data.createdAt == request.time;");
+    }
   }
 });
 test('visitante sem login não visualiza controles administrativos',async({page})=>{
@@ -129,14 +134,14 @@ test('criar produto, arquivar e restaurar',async({page})=>{
   await page.locator('#admin-filter').selectOption('active');
   await expect(page.locator('.product-row')).toHaveCount(9);
 });
-test('Storage não configurado: bloqueia imagens sem impedir cadastro de produtos',async({page})=>{
+test('regras de mídia ausentes: bloqueia fotos sem impedir cadastro de produtos',async({page})=>{
   await mockFirebase(page,{email:owner});
   await page.goto('/admin.html',{waitUntil:'domcontentloaded'});
   await expect(page.locator('#admin-app')).toBeVisible();
   await page.locator('#new-product').click();
   await expect(page.locator('#storage-notice')).toBeVisible();
   await expect(page.locator('#field-photos')).toBeDisabled();
-  await expect(page.locator('#upload-status')).toContainText('Storage');
+  await expect(page.locator('#upload-status')).toContainText('Firestore');
   await page.locator('#field-name').fill('Brinco Sem Fotografia');
   await page.locator('#field-price').fill('19.90');
   await page.locator('#field-stock').fill('5');
