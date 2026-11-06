@@ -33,14 +33,17 @@ test('menu fecha pelo fundo e não deixa conteúdo inerte',async({page})=>{
 test('categoria, histórico e atualização preservam filtro',async({page})=>{
   await ready(page);
   await page.locator('#menu-open').click();
-  await page.locator('#main-nav [data-category-link="Brincos"]').click();
+  await expect(page.locator('#main-nav [data-category-link]')).toHaveCount(0);
+  await page.locator('#main-nav a[href="#produtos"]').click();
+  await page.locator('#category-chips [data-filter="Brincos"]').click();
   await expect(page).toHaveURL(/categoria=Brincos#produtos/);
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
   await page.reload({waitUntil:'domcontentloaded'});
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
-  // O destaque representa a seção visível, não uma categoria oculta no topo.
+  // O filtro fica apenas nos chips da vitrine, não no menu do cabeçalho.
   await page.locator('#produtos').scrollIntoViewIfNeeded();
-  await expect(page.locator('#main-nav [data-category-link="Brincos"]')).toHaveClass(/active/);
+  await expect(page.locator('#category-chips [data-filter="Brincos"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#main-nav [data-category-link]')).toHaveCount(0);
 });
 
 test('troca de categoria limpa pesquisa anterior, mostrando filtro ativo',async({page})=>{
@@ -49,8 +52,7 @@ test('troca de categoria limpa pesquisa anterior, mostrando filtro ativo',async(
   await page.locator('#search-input').fill('colar');
   await expect(page.locator('#active-search')).toBeVisible();
   await expect(page.locator('#product-grid .product-card')).toHaveCount(2);
-  await page.locator('#menu-open').click();
-  await page.locator('#main-nav [data-category-link="Brincos"]').click();
+  await page.locator('#category-chips [data-filter="Brincos"]').click();
   await expect(page.locator('#active-search')).toBeHidden();
   await expect(page.locator('#search-input')).toHaveValue('');
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
@@ -211,20 +213,21 @@ test('mobile e desktop restauram menu, busca, foco e inert ao alternar',async({p
   expect(layout.x).toBe(0);
 });
 
-test('desktop abre menu compacto e retorna à navegação normal',async({page})=>{
+test('desktop esconde barra de categorias mantendo o cabeçalho compacto',async({page})=>{
   await page.setViewportSize({width:1100,height:800});
   await ready(page);
   const initial=await page.locator('.header-main').boundingBox();
   await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
+  await expect(page.locator('#main-nav')).toBeHidden();
+  await expect(page.locator('#menu-open')).toBeHidden();
+  await expect(page.locator('#category-chips [data-filter="Brincos"]')).toHaveCount(1);
   await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
   await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
-  await page.locator('#menu-open').click();
-  await expect(page.locator('#main-nav')).toHaveClass(/open/);
-  await expect(page.locator('#menu-open')).toHaveAttribute('aria-expanded','true');
+  await expect(page.locator('#main-nav')).toBeHidden();
+  await expect(page.locator('#menu-open')).toBeHidden();
+  await expect(page.locator('#search-open')).toBeVisible();
   await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
   await expect(page.locator('.site-header')).not.toHaveClass(/is-compact/);
-  await expect(page.locator('#main-nav')).not.toHaveClass(/open/);
-  await expect(page.locator('#main-nav')).toBeVisible();
   await expect.poll(async()=>{
     const rect=await page.locator('.header-main').boundingBox();
     return Math.abs(rect.height-initial.height);
