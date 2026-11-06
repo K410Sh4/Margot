@@ -215,3 +215,19 @@
 @media(prefers-reduced-motion:reduce){
   .mobile-nav-action,.mobile-bottom-nav,.mobile-menu-backdrop{transition:none!important}
 }
+
+/* V1.21 — não duplicar filtros de categorias na área do cabeçalho.
+ * O menu móvel continua acessível com links de navegação por seção.
+ */
+@media(min-width:701px){
+  .site-header .main-nav,
+  .site-header.is-compact .main-nav,
+  .site-header .main-nav.open,
+  .site-header.is-compact .main-nav.open{display:none!important}
+  .site-header .menu-toggle,
+  .site-header.is-compact .menu-toggle{display:none!important}
+  /* No header compacto, eliminar o espaço que antes era reservado ao menu. */
+  .site-header.is-compact .header-main{
+    grid-template-columns:minmax(105px,1fr) auto;
+  }
+}
