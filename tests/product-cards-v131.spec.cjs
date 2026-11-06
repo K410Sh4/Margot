@@ -142,6 +142,7 @@ test('na página de detalhes a segunda ação leva à sacola sem repetir a adiç
   await button.click();
   await expect(page.locator('#pd-cart-count')).toHaveText('1');
   await expect(page.locator('#pd-add-label')).toHaveText('Adicionado ao carrinho');
+  await expect(page.locator('#pd-qty-input')).toBeDisabled();
   await button.click();
   await expect(page).toHaveURL(/index\.html\?sacola=1|index\.html#produtos/);
   await expect(page.locator('#drawer')).toHaveClass(/open/);
