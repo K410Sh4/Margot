@@ -85,7 +85,7 @@ test('oferta confirmada gera painel, preço anterior, desconto e etiquetas',asyn
 test('estoque baixo aparece apenas entre uma e dez unidades',async({page})=>{
   await withCommercialData(page,mockItems());
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  await expect(page.locator('[data-favorite="brinco-coracao"]')).toHaveCount(1);
+  await expect(page.locator('#product-grid [data-favorite="brinco-coracao"]')).toHaveCount(1);
   const cards=page.locator('#product-grid .product-card');
   await expect(cards.nth(0).locator('.product-stock')).toContainText('Restam 7 unidades');
   await expect(cards.nth(1).locator('.product-stock')).toHaveCount(0);
@@ -108,7 +108,7 @@ test('vitrine bloqueia unidades acima do estoque informado',async({page})=>{
   }
   await expect(page.locator('#cart-count')).toHaveText('7');
   await expect(page.locator('#product-grid [data-add="brinco-coracao"]')).toBeDisabled();
-  await page.locator('#cart-open').click();
+  await page.locator('#mobile-nav-cart').click();
   await expect(page.locator('#drawer-items .quantity span').first()).toHaveText('7');
   await expect(page.locator('#drawer-items [data-delta="1"]').first()).toBeDisabled();
 });

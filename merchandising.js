@@ -51,7 +51,7 @@
     if(validTags&&tags.favorite===true)labels.push('favorite');
     if(validTags&&tags.bestSellerMonth===currentMonth)labels.push('bestSeller');
     if(promotion)labels.push('discount');
-    return Object.freeze({
+    return {
       ...p,
       referencePrice:p.price,
       price:promotion?promotion.salePrice:p.price,
@@ -59,7 +59,7 @@
       stock,
       stockCheckedAt:stock===null?null:inventory.checkedAt,
       labels:Object.freeze(labels)
-    });
+    };
   }
   const products=Object.freeze(catalog.products.map(enrich));
   window.MargotCatalog=Object.freeze({...catalog,products});
