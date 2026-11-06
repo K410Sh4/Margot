@@ -290,3 +290,24 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Galeria V3 carrega a versão maior sob demanda, preservando miniaturas na vitrine.
 - Painel libera envio automaticamente após implantar as regras Firestore da V1.30.
 - Leia docs/FOTOS-GRATIS-FIRESTORE.md para ativação e limitações.
+
+## V1.31 — Cards premium Margot
+
+- Novo card editorial inspirado na referência aprovada: fotografia ampla,
+  assinatura discreta, favoritos, etiquetas verificadas sobrepostas,
+  preço em destaque, valor anterior riscado, economia calculada,
+  estoque informado e ação de sacola em toda a largura.
+- Variante bordô com botão dourado para peças com etiqueta **Mais vendida do mês**,
+  somente quando a informação estiver confirmada no catálogo.
+- Nenhuma avaliação, alegação de material ou desconto é inventada.
+  O card continua usando exclusivamente os produtos, imagens, preços,
+  promoções e estoque sincronizados via Firestore.
+- Estilos isolados em `product-cards.css`, reutilizados pela coleção e
+  pelo painel de promoções. Grid: três colunas em desktop, duas em tablets,
+  uma em telefones estreitos para manter a leitura dos preços e CTA.
+- Fotos ausentes continuam exibindo o placeholder e ocultam a assinatura
+  sobre a imagem; o botão mantém os limites de estoque do catálogo.
+- Testes Playwright verificam links, sacola, favoritos, preço anterior,
+  economia real, etiquetas, estados sem estoque, fotos e overflow em
+  larguras 320/390/640/768/1024/1280. Capturas vão para os artefatos
+  GitHub Actions `margot-cards-premium-v131`.
