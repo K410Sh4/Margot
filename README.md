@@ -311,3 +311,10 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
   economia real, etiquetas, estados sem estoque, fotos e overflow em
   larguras 320/390/640/768/1024/1280. Capturas vão para os artefatos
   GitHub Actions `margot-cards-premium-v131`.
+
+
+## V1.32 — Compactação dos cards (reversão da escala excessiva)
+
+- Restaura a densidade da coleção: quatro colunas no desktop, três em telas intermediárias, duas nos demais dispositivos e uma somente abaixo de 360 px.
+- Reduz imagem, tipografia, espaços internos e CTA; mantém valores, descontos, badges, favoritos e sacola da V1.31.
+- Mantém o componente compartilhado por coleção e promoções; ajustes responsivos cobertos pelos testes Playwright 320/390/640/768/1024/1280.
