@@ -179,6 +179,17 @@
           current = id;
         }
       }
+      // Uma seção de produtos mais compacta pode continuar visível quando
+      // o início da seção seguinte se aproxima do topo. Enquanto produtos
+      // ainda estiverem abaixo do cabeçalho, mantemos a navegação coerente
+      // com a categoria efetivamente visível.
+      if (current === 'presentes') {
+        const products = get('produtos')?.getBoundingClientRect();
+        const headerBottom = header.getBoundingClientRect().bottom;
+        if (products && products.bottom > headerBottom + 16 && products.top < window.innerHeight * .72) {
+          return 'produtos';
+        }
+      }
       return current;
     }
     function updateActive() {
