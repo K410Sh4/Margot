@@ -5,7 +5,8 @@
 const OWNER='elgator833@gmail.com';
 const $=id=>document.getElementById(id);
 let BASE=[];
-const TODAY=()=>new Date().toISOString().slice(0,10);
+const STORE_DATE_FORMAT=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'});
+const TODAY=()=>STORE_DATE_FORMAT.format(new Date());
 const MONTH=()=>TODAY().slice(0,7);
 const PLACEHOLDER='./assets/foto-em-breve.webp';
 const IMAGE_TYPES=['image/jpeg','image/png','image/webp'];
@@ -132,9 +133,9 @@ function updateStorageUI(){
   $('storage-notice').hidden=STORAGE_READY;
   $('storage-notice').classList.toggle('is-ready',freeMediaReady);
   $('image-backend-title').textContent=freeMediaReady?
-    'Fotos grátis ativadas no Firestore.':'Fotografias aguardando autorização.';
+    'Fotos WebP disponíveis para envio.':'Fotografias aguardando autorização.';
   $('image-backend-description').textContent=freeMediaReady?
-    'As fotografias serão otimizadas para WebP e guardadas em documentos separados do Firestore. O tamanho e a resolução serão reduzidos para respeitar a cota gratuita.':
+    'As imagens serão compactadas e armazenadas em documentos do Firestore. A autorização para gravar só é confirmada ao salvar o produto.':
     STORAGE_WARNING;
   $('upload-status').textContent=enabled?'':STORAGE_WARNING;
 }

@@ -215,7 +215,7 @@ test('modo Spark: imagens WebP compactadas ficam em documento separado do Firest
   await expect(page.locator('#admin-app')).toBeVisible();
   await page.locator('.product-row').first().click();
   await expect(page.locator('#field-photos')).toBeEnabled();
-  await expect(page.locator('#image-backend-title')).toContainText('Fotos grátis ativadas');
+  await expect(page.locator('#image-backend-title')).toContainText('Fotos WebP disponíveis');
 
   const source=await page.evaluate(()=>{
     const canvas=document.createElement('canvas');

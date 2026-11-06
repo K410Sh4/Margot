@@ -8,7 +8,7 @@
   const source=window.MargotCommercialData?.products||{};
   const day=/^\d{4}-\d{2}-\d{2}$/;
   const now=Date.now();
-  const isoToday=new Date(now).toISOString().slice(0,10);
+  const isoToday=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now));
   const currentMonth=isoToday.slice(0,7);
   const moneyValid=value=>Number.isFinite(value)&&value>0&&Math.abs(Math.round(value*100)-value*100)<0.000001;
   function validDate(value){

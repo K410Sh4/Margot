@@ -10,7 +10,8 @@ const thumbValid=url=>typeof url==='string'&&(
   (url.startsWith(PHOTO_PREFIX)&&url.includes('product-images%2F'))||
   (url.length<=30000&&INLINE_WEBP.test(url))
 );
-const TODAY=()=>new Date().toISOString().slice(0,10);
+const STORE_DATE_FORMAT=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'});
+const TODAY=()=>STORE_DATE_FORMAT.format(new Date());
 let overlays=[];
 const safeText=(value,max=100)=>typeof value==='string'?
   value.replace(/[<>&"']/g,'').trim().slice(0,max):'';

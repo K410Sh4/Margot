@@ -26,7 +26,7 @@ const initialCart=readStorage('cart',{});
 const cart=Object.fromEntries(Object.entries(initialCart||{}).filter(([id,q])=>getItem(id)&&Number.isInteger(q)&&q>0&&q<100));
 const favoriteList=readStorage('favorites',[]);
 const favorites=new Set(Array.isArray(favoriteList)?favoriteList.filter(id=>getItem(id)):[]);
-let category='Todos',query='',drawerMode='cart',previousFocus=null,toastTimer;
+let category='Todos',query='',drawerMode='cart',previousFocus=null,previousFocusSnapshot=null,toastTimer;
 const categories=['Brincos','Colares','Pulseiras','Anéis','Kits'];
 // A categoria da URL é a fonte de verdade para recarregamento, links e voltar/avançar.
 function categoryFromUrl(){
@@ -191,6 +191,58 @@ function chooseCategory(c,scroll=true){
   if(scroll){$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 }
 function updateCounts(){const num=Object.values(cart).reduce((a,n)=>a+n,0);$('cart-count').textContent=num;$('cart-count').hidden=!num;$('favorite-count').textContent=favorites.size;$('favorite-count').hidden=!favorites.size}
+
+/* Preserve o foco quando cards e linhas da sacola são recriados. */
+function captureActionFocus(){
+  const el=document.activeElement;
+  const root=el?.closest?.('#product-grid,#promotion-grid,#drawer-items');
+  if(!root)return null;
+  for(const key of ['add','favorite','qty','remove','favAdd','favRemove']){
+    if(el.dataset?.[key])return {rootId:root.id,key,id:el.dataset[key],delta:el.dataset.delta};
+  }
+  return null;
+}
+function restoreActionFocus(focus){
+  if(!focus)return;
+  const root=$(focus.rootId);
+  const elements=[...root?.querySelectorAll('button')||[]];
+  const same=elements.find(el=>el.dataset[focus.key]===focus.id&&
+    (focus.key!=='qty'||el.dataset.delta===focus.delta)&&!el.disabled);
+  const fallback=focus.key==='qty'?
+    elements.find(el=>el.dataset.qty===focus.id&&!el.disabled):null;
+  (same||fallback||(focus.rootId==='drawer-items'?$('drawer-close'):null))
+    ?.focus({preventScroll:true});
+}
+function refreshShoppingView(){
+  const focus=captureActionFocus();
+  updateCounts();
+  renderProducts();
+  renderPromotionPanel();
+  if($('drawer').classList.contains('open'))renderDrawer();
+  restoreActionFocus(focus);
+}
+function syncExternalStorage(event){
+  if(event.storageArea&&event.storageArea!==localStorage)return;
+  if(event.key!==null&&event.key!=='margot-cart'&&event.key!=='margot-favorites')return;
+  if(event.key===null||event.key==='margot-cart'){
+    const data=readStorage('cart',{});
+    const valid=data&&typeof data==='object'&&!Array.isArray(data)?data:{};
+    for(const id of Object.keys(cart))delete cart[id];
+    for(const [id,qty] of Object.entries(valid)){
+      if(getItem(id)&&Number.isInteger(qty)&&qty>0&&qty<100)cart[id]=qty;
+    }
+  }
+  if(event.key===null||event.key==='margot-favorites'){
+    const data=readStorage('favorites',[]);
+    favorites.clear();
+    if(Array.isArray(data))for(const id of data){
+      if(getItem(id))favorites.add(id);
+    }
+  }
+  if($('product-grid'))refreshShoppingView();
+}
+window.addEventListener('storage',syncExternalStorage);
+
 function addToCart(id){
   const p=getItem(id);
   if(!p)return;
@@ -202,13 +254,10 @@ function addToCart(id){
   }
   cart[id]=(cart[id]||0)+1;
   saveStorage('cart',cart);
-  updateCounts();
-  renderProducts();
-  renderPromotionPanel();
+  refreshShoppingView();
   notify('Peça adicionada à sacola');
-  if($('drawer').classList.contains('open'))renderDrawer();
 }
-function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();renderPromotionPanel();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
+function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);refreshShoppingView();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
 function changeQuantity(id,delta){
   const p=getItem(id);if(!p)return;
   const next=(cart[id]||0)+delta;
@@ -218,13 +267,13 @@ function changeQuantity(id,delta){
     if(next>cap){notify('Quantidade acima do estoque informado. Confirme a disponibilidade.');return;}
     cart[id]=Math.min(99,next);
   }else cart[id]=Math.min(99,next);
-  saveStorage('cart',cart);updateCounts();renderProducts();renderPromotionPanel();renderDrawer();
+  saveStorage('cart',cart);refreshShoppingView();
 }
 function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}
 function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${p.id}">${(cart[p.id]||0)>0?'Ver na sacola':'Adicionar à sacola'}</button></div><button type="button" class="remove" data-fav-remove="${p.id}" aria-label="Remover ${p.name} dos favoritos">×</button></div>`}
 function renderDrawer(){const isCart=drawerMode==='cart';$('drawer-title').textContent=isCart?'Sua sacola':'Meus favoritos';let items=isCart?Object.keys(cart).map(getItem):[...favorites].map(getItem);items=items.filter(Boolean);$('drawer-items').innerHTML=items.length?items.map(isCart?cartLine:favoriteLine).join(''):`<div class="drawer-empty"><span class="icon" data-icon="${isCart?'bag':'heart'}"></span><p>${isCart?'Sua sacola ainda está vazia.':'Você ainda não salvou favoritos.'}</p><p>Descubra os detalhes da coleção Margot.</p></div>`;populateIcons($('drawer-items'));if(isCart&&items.length){const subtotal=items.reduce((s,p)=>s+p.price*cart[p.id],0);$('drawer-footer').innerHTML=`<div class="subtotal"><span>Subtotal estimado</span><span>${money(subtotal)}</span></div><p class="checkout-note">Valores ilustrativos. Não há cobrança automática nem reserva de estoque. O pedido deve ser confirmado com a loja.</p><button type="button" id="copy-order" class="button primary">Copiar lista de interesse</button><button type="button" id="continue-shopping" class="button outline">Continuar olhando</button>`;$('copy-order').addEventListener('click',copyOrder);$('continue-shopping').addEventListener('click',closeDrawer)}else{$('drawer-footer').innerHTML=`<button class="button outline" type="button" id="continue-shopping">Explorar coleção</button>`;$('continue-shopping').addEventListener('click',closeDrawer)}$('drawer-items').querySelectorAll('[data-qty]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.qty,Number(btn.dataset.delta))));$('drawer-items').querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.remove,-99)));$('drawer-items').querySelectorAll('[data-fav-remove]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(btn.dataset.favRemove)));$('drawer-items').querySelectorAll('[data-fav-add]').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.favAdd)))}
-function openDrawer(mode){if($('drawer').classList.contains('open')){drawerMode=mode;renderDrawer();$('drawer-close').focus();return;}previousFocus=document.activeElement;drawerMode=mode;renderDrawer();$('drawer').inert=false;$('drawer').setAttribute('aria-hidden','false');$('overlay').hidden=false;requestAnimationFrame(()=>{$('drawer').classList.add('open');$('overlay').classList.add('show')});document.body.style.overflow='hidden';$('drawer-close').focus()}
-function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classList.remove('show');$('drawer').inert=true;$('drawer').setAttribute('aria-hidden','true');$('overlay').hidden=true;document.body.style.overflow='';if(previousFocus&&document.contains(previousFocus))previousFocus.focus()}
+function openDrawer(mode){if($('drawer').classList.contains('open')){drawerMode=mode;renderDrawer();$('drawer-close').focus();return;}previousFocus=document.activeElement;previousFocusSnapshot=captureActionFocus();drawerMode=mode;renderDrawer();$('drawer').inert=false;$('drawer').setAttribute('aria-hidden','false');$('overlay').hidden=false;requestAnimationFrame(()=>{$('drawer').classList.add('open');$('overlay').classList.add('show')});document.body.style.overflow='hidden';$('drawer-close').focus()}
+function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classList.remove('show');$('drawer').inert=true;$('drawer').setAttribute('aria-hidden','true');$('overlay').hidden=true;document.body.style.overflow='';if(previousFocus&&document.contains(previousFocus))previousFocus.focus();else restoreActionFocus(previousFocusSnapshot);previousFocusSnapshot=null}
 function copyOrder(){const lines=Object.keys(cart).map(id=>`• ${getItem(id).name} — ${cart[id]} un. × ${money(getItem(id).price)}`);const subtotal=Object.keys(cart).reduce((s,id)=>s+getItem(id).price*cart[id],0);const msg=`Olá! Tenho interesse nestas peças da Margot Acessórios:\n${lines.join('\n')}\nSubtotal demonstrativo: ${money(subtotal)}\nGostaria de confirmar disponibilidade, valores e entrega.`;const fallback=()=>{const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('Falha ao copiar')};Promise.resolve(navigator.clipboard?.writeText?navigator.clipboard.writeText(msg).catch(fallback):fallback()).then(()=>notify('Lista copiada. Cole no atendimento da loja quando estiver disponível.')).catch(()=>notify('Não foi possível copiar automaticamente.'))}
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function closeMobileMenu(){window.dispatchEvent(new CustomEvent('margot:menu-close'))}
@@ -244,10 +293,7 @@ function applyCatalogLive(){
   if(favoritesChanged)saveStorage('favorites',[...favorites]);
   renderCategories();
   renderFilters();
-  renderProducts();
-  renderPromotionPanel();
-  updateCounts();
-  if($('drawer').classList.contains('open'))renderDrawer();
+  refreshShoppingView();
 }
 window.addEventListener('margot:catalog-updated',()=>{
   if($('product-grid'))applyCatalogLive();
