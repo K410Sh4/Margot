@@ -149,6 +149,73 @@ test('na página de detalhes a segunda ação leva à sacola sem repetir a adiç
   await expect(page.locator('#cart-count')).toHaveText('1');
 });
 
+test('vitrine sincroniza sacola e favoritos modificados em outra aba',async({page,context})=>{
+  await staticCatalog(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const other=await context.newPage();
+  await staticCatalog(other);
+  await other.goto('/',{waitUntil:'domcontentloaded'});
+  const product=page.locator('#product-grid [data-add="brinco-coracao"]');
+  await other.locator('#product-grid [data-add="brinco-coracao"]').click();
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  await expect(product.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await product.click();
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#drawer-items .quantity span')).toHaveText('1');
+  await page.locator('#drawer-close').click();
+  await other.locator('#product-grid [data-favorite="brinco-coracao"]').click();
+  await expect(page.locator('#product-grid [data-favorite="brinco-coracao"]')).toHaveAttribute('aria-pressed','true');
+  await other.locator('#cart-open').click();
+  await other.locator('#drawer-items [data-remove="brinco-coracao"]').click();
+  await expect(page.locator('#cart-count')).toBeHidden();
+  await expect(product.locator('.product-cart-label')).toHaveText('Adicionar à sacola');
+  await other.close();
+});
+
+test('o foco permanece no botão após atualização dos cards e da sacola',async({page})=>{
+  await staticCatalog(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const add=page.locator('#product-grid [data-add="brinco-coracao"]');
+  await add.focus();
+  await page.keyboard.press('Enter');
+  await expect(add).toBeFocused();
+  await expect(add.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await add.press('Enter');
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  const increase=page.locator('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]');
+  await increase.focus();
+  await page.keyboard.press('Enter');
+  await expect(increase).toBeFocused();
+  await expect(page.locator('#cart-count')).toHaveText('2');
+  await page.locator('#drawer-close').click();
+  await expect(add).toBeFocused();
+  const favorite=page.locator('#product-grid [data-favorite="brinco-coracao"]');
+  await favorite.focus();
+  await page.keyboard.press('Enter');
+  await expect(favorite).toBeFocused();
+  await expect(favorite).toHaveAttribute('aria-pressed','true');
+});
+
+test('promoção da vitrine respeita o calendário da loja de São Paulo',async({page})=>{
+  // 01h30 UTC do dia 7 ainda é 22h30 do dia 6 no horário da loja.
+  await page.clock.install({time:new Date('2026-11-07T01:30:00.000Z')});
+  await staticCatalog(page);
+  await page.route('**/merchandising-data.js*',route=>route.fulfill({
+    status:200,contentType:'text/javascript',
+    body:'window.MargotCommercialData='+JSON.stringify({products:{
+      'brinco-coracao':{
+        promotion:{confirmed:true,source:'Preço comercial conferido',
+          originalPrice:24.90,salePrice:14.90,checkedAt:'2026-11-06',
+          startsAt:'2026-11-06',endsAt:'2026-11-06'}
+      }
+    }})+';'
+  }));
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const card=page.locator('#product-grid .product-card').first();
+  await expect(card.locator('.price')).toHaveText('R$ 14,90');
+  await expect(card.locator('.product-old-price')).toHaveText('R$ 24,90');
+});
+
 test('produto sem estoque desabilita ação e mantém detalhes e favoritos',async({page})=>{
   await staticCatalog(page);
   const data={products:{
