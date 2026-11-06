@@ -131,7 +131,7 @@ test('foto real apresenta assinatura discreta; fallback não deixa assinatura so
   await expect(card.locator('.product-visual')).toHaveClass(/is-photo-missing/);
 });
 
-for(const width of [320,390,640,768,1024,1280]){
+for(const width of [320,390,600,640,768,920,1024,1150,1280]){
   test('layout premium sem overflow, CTA legível e grid correto em '+width+'px',async({page})=>{
     await staticCatalog(page);
     await verifiedOffer(page);
@@ -152,13 +152,25 @@ for(const width of [320,390,640,768,1024,1280]){
         buttonText:button.querySelector('.product-cart-label').getBoundingClientRect().width,
         width:root.width};
     });
-    expect(dims.columns).toBe(width<=359?1:width<=800?2:width<=1120?3:4);
-    expect(dims.cardWidth).toBeGreaterThan(width<=359?200:140);
+    expect(dims.columns).toBe(width<=600?3:width<=920?4:width<=1150?5:6);
+    expect(dims.cardWidth).toBeGreaterThan(width<=600?80:135);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
     expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
-    expect(dims.buttonText).toBeGreaterThan(width>=360&&width<=640?70:90);
-    if(width===1280)expect(dims.cardWidth).toBeLessThan(315);
-    if(width===390)expect(dims.cardWidth).toBeLessThan(200);
+    expect(dims.buttonText).toBeGreaterThan(width<=600?30:65);
+    if(width===1280)expect(dims.cardWidth).toBeLessThan(205);
+    if(width===390)expect(dims.cardWidth).toBeLessThan(130);
+    const contained=await page.evaluate(()=>{
+      const cards=[...document.querySelectorAll('#product-grid .product-card')];
+      return cards.every(card=>{
+        const rect=card.getBoundingClientRect();
+        const items=[card.querySelector('.product-info'),card.querySelector('.price'),card.querySelector('.add-to-cart'),card.querySelector('.product-title-link')].filter(Boolean);
+        return items.every(item=>{
+          const a=item.getBoundingClientRect();
+          return a.left>=rect.left-1 && a.right<=rect.right+1;
+        });
+      });
+    });
+    expect(contained).toBe(true);
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
     const artifact=path.join('test-results','product-cards-v131');
