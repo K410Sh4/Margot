@@ -3,7 +3,7 @@
  * Checkout não é integrado: o pedido é copiado para atendimento manual.
  */
 'use strict';
-const STORE = window.MargotCatalog;
+let STORE = window.MargotCatalog;
 
 const ICONS = {
   menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
@@ -206,6 +206,29 @@ function copyOrder(){const lines=Object.keys(cart).map(id=>`• ${getItem(id).na
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function closeMobileMenu(){window.dispatchEvent(new CustomEvent('margot:menu-close'))}
 function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();applyProductPhotoFallback($('promotion-grid'));renderProducts();renderPromotionPanel();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>chooseCategory('Todos'));$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;renderProducts()});$('search-form').addEventListener('submit',e=>{e.preventDefault();window.dispatchEvent(new CustomEvent('margot:search-close'));$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('clear-active-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('drawer').classList.contains('open'))closeDrawer();if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
+
+function applyCatalogLive(){
+  STORE=window.MargotCatalog;
+  let changed=false;
+  for(const id of Object.keys(cart)){
+    if(!getItem(id)){delete cart[id];changed=true}
+  }
+  if(changed)saveStorage('cart',cart);
+  let favoritesChanged=false;
+  for(const id of [...favorites]){
+    if(!getItem(id)){favorites.delete(id);favoritesChanged=true}
+  }
+  if(favoritesChanged)saveStorage('favorites',[...favorites]);
+  renderCategories();
+  renderFilters();
+  renderProducts();
+  renderPromotionPanel();
+  updateCounts();
+  if($('drawer').classList.contains('open'))renderDrawer();
+}
+window.addEventListener('margot:catalog-updated',()=>{
+  if($('product-grid'))applyCatalogLive();
+});
 document.addEventListener('DOMContentLoaded',()=>{
   init();
   // Link vindo da página individual: sacola do MESMO armazenamento local.

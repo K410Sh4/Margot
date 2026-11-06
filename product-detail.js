@@ -3,7 +3,7 @@
  */
 (() => {
   'use strict';
-  const catalog=window.MargotCatalog;
+  let catalog=window.MargotCatalog;
   const fallbackImage='./assets/foto-em-breve.webp';
   const $=id=>document.getElementById(id);
   const money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
@@ -289,17 +289,18 @@
     }
   }
 
-  function init(){
+  function renderCurrentProduct(){
     const id=new URLSearchParams(location.search).get('id');
+    catalog=window.MargotCatalog;
     product=catalog?.products?.find(item=>item.id===id)||null;
     $('pd-loading').hidden=true;
+    $('pd-not-found').hidden=Boolean(product);
+    $('pd-product').hidden=!product;
     if(!product){
-      $('pd-not-found').hidden=false;
       document.title='Produto não encontrado | Margot Acessórios';
       return;
     }
     document.title=product.name+' | Margot Acessórios';
-    $('pd-product').hidden=false;
     $('pd-crumb-category').textContent=product.category;
     $('pd-crumb-category').href='./index.html?categoria='+encodeURIComponent(product.category)+'#produtos';
     $('pd-crumb-name').textContent=product.name;
@@ -317,6 +318,9 @@
     syncCartCount();
     syncFavorite();
     quantity();
+  }
+  function init(){
+    renderCurrentProduct();
     $('pd-decrease').addEventListener('click',()=>{
       $('pd-qty-input').value=String(quantity()-1);
       quantity();
@@ -343,9 +347,10 @@
     $('pd-image-dialog').addEventListener('click',event=>{
       if(event.target===$('pd-image-dialog'))$('pd-image-dialog').close();
     });
+    window.addEventListener('margot:catalog-updated',renderCurrentProduct);
     window.addEventListener('storage',event=>{
       if(event.key==='margot-cart'){syncCartCount();quantity();}
-      if(event.key==='margot-favorites')syncFavorite();
+      if(event.key==='margot-favorites'&&product)syncFavorite();
     });
   }
   document.addEventListener('DOMContentLoaded',init);

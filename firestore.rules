@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Apenas a conta Google autenticada e verificada da proprietária edita a loja.
+    // Segurança aplicada NO SERVIDOR, não depende dos botões do navegador.
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'elgator833@gmail.com'
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function validDate(s) {
+      return s is string && (s == '' || s.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'));
+    }
+    function validMonth(s) {
+      return s is string && (s == '' || s.matches('^[0-9]{4}-[0-9]{2}$'));
+    }
+    function safeText(s, max) {
+      return s is string && s.size() <= max && !s.matches('.*[<>].*');
+    }
+    function validProduct(p) {
+      return p.keys().hasAll(['name','category','basePrice','description','imageUrls',
+        'imagePaths','stockCount','stockCheckedAt','favorite','bestSellerMonth',
+        'salePrice','saleStart','saleEnd','saleCheckedAt','deleted','updatedAt'])
+        && p.keys().hasOnly(['name','category','basePrice','description','imageUrls',
+        'imagePaths','stockCount','stockCheckedAt','favorite','bestSellerMonth',
+        'salePrice','saleStart','saleEnd','saleCheckedAt','deleted','updatedAt'])
+        && safeText(p.name, 90) && p.name.size() >= 2
+        && safeText(p.description, 1600)
+        && p.category in ['Brincos','Colares','Pulseiras','Anéis','Kits']
+        && p.basePrice is number && p.basePrice > 0 && p.basePrice <= 100000
+        && p.imageUrls is list && p.imageUrls.size() <= 8
+        && p.imagePaths is list && p.imagePaths.size() <= 8
+        && p.imageUrls.size() == p.imagePaths.size()
+        && (p.stockCount == null || (p.stockCount is int && p.stockCount >= 0 && p.stockCount <= 100000))
+        && validDate(p.stockCheckedAt)
+        && p.favorite is bool
+        && validMonth(p.bestSellerMonth)
+        && (p.salePrice == null || (p.salePrice is number && p.salePrice > 0 && p.salePrice < p.basePrice))
+        && validDate(p.saleStart) && validDate(p.saleEnd) && validDate(p.saleCheckedAt)
+        && p.deleted is bool
+        && p.updatedAt is timestamp && p.updatedAt == request.time;
+    }
+    match /products/{productId} {
+      // Leitura pública apenas do catálogo, sem dados privados ou transações.
+      allow get, list: if true;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
+        && validProduct(request.resource.data);
+      allow delete: if isOwner();
+    }
+    // Nenhuma coleção não declarada é acessível por estas regras.
+  }
+}

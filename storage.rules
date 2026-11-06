@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'elgator833@gmail.com'
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    match /product-images/{productId}/{imageId} {
+      // Fotos aprovadas ficam públicas. Listagem e gravação restritas.
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
+        && imageId.matches('^[A-Za-z0-9_-]{1,80}[.](jpg|jpeg|png|webp)$')
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow delete: if isOwner();
+    }
+    // Outras pastas permanecem negadas por padrão.
+  }
+}

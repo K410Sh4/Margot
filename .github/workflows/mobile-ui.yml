@@ -8,6 +8,16 @@ on:
       - 'mobile-navigation.css'
       - 'store.js'
       - 'catalog-data.js'
+      - 'admin.html'
+      - 'admin.css'
+      - 'admin.js'
+      - 'site-live.js'
+      - 'account.js'
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'storage.rules'
+      - '.firebaserc'
+      - 'docs/PAINEL-ADMIN-FIREBASE.md'
       - 'merchandising-data.js'
       - 'merchandising.js'
       - 'docs/PROMOCOES-ESTOQUE.md'
@@ -29,6 +39,16 @@ on:
       - 'mobile-navigation.css'
       - 'store.js'
       - 'catalog-data.js'
+      - 'admin.html'
+      - 'admin.css'
+      - 'admin.js'
+      - 'site-live.js'
+      - 'account.js'
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'storage.rules'
+      - '.firebaserc'
+      - 'docs/PAINEL-ADMIN-FIREBASE.md'
       - 'merchandising-data.js'
       - 'merchandising.js'
       - 'docs/PROMOCOES-ESTOQUE.md'
@@ -58,3 +78,11 @@ jobs:
       - run: npm install --no-package-lock --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npm run test:mobile
+      - name: Capturas da administração (desktop e mobile)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: margot-admin-previews
+          path: test-results/admin-*.png
+          if-no-files-found: ignore
+          retention-days: 7

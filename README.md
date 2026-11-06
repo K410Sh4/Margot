@@ -257,3 +257,15 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Limite adicional de quantidade respeita a contagem informada (no navegador), com comunicação transparente sobre confirmação pela loja.
 - Testes específicos incluem valores 0, 1, 7, 10 e 11, promoções válidas/expiradas, melhor venda mensal, rótulos, preços e responsividade.
 - Documentação de operação: [Promoções e Estoque](docs/PROMOCOES-ESTOQUE.md).
+
+
+## V1.28 — Painel privado de produtos em tempo real (05/11/2026)
+
+- Página administrativa: admin.html (Google Login, editor de produtos, estoque, promoções, selos e fotografias).
+- Acesso à edição vinculado ao Google e-mail verificado definido em firestore.rules e storage.rules (autorização no servidor).
+- Catálogo da vitrine e página V3 inscritos no Cloud Firestore via site-live.js, com fallback para o catálogo demonstrativo se o banco estiver indisponível.
+- Fotos de até 5 MB por arquivo no Firebase Storage, JPEG/PNG/WebP, até 8 por produto; remoção e arquivamento reversível.
+- Limites e avisos de estoque de 1 a 10 unidades, promoções com datas e melhores vendidos do mês.
+- Os dados no Firebase não foram acessados nem publicados nesta execução: a ativação requer implantação das regras pela conta proprietária.
+- **Guia de ativação:** docs/PAINEL-ADMIN-FIREBASE.md. O GitHub Pages publica o frontend; as regras exigem deploy separado no Firebase.
+- Testes Playwright: autenticação de usuário autorizado/não autorizado com SDK simulado, cadastro, arquivamento, edição, fotos, vitrine em tempo real e mobile.
