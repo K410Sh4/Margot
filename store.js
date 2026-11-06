@@ -90,6 +90,7 @@ function applyProductPhotoFallback(root){
     img.alt = 'Foto em breve';
     const tag = img.closest('.product-visual')?.querySelector('.demo-tag');
     if (tag) tag.hidden = false;
+    img.closest('.product-visual')?.classList.add('is-photo-missing');
   }, true);
 }
 function syncSearchBadge(){const el=$('active-search');if(el){el.hidden=!query;el.querySelector('[data-search-term]').textContent=query}}
@@ -98,13 +99,14 @@ function priceMarkup(p){
     (p.promotion?'<del class="product-old-price">'+money(p.promotion.originalPrice)+'</del>':'');
 }
 function badgesMarkup(p){
-  if(!Array.isArray(p.labels)||!p.labels.length)return '';
-  return '<div class="product-badges" aria-label="Classificações da peça">'+p.labels.map(label=>{
+  const labels=Array.isArray(p.labels)?p.labels:[];
+  const highlights=labels.map(label=>{
     if(label==='favorite')return '<span class="product-badge product-badge--favorite">Peça favorita</span>';
     if(label==='bestSeller')return '<span class="product-badge product-badge--bestseller">Mais vendida do mês</span>';
-    if(label==='discount')return '<span class="product-badge product-badge--discount">-'+p.promotion.percent+'%</span>';
     return '';
-  }).join('')+'</div>';
+  }).filter(Boolean);
+  return (highlights.length?'<div class="product-badges" aria-label="Classificações da peça">'+highlights.join('')+'</div>':'')+
+    (p.promotion?'<span class="product-badge product-badge--discount" aria-label="Desconto de '+p.promotion.percent+' por cento">-'+p.promotion.percent+'%</span>':'');
 }
 function lowStockMarkup(p){
   if(p.stock===0)return '<span class="product-stock product-stock--out">Indisponível no estoque informado</span>';
@@ -119,18 +121,30 @@ function canAdd(p){
     (cart[p.id]||0)<99:(cart[p.id]||0)<Math.min(99,p.stock);
 }
 function productCard(p){
-  return '<article class="product-card'+(p.promotion?' product-card--offer':'')+'">'+
-    '<div class="product-visual">'+
-      '<span class="demo-tag"'+(hasProductPhoto(p)?' hidden':'')+'>Foto em breve</span>'+
+  const hasPhoto=hasProductPhoto(p);
+  const available=canAdd(p);
+  const stockMarkup=lowStockMarkup(p);
+  const savings=p.promotion?money(p.promotion.originalPrice-p.price):'';
+  const buttonLabel=p.stock===0?'Indisponível':available?'Adicionar à sacola':'Limite atingido';
+  return '<article class="product-card'+(p.promotion?' product-card--offer':'')+(p.labels?.includes('bestSeller')?' product-card--signature':'')+'">'+
+    '<div class="product-visual'+(hasPhoto?'':' is-photo-missing')+'">'+
+      '<span class="demo-tag"'+(hasPhoto?' hidden':'')+'>Foto em breve</span>'+
       '<a class="product-open" href="./produto.html?id='+encodeURIComponent(p.id)+'" aria-label="Ver detalhes de '+p.name+'">'+productImage(p)+'</a>'+
+      (hasPhoto?'<span class="product-photo-signature" aria-hidden="true"><strong>MARGOT</strong><small>acessórios</small></span>':'')+
       badgesMarkup(p)+
       '<button class="heart-btn" type="button" data-favorite="'+p.id+'" aria-pressed="'+favorites.has(p.id)+'" aria-label="'+(favorites.has(p.id)?'Remover dos':'Adicionar aos')+' favoritos: '+p.name+'"><span class="icon" data-icon="heart"></span></button>'+
     '</div>'+
-    '<div class="product-info"><span class="category-label">'+p.category+'</span>'+
+    '<div class="product-info">'+
+      '<span class="category-label">'+p.category+'</span>'+
       '<h3><a class="product-title-link" href="./produto.html?id='+encodeURIComponent(p.id)+'">'+p.name+'</a></h3>'+
-      '<div class="product-price-line">'+priceMarkup(p)+'</div>'+
-      lowStockMarkup(p)+
-      '<button class="add-to-cart" type="button" data-add="'+p.id+'" aria-label="'+(canAdd(p)?'Adicionar '+p.name+' à sacola':'Não é possível adicionar '+p.name+' à sacola')+'"'+(canAdd(p)?'':' disabled')+'><span class="icon" data-icon="bag"></span></button>'+
+      '<div class="product-price-summary">'+
+        '<div class="product-price-line">'+priceMarkup(p)+'</div>'+
+        (p.promotion?'<span class="product-savings">Economize <strong>'+savings+'</strong></span>':'')+
+      '</div>'+
+      (stockMarkup||'<span class="product-stock-spacer" aria-hidden="true"></span>')+
+      '<button class="add-to-cart" type="button" data-add="'+p.id+'" aria-label="'+(available?'Adicionar '+p.name+' à sacola':'Não é possível adicionar '+p.name+' à sacola')+'"'+(available?'':' disabled')+'>'+
+        '<span class="icon" data-icon="bag"></span><span class="product-cart-label">'+buttonLabel+'</span><span class="product-cart-arrow" aria-hidden="true">→</span>'+
+      '</button>'+
     '</div></article>';
 }
 function bindProductActions(root){

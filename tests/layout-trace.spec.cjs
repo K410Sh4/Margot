@@ -269,12 +269,23 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      await expect(page.locator('#promotion-grid .product-card')).toHaveCount(1);
      await page.locator('#promocoes').scrollIntoViewIfNeeded();
    },{transition:true,fullPage:true});
+   await action('Cards premium desktop 1280',async()=>{
+     await page.setViewportSize({width:1280,height:850});
+     await page.goto('/',{waitUntil:'domcontentloaded'});
+     await expect(page.locator('#product-grid .product-card')).toHaveCount(8);
+     await page.locator('#product-grid').scrollIntoViewIfNeeded();
+   },{transition:true,fullPage:true});
    await action('SIMULACAO — produto V3 com etiquetas e estoque',async()=>{
      await page.goto('/produto.html?id=brinco-coracao',{waitUntil:'domcontentloaded'});
      await expect(page.locator('#pd-badges .pd-badge')).toHaveCount(3);
    },{transition:true,fullPage:true});
    await action('SIMULACAO — produto V3 mobile 390',async()=>{
      await page.setViewportSize({width:390,height:844});
+   },{transition:true,fullPage:true});
+   await action('Cards premium mobile 390',async()=>{
+     await page.goto('/',{waitUntil:'domcontentloaded'});
+     await page.locator('#product-grid').scrollIntoViewIfNeeded();
+     await expect(page.locator('#product-grid .add-to-cart').first()).toBeVisible();
    },{transition:true,fullPage:true});
 
 
