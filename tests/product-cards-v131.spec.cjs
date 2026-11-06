@@ -119,6 +119,55 @@ test('após adicionar o card muda de estado e abre a sacola sem duplicar a unida
   await expect(page.locator('#product-grid .product-card').first().locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
 });
 
+test('WhatsApp da sacola prepara mensagem atualizada sem enviar automaticamente',async({page})=>{
+  await staticCatalog(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  await page.locator('#product-grid [data-add="brinco-coracao"]').click();
+  await page.locator('#product-grid [data-add="colar-perola"]').click();
+  await page.locator('#cart-open').click();
+  const link=page.locator('#whatsapp-order');
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute('target','_blank');
+  await expect(link).toHaveAttribute('rel',/noopener/);
+  const parseLink=async()=>{
+    const href=await link.getAttribute('href');
+    const url=new URL(href);
+    expect(url.origin).toBe('https://wa.me');
+    expect(url.pathname).toBe('/5535997450100');
+    return url.searchParams.get('text');
+  };
+  let message=await parseLink();
+  expect(message).toContain('Brinco Coração Dourado');
+  expect(message).toContain('Colar Pérola Delicada');
+  expect(message).toContain('1 unidade');
+  expect(message).toContain('R$ 14,90');
+  expect(message).toContain('R$ 21,90');
+  expect(message).toContain('Subtotal estimado: R$ 36,80');
+  expect(message).toContain('confirmar disponibilidade');
+  expect(message).toContain('\n');
+  await page.locator('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]').click();
+  message=await parseLink();
+  expect(message).toContain('Brinco Coração Dourado — 2 unidades');
+  expect(message).toContain('Subtotal estimado: R$ 51,70');
+  await page.locator('#drawer-items [data-remove="colar-perola"]').click();
+  message=await parseLink();
+  expect(message).not.toContain('Colar Pérola Delicada');
+  expect(message).toContain('Subtotal estimado: R$ 29,80');
+  await page.locator('#drawer-items [data-remove="brinco-coracao"]').click();
+  await expect(link).toHaveCount(0);
+  await expect(page.locator('#drawer-items')).toContainText('Sua sacola ainda está vazia');
+});
+
+test('rodapé disponibiliza contato WhatsApp comercial sem finalização automática',async({page})=>{
+  await staticCatalog(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const contact=page.locator('#atendimento .margot-whatsapp-contact');
+  await expect(contact).toHaveAttribute('href','https://wa.me/5535997450100');
+  await expect(contact).toHaveAttribute('target','_blank');
+  await expect(contact).toContainText('(35) 99745-0100');
+  await expect(page.locator('.online-notice')).toContainText('não finaliza pagamentos nem reserva estoque');
+});
+
 test('o card de promoções acompanha o estado da vitrine e abre a sacola',async({page})=>{
   await staticCatalog(page);
   await verifiedOffer(page);
