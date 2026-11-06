@@ -181,7 +181,8 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await action('Subir 430',()=>page.evaluate(()=>scrollTo({top:430,behavior:'instant'})),{transition:true});
    await action('Voltar topo',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
    await action('Abrir menu mobile',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
-   await action('Selecionar brincos',()=>clickForTrace(page.locator('#main-nav [data-category-link="Brincos"]'),'categoria Brincos'));
+   await action('Abrir seção de produtos',()=>clickForTrace(page.locator('#main-nav a[href="#produtos"]'),'seção Produtos'));
+   await action('Selecionar brincos no catálogo',()=>clickForTrace(page.locator('#category-chips [data-filter="Brincos"]'),'categoria Brincos'));
    await action('Mostrar todos',()=>clickForTrace(page.locator('#show-all'),'Ver todos'));
    await action('Abrir busca',()=>clickForTrace(page.locator('#mobile-nav-search'),'busca mobile'),{transition:true});
    await action('Pesquisar colar',()=>page.locator('#search-input').fill('colar'));
@@ -217,7 +218,11 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      }
    },{transition:true});
    await expect(page.locator('.site-header')).toHaveClass(/is-compact/);
-   await action('Desktop abrir menu',()=>clickForTrace(page.locator('#menu-open'),'menu'),{transition:true});
+   await action('Desktop sem barra de categorias',async()=>{
+      await expect(page.locator('#main-nav')).toBeHidden();
+      await expect(page.locator('#menu-open')).toBeHidden();
+      await expect(page.locator('#category-chips [data-filter="Brincos"]')).toHaveCount(1);
+    },{transition:true});
    await action('Desktop restaurar',()=>page.evaluate(()=>scrollTo({top:0,behavior:'instant'})),{transition:true});
    await action('Assinatura editorial desktop',()=>page.locator('.closing-note').scrollIntoViewIfNeeded(),{transition:true});
    await action('Transicao para rodape desktop',()=>page.locator('.footer').scrollIntoViewIfNeeded(),{transition:true});

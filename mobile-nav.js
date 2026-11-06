@@ -56,7 +56,7 @@
       backdrop.hidden = !mobileDialog;
       document.body.classList.toggle('mobile-menu-open', mobileDialog);
       toggle.setAttribute('aria-expanded', String(opened));
-      toggle.setAttribute('aria-label', opened ? 'Menu de categorias aberto' : 'Abrir menu');
+      toggle.setAttribute('aria-label', opened ? 'Menu de navegação aberto' : 'Abrir menu');
 
       if (mobileDialog) {
         nav.setAttribute('role', 'dialog');
@@ -168,11 +168,11 @@
     }
     mirrorCounts();
 
-    // Uma única regra de seção e categoria para o menu do topo e a barra inferior.
+    // Navegação por seções; a filtragem de categorias acontece apenas na vitrine.
     function currentSection() {
       const marker = window.scrollY + header.getBoundingClientRect().height + 28;
       let current = 'inicio';
-      for (const id of ['inicio','categorias','produtos','presentes']) {
+      for (const id of ['inicio','categorias','produtos','presentes','atendimento']) {
         const section = get(id);
         if (!section) continue;
         if (marker >= section.getBoundingClientRect().top + window.scrollY) {
@@ -183,28 +183,11 @@
     }
     function updateActive() {
       ticking = false;
-      const selectedCategory = new URLSearchParams(window.location.search).get('categoria');
-      const categoryName = ['Brincos','Colares','Pulseiras','Anéis','Kits'].includes(selectedCategory)
-        ? selectedCategory : 'Todos';
-      // Uma categoria filtrada deve aparecer ativa enquanto o catálogo está
-      // efetivamente na área visível, mesmo quando o catálogo compacto
-      // aproxima a seção seguinte do cabeçalho.
-      const catalog = get('produtos')?.getBoundingClientRect();
-      const catalogVisible = catalog &&
-        catalog.bottom > header.getBoundingClientRect().bottom &&
-        catalog.top < window.innerHeight;
-      const section = categoryName !== 'Todos' && catalogVisible
-        ? 'produtos' : currentSection();
-      // Nenhum link permanece marcado artificialmente fora da seção correspondente.
+      const section = currentSection();
+      // Destacar somente a seção visível, sem duplicar os filtros de produtos.
       for (const link of nav.querySelectorAll('a[href]')) {
-        const selection = link.dataset.categoryLink;
         const href = link.getAttribute('href');
-        const active = section === 'inicio' ? href === '#inicio'
-          : section === 'categorias' ? href === '#categorias'
-          : section === 'produtos' ? (categoryName === 'Todos'
-              ? selection === 'Todos' : selection === categoryName)
-          : section === 'presentes' ? href === '#presentes'
-          : false;
+        const active = href === '#'+section;
         link.classList.toggle('active', active);
         if (active) link.setAttribute('aria-current','location');
         else link.removeAttribute('aria-current');
