@@ -131,7 +131,7 @@ test('foto real apresenta assinatura discreta; fallback não deixa assinatura so
   await expect(card.locator('.product-visual')).toHaveClass(/is-photo-missing/);
 });
 
-test('visual premium: foto, painel sobreposto e CTA preservam estados reais',async({page})=>{
+test('visual editorial: foto e painel separados com CTA consistente',async({page})=>{
   await staticCatalog(page);
   await verifiedOffer(page);
   await page.setViewportSize({width:1280,height:850});
@@ -148,21 +148,26 @@ test('visual premium: foto, painel sobreposto e CTA preservam estados reais',asy
     const info=normal.querySelector('.product-info').getBoundingClientRect();
     const photo=normal.querySelector('.product-visual').getBoundingClientRect();
     return {
-      photoOverlapsInfo:info.top<photo.bottom,
+      panelFollowsPhoto:Math.abs(info.top-photo.bottom)<=1,
+      infoPadding:parseFloat(getComputedStyle(normal.querySelector('.product-info')).paddingLeft),
+      imageRatio:photo.width/photo.height,
       normalButton:getComputedStyle(normal.querySelector('.add-to-cart')).backgroundImage,
       specialButton:getComputedStyle(special.querySelector('.add-to-cart')).backgroundImage,
       brandMissing:normal.querySelector('.product-photo-signature')===null
     };
   });
-  expect(visuals.photoOverlapsInfo).toBe(true);
+  expect(visuals.panelFollowsPhoto).toBe(true);
+  expect(visuals.infoPadding).toBeGreaterThanOrEqual(16);
+  expect(visuals.imageRatio).toBeGreaterThan(1.40);
+  expect(visuals.imageRatio).toBeLessThan(1.47);
   expect(visuals.normalButton).toContain('gradient');
   expect(visuals.specialButton).toContain('gradient');
-  expect(visuals.normalButton).not.toBe(visuals.specialButton);
+  expect(visuals.normalButton).toBe(visuals.specialButton);
   expect(visuals.brandMissing).toBe(true);
 });
 
 for(const width of [320,390,600,640,768,920,1024,1150,1280]){
-  test('layout premium sem overflow, CTA legível e grid correto em '+width+'px',async({page})=>{
+  test('layout editorial sem overflow, CTA legível e grade adaptativa em '+width+'px',async({page})=>{
     await staticCatalog(page);
     await verifiedOffer(page);
     await page.setViewportSize({width,height:850});
@@ -177,18 +182,23 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
       const button=card.querySelector('.add-to-cart');
       const root=el.getBoundingClientRect();
       const a=card.getBoundingClientRect(),b=button.getBoundingClientRect();
-      return {columns:getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length,
+      const gridStyle=getComputedStyle(el);
+      return {columns:gridStyle.gridTemplateColumns.split(' ').filter(Boolean).length,
+        gap:parseFloat(gridStyle.columnGap),
         cardWidth:a.width,buttonWidth:b.width,buttonHeight:b.height,
         buttonText:button.querySelector('.product-cart-label').getBoundingClientRect().width,
+        titleFontSize:parseFloat(getComputedStyle(card.querySelector('h3')).fontSize),
         width:root.width};
     });
-    expect(dims.columns).toBe(width<=600?3:width<=920?4:width<=1150?5:6);
-    expect(dims.cardWidth).toBeGreaterThan(width<=600?80:135);
+    const expectedColumns=width<=560?1:Math.max(1,Math.floor((dims.width+dims.gap)/(250+dims.gap)));
+    expect(dims.columns).toBe(expectedColumns);
+    expect(dims.cardWidth).toBeGreaterThan(width<=560?200:230);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
-    expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
-    expect(dims.buttonText).toBeGreaterThan(width<=600?30:65);
-    if(width===1280)expect(dims.cardWidth).toBeLessThan(205);
-    if(width===390)expect(dims.cardWidth).toBeLessThan(130);
+    expect(dims.buttonHeight).toBeGreaterThanOrEqual(49);
+    expect(dims.buttonText).toBeGreaterThan(75);
+    expect(dims.titleFontSize).toBeGreaterThanOrEqual(19);
+    if(width===1280)expect(dims.cardWidth).toBeGreaterThan(250);
+    if(width===390)expect(dims.cardWidth).toBeGreaterThan(300);
     const contained=await page.evaluate(()=>{
       const cards=[...document.querySelectorAll('#product-grid .product-card')];
       return cards.every(card=>{
@@ -203,11 +213,11 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
     expect(contained).toBe(true);
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
-    const artifact=path.join('test-results','product-cards-v131');
+    const artifact=path.join('test-results','product-cards-v135');
     fs.mkdirSync(artifact,{recursive:true});
     await page.locator('#product-grid').scrollIntoViewIfNeeded();
     await page.locator('#product-grid').screenshot({
-      path:path.join(artifact,'margot-cards-'+width+'.png'),
+      path:path.join(artifact,'margot-editorial-cards-'+width+'.png'),
       animations:'disabled'
     });
   });
