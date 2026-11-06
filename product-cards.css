@@ -1,4 +1,4 @@
-/* Margot V1.33 · Cards premium responsivos 6/5/4/3.
+/* Margot V1.34 · Cards premium responsivos 6/5/4/3.
  * Componente compartilhado pela coleção e pelas promoções.
  * Dados visuais são fornecidos exclusivamente pelo catálogo (sem avaliações fictícias).
  */
@@ -477,4 +477,171 @@
     transition:none!important;
     transform:none!important;
   }
+}
+
+
+/* Margot V1.34 — estética editorial premium; catálogo e ações inalterados. */
+.product-card{
+  position:relative;
+  border-color:#edcbd0;
+  border-radius:21px;
+  background:linear-gradient(180deg,#fffdfb,#fff6f5);
+  box-shadow:0 9px 26px rgba(116,60,77,.105);
+  transition:box-shadow .2s ease,border-color .2s ease;
+}
+.product-card:hover{
+  border-color:#dfa7b5;
+  box-shadow:0 15px 30px rgba(116,60,77,.16);
+}
+.product-card .product-visual{
+  aspect-ratio:1.05;
+  border-radius:0 0 17px 17px;
+}
+.product-card .product-visual::after{
+  background:linear-gradient(180deg,rgba(38,17,27,.34) 0%,transparent 34%,transparent 62%,rgba(42,18,29,.24) 100%);
+}
+.product-card .product-visual.is-photo-missing::after{display:none}
+.product-card:hover .product-photo{transform:scale(1.035)}
+.product-photo-signature{
+  z-index:3;
+  top:0;
+  left:0;
+  max-width:75%;
+  align-items:flex-start;
+  padding:10px 12px 9px;
+  border-radius:0 0 15px 0;
+  background:linear-gradient(120deg,rgba(60,29,40,.79),rgba(60,29,40,.39));
+  color:#ffe0ab;
+  text-shadow:0 1px 5px rgba(37,16,27,.5);
+}
+.product-photo-signature strong{
+  font-size:clamp(13px,1.3vw,18px);
+  letter-spacing:.055em;
+}
+.product-photo-signature small{
+  font-size:8px;
+  letter-spacing:.17em;
+}
+.product-card .product-visual .demo-tag{
+  z-index:4;
+  border-radius:999px;
+  color:#905a69;
+  background:rgba(255,250,250,.94);
+}
+.product-card .heart-btn{
+  z-index:5;
+  width:36px;
+  height:36px;
+  border:1px solid rgba(255,245,246,.78);
+  background:rgba(255,251,252,.97);
+  box-shadow:0 7px 18px rgba(51,23,34,.14);
+}
+.product-card .heart-btn:hover{background:#fff2f5}
+.product-card .product-badge{
+  border-radius:999px;
+  font-weight:800;
+  box-shadow:0 5px 12px rgba(36,19,28,.15);
+}
+.product-card .product-badge--favorite,
+.product-card .product-badge--bestseller{
+  background:linear-gradient(125deg,#fce4ae,#eab96e);
+  border:1px solid #ffe7be;
+  color:#653e2a;
+}
+.product-card .product-badge--favorite::before{content:"✦";margin-right:4px}
+.product-card .product-badge--bestseller::before{content:"♛";margin-right:4px;font-size:1.15em}
+.product-card .product-visual .product-badge--discount{
+  background:linear-gradient(130deg,#c43e69,#922a4e);
+  border-color:rgba(255,235,239,.3);
+  box-shadow:0 6px 16px rgba(92,24,52,.2);
+}
+#product-grid .product-card .product-info,
+#promotion-grid .product-card .product-info{
+  position:relative;
+  z-index:3;
+  margin-top:-11px;
+  border-top:1px solid rgba(236,211,218,.75);
+  border-radius:16px 16px 0 0;
+  background:linear-gradient(180deg,#fffcfb 0%,#fff5f4 100%);
+  box-shadow:0 -8px 19px rgba(78,36,51,.06);
+}
+.product-card .product-info h3{
+  font-family:Georgia,"Times New Roman",serif;
+  letter-spacing:-.02em;
+  color:var(--card-ink);
+}
+.product-card .product-info .product-price-line .price{
+  color:#96314f;
+  letter-spacing:-.025em;
+}
+.product-card .product-old-price{color:#987d85}
+.product-card .product-savings{
+  border:1px solid rgba(225,154,177,.14);
+  border-radius:10px;
+  background:linear-gradient(120deg,#fff0f0,#f9dfe5);
+}
+.product-card .product-savings strong{color:#a42f57}
+.product-card .product-stock::before{
+  background:#50ad56;
+  box-shadow:0 0 0 3px rgba(80,173,86,.13);
+}
+.product-card .product-stock--out::before{
+  background:#c85265;
+  box-shadow:0 0 0 3px rgba(200,82,101,.12);
+}
+.product-card .product-info .add-to-cart{
+  border-radius:11px;
+  border:1px solid rgba(255,216,231,.34);
+  background:linear-gradient(115deg,#bf3c64,#9e3156 55%,#8c294b);
+  box-shadow:0 7px 17px rgba(125,36,71,.2);
+}
+.product-card .product-info .add-to-cart:hover:not(:disabled){
+  background:linear-gradient(115deg,#b33560,#8c284c);
+  box-shadow:0 9px 19px rgba(125,36,71,.27);
+}
+.product-card .product-cart-arrow{display:block;font-weight:700}
+.product-card--signature{
+  --card-ink:#fff5f0;
+  --card-muted:#f1ced7;
+  --card-highlight:#ffd38b;
+  border-color:#af7d74;
+  background:linear-gradient(180deg,#462c39,#2b202b);
+  box-shadow:0 13px 30px rgba(57,21,37,.19);
+}
+.product-card--signature .product-visual::after{
+  background:linear-gradient(180deg,rgba(17,7,13,.46),transparent 40%,rgba(13,6,12,.34));
+}
+#product-grid .product-card--signature .product-info,
+#promotion-grid .product-card--signature .product-info{
+  border-top-color:rgba(242,202,170,.24);
+  background:linear-gradient(155deg,#49313d 0%,#2b212b 100%);
+  box-shadow:0 -9px 24px rgba(17,8,13,.28);
+}
+.product-card--signature .product-info .product-price-line .price{color:#ffd38b}
+.product-card--signature .product-savings{
+  border-color:rgba(242,191,155,.26);
+  background:rgba(157,90,104,.22);
+}
+.product-card--signature .product-savings strong{color:#ffdc9e}
+.product-card--signature .product-stock::before{background:#66df72}
+.product-card--signature .product-info .add-to-cart{
+  color:#4a2b2c;
+  border-color:#ffe3b0;
+  background:linear-gradient(110deg,#ffde9c,#f3c16e 65%,#eeb25f);
+  box-shadow:0 7px 17px rgba(224,156,71,.23);
+}
+.product-card--signature .product-info .add-to-cart:hover:not(:disabled){
+  background:linear-gradient(110deg,#ffe8b7,#f1bc66);
+  box-shadow:0 10px 20px rgba(224,156,71,.28);
+}
+@media(max-width:600px){
+  .product-card .product-cart-arrow{display:none}
+  .product-card .product-badge--favorite::before,
+  .product-card .product-badge--bestseller::before{display:none}
+  #product-grid .product-card .product-info,
+  #promotion-grid .product-card .product-info{margin-top:-8px;border-radius:11px 11px 0 0}
+  .product-card .heart-btn{width:30px;height:30px}
+}
+@media(prefers-reduced-motion:reduce){
+  .product-card,.product-card .product-photo{transition:none!important;transform:none!important}
 }
