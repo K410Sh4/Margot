@@ -40,13 +40,28 @@
     el.textContent=String(count);
     el.hidden=count===0;
   }
+  function availableToAdd(){
+    const stored=read('cart',{});
+    const already=stored&&typeof stored==='object'&&!Array.isArray(stored)&&
+      Number.isInteger(stored[product.id])&&stored[product.id]>0?stored[product.id]:0;
+    const limit=product.stock===null||product.stock===undefined?99:Math.min(99,product.stock);
+    return Math.max(0,limit-already);
+  }
   function quantity(){
     const input=$('pd-qty-input');
+    const available=availableToAdd();
+    const limit=Math.max(1,available);
     const value=Number(input.value);
-    const next=Number.isFinite(value)?Math.min(99,Math.max(1,Math.trunc(value))):1;
+    const next=Number.isFinite(value)?Math.min(limit,Math.max(1,Math.trunc(value))):1;
     input.value=String(next);
-    $('pd-decrease').disabled=next<=1;
-    $('pd-increase').disabled=next>=99;
+    input.max=String(limit);
+    input.disabled=available===0;
+    $('pd-decrease').disabled=available===0||next<=1;
+    $('pd-increase').disabled=available===0||next>=limit;
+    // Mantém o botão clicável para informar o limite; estoque zero é a exceção.
+    $('pd-add').disabled=product.stock===0;
+    $('pd-add').setAttribute('aria-label',available===0?
+      'Limite do estoque informado atingido ou peça esgotada':'Adicionar '+product.name+' à sacola');
     return next;
   }
   function getFavorites(){
@@ -74,21 +89,109 @@
     const stored=read('cart',{});
     const cart=stored&&typeof stored==='object'&&!Array.isArray(stored)?{...stored}:{};
     const previous=Number.isInteger(cart[product.id])&&cart[product.id]>0?cart[product.id]:0;
-    if(previous>=99){
-      toast('Esta peça já atingiu o limite de 99 unidades na sacola.');
+    const remaining=availableToAdd();
+    if(remaining<=0){
+      toast('Limite do estoque informado ou da sacola atingido. Confirme a disponibilidade.');
+      quantity();
       return;
     }
     const requested=quantity();
-    const next=Math.min(99,previous+requested);
+    const next=Math.min(99,previous+Math.min(requested,remaining));
     cart[product.id]=next;
     if(!write('cart',cart)){
       toast('Não foi possível guardar a sacola neste navegador.');
       return;
     }
     syncCartCount();
+    quantity();
     $('pd-view-cart').hidden=false;
     toast(next-previous+' '+(next-previous===1?'unidade adicionada':'unidades adicionadas')+' à sacola.');
-    if(next-previous<requested)toast('Limite de 99 unidades atingido. Confira a sacola.');
+    if(next-previous<requested)toast('Quantidade limitada ao estoque informado. Confirme a disponibilidade.');
+  }
+
+  function verifiedLabels(item){
+    const badges=$('pd-badges');
+    badges.replaceChildren();
+    const labels={
+      favorite:'Peça favorita',
+      bestSeller:'Mais vendida do mês',
+      discount:'Oferta'
+    };
+    for(const type of item.labels||[]){
+      if(!labels[type])continue;
+      const tag=document.createElement('span');
+      tag.className='pd-badge pd-badge--'+type;
+      tag.textContent=type==='discount'&&item.promotion?
+        '-'+item.promotion.percent+'%':labels[type];
+      badges.append(tag);
+    }
+    badges.hidden=badges.childElementCount===0;
+  }
+  function renderCommercialInfo(){
+    verifiedLabels(product);
+    const promo=product.promotion;
+    $('pd-old-price').hidden=!promo;
+    $('pd-saving').hidden=!promo;
+    $('pd-promotion-panel').hidden=!promo;
+    if(promo){
+      $('pd-old-price').textContent=money(promo.originalPrice);
+      $('pd-saving').textContent='Economize '+money(promo.originalPrice-promo.salePrice);
+      $('pd-promotion-copy').textContent='De '+money(promo.originalPrice)+
+        ' por '+money(promo.salePrice)+'. Oferta informada até '+
+        promo.endsAt.split('-').reverse().join('/')+'. Valores sujeitos à confirmação.';
+    }
+    const msg=$('pd-availability-text'),note=$('pd-stock-note');
+    const stock=product.stock;
+    note.hidden=stock===null||stock===undefined;
+    if(Number.isInteger(stock))$('pd-qty-hint').textContent='Limite do estoque informado: '+stock+(stock===1?' unidade':' unidades');
+    $('pd-availability').classList.toggle('pd-availability--low',
+      window.MargotMerchandising?.lowStock(product)===true);
+    $('pd-availability').classList.toggle('pd-availability--out',stock===0);
+    const checked=product.stockCheckedAt?.split('-').reverse().join('/')||'';
+    if(stock===0)msg.textContent='Sem unidades no estoque informado em '+checked+'. Consulte a loja.';
+    else if(Number.isInteger(stock)&&stock>=1&&stock<=10){
+      msg.textContent=(stock===1?'Resta ':'Restam ')+stock+(stock===1?' unidade':' unidades')+
+        ' no estoque informado em '+checked+'.';
+    }else if(Number.isInteger(stock)){
+      msg.textContent='Estoque informado em '+checked+'. Disponibilidade sujeita à confirmação.';
+    }else{
+      msg.textContent='Disponibilidade e detalhes a confirmar com a loja';
+    }
+  }
+  function renderOffers(){
+    const grid=$('pd-offers-grid'),empty=$('pd-offers-empty');
+    const offers=window.MargotMerchandising?.promotions||[];
+    grid.replaceChildren();
+    for(const item of offers){
+      const link=document.createElement('a');
+      link.className='pd-related-card pd-related-card--offer';
+      link.href='./produto.html?id='+encodeURIComponent(item.id);
+      const imgWrap=document.createElement('span');
+      imgWrap.className='pd-related-visual';
+      const img=document.createElement('img');
+      img.src=item.image||fallbackImage;
+      img.alt=item.image?'Foto de '+item.name:'Imagem de '+item.name+' em breve';
+      img.loading='lazy';
+      img.addEventListener('error',()=>{if(img.getAttribute('src')!==fallbackImage)img.src=fallbackImage;});
+      imgWrap.append(img);
+      const discount=document.createElement('span');
+      discount.className='pd-offer-tag';
+      discount.textContent='-'+item.promotion.percent+'%';
+      imgWrap.append(discount);
+      const name=document.createElement('strong');
+      name.textContent=item.name;
+      const price=document.createElement('span');
+      price.className='pd-related-price';
+      price.textContent=money(item.price);
+      const old=document.createElement('del');
+      old.className='pd-related-old-price';
+      old.textContent=money(item.promotion.originalPrice);
+      link.append(imgWrap,name,price,old);
+      grid.append(link);
+    }
+    $('pd-offers').hidden=offers.length===0;
+    grid.hidden=offers.length===0;
+    empty.hidden=offers.length!==0;
   }
 
   function normalizedImages(item){
@@ -203,6 +306,8 @@
     $('pd-title').textContent=product.name;
     $('pd-category').textContent=product.category;
     $('pd-price').textContent=money(product.price);
+    renderCommercialInfo();
+    renderOffers();
     $('pd-description').textContent=product.description||
       (product.name+' faz parte da seleção '+product.category.toLocaleLowerCase('pt-BR')+
       ' da Margot. As informações de material, medidas e disponibilidade serão confirmadas antes de qualquer pedido.');
@@ -239,7 +344,7 @@
       if(event.target===$('pd-image-dialog'))$('pd-image-dialog').close();
     });
     window.addEventListener('storage',event=>{
-      if(event.key==='margot-cart')syncCartCount();
+      if(event.key==='margot-cart'){syncCartCount();quantity();}
       if(event.key==='margot-favorites')syncFavorite();
     });
   }

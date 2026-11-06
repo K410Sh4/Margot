@@ -93,7 +93,69 @@ function applyProductPhotoFallback(root){
   }, true);
 }
 function syncSearchBadge(){const el=$('active-search');if(el){el.hidden=!query;el.querySelector('[data-search-term]').textContent=query}}
-function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag"${hasProductPhoto(p)?' hidden':''}>Foto em breve</span><a class="product-open" href="./produto.html?id=${encodeURIComponent(p.id)}" aria-label="Ver detalhes de ${p.name}">${productImage(p)}</a><button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3><a class="product-title-link" href="./produto.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;syncSearchBadge();document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
+function priceMarkup(p){
+  return '<span class="price">'+money(p.price)+'</span>'+
+    (p.promotion?'<del class="product-old-price">'+money(p.promotion.originalPrice)+'</del>':'');
+}
+function badgesMarkup(p){
+  if(!Array.isArray(p.labels)||!p.labels.length)return '';
+  return '<div class="product-badges" aria-label="Classificações da peça">'+p.labels.map(label=>{
+    if(label==='favorite')return '<span class="product-badge product-badge--favorite">Peça favorita</span>';
+    if(label==='bestSeller')return '<span class="product-badge product-badge--bestseller">Mais vendida do mês</span>';
+    if(label==='discount')return '<span class="product-badge product-badge--discount">-'+p.promotion.percent+'%</span>';
+    return '';
+  }).join('')+'</div>';
+}
+function lowStockMarkup(p){
+  if(p.stock===0)return '<span class="product-stock product-stock--out">Indisponível no estoque informado</span>';
+  if(window.MargotMerchandising?.lowStock(p)){
+    return '<span class="product-stock">'+(p.stock===1?'Resta ':'Restam ')+p.stock+
+      (p.stock===1?' unidade':' unidades')+' · sob confirmação</span>';
+  }
+  return '';
+}
+function canAdd(p){
+  return p.stock===null||p.stock===undefined?
+    (cart[p.id]||0)<99:(cart[p.id]||0)<Math.min(99,p.stock);
+}
+function productCard(p){
+  return '<article class="product-card'+(p.promotion?' product-card--offer':'')+'">'+
+    '<div class="product-visual">'+
+      '<span class="demo-tag"'+(hasProductPhoto(p)?' hidden':'')+'>Foto em breve</span>'+
+      '<a class="product-open" href="./produto.html?id='+encodeURIComponent(p.id)+'" aria-label="Ver detalhes de '+p.name+'">'+productImage(p)+'</a>'+
+      badgesMarkup(p)+
+      '<button class="heart-btn" type="button" data-favorite="'+p.id+'" aria-pressed="'+favorites.has(p.id)+'" aria-label="'+(favorites.has(p.id)?'Remover dos':'Adicionar aos')+' favoritos: '+p.name+'"><span class="icon" data-icon="heart"></span></button>'+
+    '</div>'+
+    '<div class="product-info"><span class="category-label">'+p.category+'</span>'+
+      '<h3><a class="product-title-link" href="./produto.html?id='+encodeURIComponent(p.id)+'">'+p.name+'</a></h3>'+
+      '<div class="product-price-line">'+priceMarkup(p)+'</div>'+
+      lowStockMarkup(p)+
+      '<button class="add-to-cart" type="button" data-add="'+p.id+'" aria-label="'+(canAdd(p)?'Adicionar '+p.name+' à sacola':'Não é possível adicionar '+p.name+' à sacola')+'"'+(canAdd(p)?'':' disabled')+'><span class="icon" data-icon="bag"></span></button>'+
+    '</div></article>';
+}
+function bindProductActions(root){
+  populateIcons(root);
+  root.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));
+  root.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)));
+}
+function renderProducts(){
+  const found=filteredProducts();
+  $('product-grid').innerHTML=found.map(productCard).join('');
+  bindProductActions($('product-grid'));
+  $('catalog-status').textContent=found.length+' '+(found.length===1?'produto':'produtos')+' em exibição';
+  $('empty-results').hidden=found.length>0;
+  syncSearchBadge();
+}
+function renderPromotionPanel(){
+  const panel=$('promotion-grid');
+  if(!panel)return;
+  const available=window.MargotMerchandising?.promotions||[];
+  panel.hidden=available.length===0;
+  $('promotion-empty').hidden=available.length!==0;
+  panel.innerHTML=available.map(productCard).join('');
+  bindProductActions(panel);
+}
+
 function chooseCategory(c,scroll=true){
   if(c!=='Todos'&&!categories.includes(c))return;
   query='';$('search-input').value='';$('clear-search').hidden=true;
@@ -107,10 +169,35 @@ function chooseCategory(c,scroll=true){
   if(scroll){$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 }
 function updateCounts(){const num=Object.values(cart).reduce((a,n)=>a+n,0);$('cart-count').textContent=num;$('cart-count').hidden=!num;$('favorite-count').textContent=favorites.size;$('favorite-count').hidden=!favorites.size}
-function addToCart(id){if(!getItem(id))return;if((cart[id]||0)>=99){notify('Limite de 99 unidades por peça.');return}cart[id]=(cart[id]||0)+1;saveStorage('cart',cart);updateCounts();notify('Peça adicionada à sacola');if($('drawer').classList.contains('open'))renderDrawer()}
-function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
-function changeQuantity(id,delta){const next=(cart[id]||0)+delta;if(next<=0)delete cart[id];else cart[id]=Math.min(99,next);saveStorage('cart',cart);updateCounts();renderDrawer()}
-function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}">+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}
+function addToCart(id){
+  const p=getItem(id);
+  if(!p)return;
+  if(p.stock===0){notify('Peça indisponível no estoque informado.');return;}
+  if(!canAdd(p)){
+    notify(p.stock!==null&&p.stock!==undefined?'Limite do estoque informado atingido. Confirme a disponibilidade.':'Limite de 99 unidades por peça.');
+    return;
+  }
+  cart[id]=(cart[id]||0)+1;
+  saveStorage('cart',cart);
+  updateCounts();
+  renderProducts();
+  renderPromotionPanel();
+  notify('Peça adicionada à sacola');
+  if($('drawer').classList.contains('open'))renderDrawer();
+}
+function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();renderPromotionPanel();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
+function changeQuantity(id,delta){
+  const p=getItem(id);if(!p)return;
+  const next=(cart[id]||0)+delta;
+  if(next<=0)delete cart[id];
+  else if(delta>0){
+    const cap=p.stock===null||p.stock===undefined?99:Math.min(99,p.stock);
+    if(next>cap){notify('Quantidade acima do estoque informado. Confirme a disponibilidade.');return;}
+    cart[id]=Math.min(99,next);
+  }else cart[id]=Math.min(99,next);
+  saveStorage('cart',cart);updateCounts();renderProducts();renderPromotionPanel();renderDrawer();
+}
+function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}
 function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${p.id}">Adicionar à sacola</button></div><button type="button" class="remove" data-fav-remove="${p.id}" aria-label="Remover ${p.name} dos favoritos">×</button></div>`}
 function renderDrawer(){const isCart=drawerMode==='cart';$('drawer-title').textContent=isCart?'Sua sacola':'Meus favoritos';let items=isCart?Object.keys(cart).map(getItem):[...favorites].map(getItem);items=items.filter(Boolean);$('drawer-items').innerHTML=items.length?items.map(isCart?cartLine:favoriteLine).join(''):`<div class="drawer-empty"><span class="icon" data-icon="${isCart?'bag':'heart'}"></span><p>${isCart?'Sua sacola ainda está vazia.':'Você ainda não salvou favoritos.'}</p><p>Descubra os detalhes da coleção Margot.</p></div>`;populateIcons($('drawer-items'));if(isCart&&items.length){const subtotal=items.reduce((s,p)=>s+p.price*cart[p.id],0);$('drawer-footer').innerHTML=`<div class="subtotal"><span>Subtotal estimado</span><span>${money(subtotal)}</span></div><p class="checkout-note">Valores ilustrativos. Não há cobrança automática nem reserva de estoque. O pedido deve ser confirmado com a loja.</p><button type="button" id="copy-order" class="button primary">Copiar lista de interesse</button><button type="button" id="continue-shopping" class="button outline">Continuar olhando</button>`;$('copy-order').addEventListener('click',copyOrder);$('continue-shopping').addEventListener('click',closeDrawer)}else{$('drawer-footer').innerHTML=`<button class="button outline" type="button" id="continue-shopping">Explorar coleção</button>`;$('continue-shopping').addEventListener('click',closeDrawer)}$('drawer-items').querySelectorAll('[data-qty]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.qty,Number(btn.dataset.delta))));$('drawer-items').querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.remove,-99)));$('drawer-items').querySelectorAll('[data-fav-remove]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(btn.dataset.favRemove)));$('drawer-items').querySelectorAll('[data-fav-add]').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.favAdd)))}
 function openDrawer(mode){previousFocus=document.activeElement;drawerMode=mode;renderDrawer();$('drawer').inert=false;$('drawer').setAttribute('aria-hidden','false');$('overlay').hidden=false;requestAnimationFrame(()=>{$('drawer').classList.add('open');$('overlay').classList.add('show')});document.body.style.overflow='hidden';$('drawer-close').focus()}
@@ -118,7 +205,7 @@ function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classLi
 function copyOrder(){const lines=Object.keys(cart).map(id=>`• ${getItem(id).name} — ${cart[id]} un. × ${money(getItem(id).price)}`);const subtotal=Object.keys(cart).reduce((s,id)=>s+getItem(id).price*cart[id],0);const msg=`Olá! Tenho interesse nestas peças da Margot Acessórios:\n${lines.join('\n')}\nSubtotal demonstrativo: ${money(subtotal)}\nGostaria de confirmar disponibilidade, valores e entrega.`;const fallback=()=>{const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('Falha ao copiar')};Promise.resolve(navigator.clipboard?.writeText?navigator.clipboard.writeText(msg).catch(fallback):fallback()).then(()=>notify('Lista copiada. Cole no atendimento da loja quando estiver disponível.')).catch(()=>notify('Não foi possível copiar automaticamente.'))}
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function closeMobileMenu(){window.dispatchEvent(new CustomEvent('margot:menu-close'))}
-function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();renderProducts();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>chooseCategory('Todos'));$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;renderProducts()});$('search-form').addEventListener('submit',e=>{e.preventDefault();window.dispatchEvent(new CustomEvent('margot:search-close'));$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('clear-active-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('drawer').classList.contains('open'))closeDrawer();if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
+function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();applyProductPhotoFallback($('promotion-grid'));renderProducts();renderPromotionPanel();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>chooseCategory('Todos'));$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;renderProducts()});$('search-form').addEventListener('submit',e=>{e.preventDefault();window.dispatchEvent(new CustomEvent('margot:search-close'));$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('clear-active-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('drawer').classList.contains('open'))closeDrawer();if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
 document.addEventListener('DOMContentLoaded',()=>{
   init();
   // Link vindo da página individual: sacola do MESMO armazenamento local.

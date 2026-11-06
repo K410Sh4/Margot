@@ -8,9 +8,11 @@
   <title>Detalhes do produto | Margot Acessórios</title>
   <link rel="icon" href="./assets/favicon-32.png?v=official-2" type="image/png">
   <link rel="stylesheet" href="./styles.css?v=1.26">
-  <link rel="stylesheet" href="./product-detail.css?v=1.26">
+  <link rel="stylesheet" href="./product-detail.css?v=1.27">
   <script src="./catalog-data.js?v=1.26" defer></script>
-  <script src="./product-detail.js?v=1.26" defer></script>
+  <script src="./merchandising-data.js?v=1.27" defer></script>
+  <script src="./merchandising.js?v=1.27" defer></script>
+  <script src="./product-detail.js?v=1.27" defer></script>
 </head>
 <body class="pd-page">
   <a class="skip-link" href="#conteudo">Ir para detalhes do produto</a>
@@ -75,17 +77,25 @@
 
         <div class="pd-buy-panel">
           <p class="pd-overline">MARGOT <span aria-hidden="true">·</span> <span id="pd-category"></span></p>
+          <div id="pd-badges" class="pd-badges" aria-label="Destaques da peça" hidden></div>
           <h1 class="pd-title" id="pd-title"></h1>
           <p class="pd-lead">Um detalhe para acompanhar seus momentos.</p>
           <div class="pd-price-block">
             <strong id="pd-price" class="pd-price"></strong>
+            <del id="pd-old-price" class="pd-old-price" hidden></del>
+            <span id="pd-saving" class="pd-saving" hidden></span>
             <span class="pd-preview-price">Valor ilustrativo · sujeito à confirmação</span>
           </div>
-          <p class="pd-availability"><span class="pd-availability-dot" aria-hidden="true"></span>Disponibilidade e detalhes a confirmar com a loja</p>
+          <div class="pd-promotion-panel" id="pd-promotion-panel" hidden>
+            <span class="pd-promotion-panel__icon" aria-hidden="true">✦</span>
+            <div><strong>Condição especial</strong><p id="pd-promotion-copy"></p></div>
+          </div>
+          <p class="pd-availability" id="pd-availability"><span class="pd-availability-dot" aria-hidden="true"></span><span id="pd-availability-text">Disponibilidade e detalhes a confirmar com a loja</span></p>
+          <p class="pd-stock-note" id="pd-stock-note" hidden>Estoque informado, sem reserva automática. Confirme a disponibilidade antes de solicitar.</p>
           <div class="pd-qty-row">
             <div>
               <label for="pd-qty-input">Quantidade</label>
-              <p class="pd-qty-hint">Até 99 unidades por peça</p>
+              <p class="pd-qty-hint" id="pd-qty-hint">Até 99 unidades por peça</p>
             </div>
             <div class="pd-qty-control">
               <button id="pd-decrease" type="button" aria-label="Diminuir quantidade">−</button>
@@ -147,6 +157,15 @@
         </div>
       </section>
 
+      <section class="pd-offers" id="pd-offers" aria-labelledby="pd-offers-title">
+        <div class="pd-section-heading">
+          <p class="pd-overline">CONDIÇÕES DA COLEÇÃO</p>
+          <h2 id="pd-offers-title">Promoções da Margot</h2>
+          <p>Ofertas verificadas, quando disponíveis.</p>
+        </div>
+        <div class="pd-related-grid" id="pd-offers-grid" hidden></div>
+        <p class="pd-offers-empty" id="pd-offers-empty">Ainda não há descontos confirmados. Explore as peças da coleção.</p>
+      </section>
       <section class="pd-related" aria-labelledby="pd-related-title">
         <div class="pd-section-heading">
           <p class="pd-overline">CONTINUE DESCOBRINDO</p>
