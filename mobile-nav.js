@@ -172,7 +172,7 @@
     function currentSection() {
       const marker = window.scrollY + header.getBoundingClientRect().height + 28;
       let current = 'inicio';
-      for (const id of ['inicio','categorias','produtos','presentes']) {
+      for (const id of ['inicio','categorias','produtos','presentes','atendimento']) {
         const section = get(id);
         if (!section) continue;
         if (marker >= section.getBoundingClientRect().top + window.scrollY) {
