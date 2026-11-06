@@ -51,19 +51,26 @@
   }
   function quantity(){
     const input=$('pd-qty-input');
+    const stored=read('cart',{});
+    const inCart=Number.isInteger(stored?.[product.id])&&stored[product.id]>0;
     const available=availableToAdd();
     const limit=Math.max(1,available);
     const value=Number(input.value);
     const next=Number.isFinite(value)?Math.min(limit,Math.max(1,Math.trunc(value))):1;
     input.value=String(next);
     input.max=String(limit);
-    input.disabled=available===0;
-    $('pd-decrease').disabled=available===0||next<=1;
-    $('pd-increase').disabled=available===0||next>=limit;
+    input.disabled=inCart||available===0;
+    $('pd-decrease').disabled=inCart||available===0||next<=1;
+    $('pd-increase').disabled=inCart||available===0||next>=limit;
+    $('pd-qty-hint').textContent=inCart?'Para mudar a quantidade, abra a sacola.':
+      Number.isInteger(product.stock)?'Limite do estoque informado: '+product.stock+(product.stock===1?' unidade':' unidades'):'Até 99 unidades por peça';
     // Mantém o botão clicável para informar o limite; estoque zero é a exceção.
-    $('pd-add').disabled=product.stock===0;
-    $('pd-add').setAttribute('aria-label',available===0?
+    $('pd-add').disabled=product.stock===0&&!inCart;
+    $('pd-add').classList.toggle('is-in-cart',inCart);
+    $('pd-add-label').textContent=inCart?'Adicionado ao carrinho':'Adicionar à sacola';
+    $('pd-add').setAttribute('aria-label',inCart?'Ver '+product.name+' na sacola':available===0?
       'Limite do estoque informado atingido ou peça esgotada':'Adicionar '+product.name+' à sacola');
+    $('pd-view-cart').hidden=!inCart;
     return next;
   }
   function getFavorites(){
@@ -91,6 +98,7 @@
     const stored=read('cart',{});
     const cart=stored&&typeof stored==='object'&&!Array.isArray(stored)?{...stored}:{};
     const previous=Number.isInteger(cart[product.id])&&cart[product.id]>0?cart[product.id]:0;
+    if(previous>0){window.location.assign('./index.html?sacola=1#produtos');return;}
     const remaining=availableToAdd();
     if(remaining<=0){
       toast('Limite do estoque informado ou da sacola atingido. Confirme a disponibilidade.');

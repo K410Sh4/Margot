@@ -103,12 +103,19 @@ test('estoque baixo aparece apenas entre uma e dez unidades',async({page})=>{
 test('vitrine bloqueia unidades acima do estoque informado',async({page})=>{
   await withCommercialData(page,mockItems());
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  for(let n=0;n<7;n++){
-    await page.locator('#product-grid [data-add="brinco-coracao"]').click();
-  }
-  await expect(page.locator('#cart-count')).toHaveText('7');
-  await expect(page.locator('#product-grid [data-add="brinco-coracao"]')).toBeDisabled();
+  await page.locator('#product-grid [data-add="brinco-coracao"]').click();
+  await expect(page.locator('#product-grid [data-add="brinco-coracao"] .product-cart-label'))
+    .toHaveText('Adicionado ao carrinho');
   await page.locator('#mobile-nav-cart').click();
+  await page.evaluate(()=>{
+    for(let n=0;n<10;n++){
+      const plus=document.querySelector('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]');
+      if(!plus||plus.disabled)break;
+      plus.click();
+    }
+  });
+  await expect(page.locator('#cart-count')).toHaveText('7');
+  await expect(page.locator('#product-grid [data-add="brinco-coracao"]')).toBeEnabled();
   await expect(page.locator('#drawer-items .quantity span').first()).toHaveText('7');
   await expect(page.locator('#drawer-items [data-delta="1"]').first()).toBeDisabled();
 });
@@ -121,11 +128,11 @@ test('página V3 limita quantidade ao saldo informado sem alegar reserva',async(
   await expect(page.locator('#pd-qty-input')).toHaveValue('7');
   await page.locator('#pd-add').click();
   await expect(page.locator('#pd-cart-count')).toHaveText('7');
-  await page.locator('#pd-add').click();
-  await expect(page.locator('#pd-cart-count')).toHaveText('7');
+  await expect(page.locator('#pd-add-label')).toHaveText('Adicionado ao carrinho');
   await expect(page.locator('.pd-disclosure')).toContainText('não efetua compra');
-  await page.locator('#pd-view-cart').click();
+  await page.locator('#pd-add').click();
   await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#cart-count')).toHaveText('7');
   await expect(page.locator('#drawer-items .quantity span')).toHaveText('7');
 });
 

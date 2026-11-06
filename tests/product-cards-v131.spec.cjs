@@ -86,6 +86,69 @@ test('oferta verificada mostra economia, desconto, estoque e tema premium mensal
   await expect(page.locator('#drawer-items')).toContainText('R$ 14,90');
 });
 
+test('após adicionar o card muda de estado e abre a sacola sem duplicar a unidade',async({page})=>{
+  await staticCatalog(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const card=page.locator('#product-grid .product-card').first();
+  const button=card.locator('.add-to-cart');
+  await expect(button.locator('.product-cart-label')).toHaveText('Adicionar à sacola');
+  await button.click();
+  await expect(button).toHaveClass(/is-in-cart/);
+  await expect(button.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await expect(button).toHaveAttribute('aria-label',/Ver .* na sacola/);
+  await expect(page.locator('#cart-count')).toHaveText('1');
+
+  await button.click();
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#drawer-title')).toHaveText('Sua sacola');
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  await expect(page.locator('#drawer-items .quantity span')).toHaveText('1');
+
+  // A sacola ainda permite aumentar ou remover a quantidade manualmente.
+  await page.locator('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]').click();
+  await expect(page.locator('#cart-count')).toHaveText('2');
+  await expect(button.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await page.locator('#drawer-items [data-remove="brinco-coracao"]').click();
+  await expect(page.locator('#cart-count')).toBeHidden();
+  await expect(button.locator('.product-cart-label')).toHaveText('Adicionar à sacola');
+  await page.locator('#drawer-close').click();
+  await button.click();
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  await expect(button.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await expect(page.locator('#product-grid .product-card').first().locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+});
+
+test('o card de promoções acompanha o estado da vitrine e abre a sacola',async({page})=>{
+  await staticCatalog(page);
+  await verifiedOffer(page);
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const catalogButton=page.locator('#product-grid .product-card').first().locator('.add-to-cart');
+  const promotionButton=page.locator('#promotion-grid .product-card').first().locator('.add-to-cart');
+  await catalogButton.click();
+  await expect(promotionButton.locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
+  await promotionButton.click();
+  await expect(page.locator('#drawer-title')).toHaveText('Sua sacola');
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#cart-count')).toHaveText('1');
+});
+
+test('na página de detalhes a segunda ação leva à sacola sem repetir a adição',async({page})=>{
+  await staticCatalog(page);
+  await page.goto('/produto.html?id=brinco-coracao',{waitUntil:'domcontentloaded'});
+  const button=page.locator('#pd-add');
+  await expect(button).toBeVisible();
+  await expect(page.locator('#pd-add-label')).toHaveText('Adicionar à sacola');
+  await button.click();
+  await expect(page.locator('#pd-cart-count')).toHaveText('1');
+  await expect(page.locator('#pd-add-label')).toHaveText('Adicionado ao carrinho');
+  await expect(page.locator('#pd-qty-input')).toBeDisabled();
+  await button.click();
+  await expect(page).toHaveURL(/index\.html\?sacola=1|index\.html#produtos/);
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#cart-count')).toHaveText('1');
+});
+
 test('produto sem estoque desabilita ação e mantém detalhes e favoritos',async({page})=>{
   await staticCatalog(page);
   const data={products:{

@@ -395,3 +395,12 @@
   .product-card .heart-btn,
   .product-card .product-info .add-to-cart {transition:none!important;transform:none!important}
 }
+
+/* V1.37 — peça já na sacola: o botão abre o painel sem somar unidades. */
+.product-card .product-info .add-to-cart.is-in-cart,
+.product-card .product-info .add-to-cart.is-in-cart:hover:not(:disabled){
+  background:linear-gradient(110deg,#875064,#68394d);
+  box-shadow:0 5px 13px rgba(95,51,72,.16);
+}
+.product-card .add-to-cart.is-in-cart .product-cart-arrow{display:none}
+.product-card .add-to-cart.is-in-cart .product-cart-label{font-size:11px}

@@ -279,3 +279,10 @@ body.pd-page{
   .pd-offers{padding:22px 0 10px}
   .pd-offers-empty{font-size:12px}
 }
+
+/* V1.28 — estado adicionado: o próximo clique leva à sacola. */
+.pd-actions .pd-button-primary.is-in-cart,
+.pd-actions .pd-button-primary.is-in-cart:hover:not(:disabled){
+  background:linear-gradient(110deg,#875064,#68394d);
+  box-shadow:0 5px 13px rgba(95,51,72,.16);
+}
