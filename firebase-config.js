@@ -7,3 +7,6 @@ window.MARGOT_FIREBASE_CONFIG = {
     "apiKey":  "AIzaSyC4l_J8ih11gXW3KISqRQidrsVPuuuBGxQ",
     "authDomain":  "margot-acessorios-865987.firebaseapp.com"
 };
+
+// Ativar somente após configurar Firebase Storage e publicar storage.rules.
+window.MARGOT_STORAGE_UPLOADS_ENABLED = false;
