@@ -487,10 +487,9 @@
   border-radius:21px;
   background:linear-gradient(180deg,#fffdfb,#fff6f5);
   box-shadow:0 9px 26px rgba(116,60,77,.105);
-  transition:box-shadow .2s ease,border-color .2s ease,transform .2s ease;
+  transition:box-shadow .2s ease,border-color .2s ease;
 }
 .product-card:hover{
-  transform:translateY(-2px);
   border-color:#dfa7b5;
   box-shadow:0 15px 30px rgba(116,60,77,.16);
 }
