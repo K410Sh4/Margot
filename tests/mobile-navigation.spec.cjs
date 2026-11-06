@@ -549,3 +549,37 @@ test('mobile mantém foto livre e contraste no texto com paleta rosé',async({pa
   expect(state.footerGradient).toContain('linear-gradient');
   expect(state.pageWidth).toBeLessThanOrEqual(state.viewport+1);
 });
+
+test('logo minimalista do rodapé substitui a antiga sem frase duplicada',async({page})=>{
+  await ready(page);
+  const brand=page.locator('footer .footer-brand');
+  const img=brand.locator('img');
+  await brand.scrollIntoViewIfNeeded();
+  await expect(img).toHaveAttribute('src',/margot-logo-minimal-footer\.png\?v=1\.25$/);
+  await expect.poll(()=>img.evaluate(el=>el.complete ? el.naturalWidth : 0)).toBe(753);
+  await expect.poll(()=>img.evaluate(el=>el.complete ? el.naturalHeight : 0)).toBe(440);
+  await expect(brand).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  await expect(page.locator('footer')).not.toContainText('Delicadeza em cada detalhe.');
+  // A logo oficial das outras áreas não é substituída.
+  await expect(page.locator('.site-header .brand img')).toHaveAttribute('src',/margot-logo\.webp/);
+});
+
+for(const width of [320,390,1280]){
+  test('logo do rodapé permanece discreta e dentro da tela em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:800});
+    await ready(page);
+    await page.locator('footer .footer-brand').scrollIntoViewIfNeeded();
+    const m=await page.evaluate(()=>{
+      const brand=document.querySelector('footer .footer-brand').getBoundingClientRect();
+      const img=document.querySelector('footer .footer-brand img').getBoundingClientRect();
+      return{brandWidth:brand.width,imgWidth:img.width,brandLeft:brand.left,
+        brandRight:brand.right,documentWidth:document.documentElement.scrollWidth,
+        viewport:document.documentElement.clientWidth};
+    });
+    expect(m.brandWidth).toBeLessThanOrEqual(width<=700?141:155);
+    expect(Math.abs(m.imgWidth-m.brandWidth)).toBeLessThanOrEqual(2);
+    expect(m.brandLeft).toBeGreaterThanOrEqual(0);
+    expect(m.brandRight).toBeLessThanOrEqual(m.viewport+1);
+    expect(m.documentWidth).toBeLessThanOrEqual(m.viewport+1);
+  });
+}
