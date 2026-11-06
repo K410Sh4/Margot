@@ -318,3 +318,10 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Restaura a densidade da coleção: quatro colunas no desktop, três em telas intermediárias, duas nos demais dispositivos e uma somente abaixo de 360 px.
 - Reduz imagem, tipografia, espaços internos e CTA; mantém valores, descontos, badges, favoritos e sacola da V1.31.
 - Mantém o componente compartilhado por coleção e promoções; ajustes responsivos cobertos pelos testes Playwright 320/390/640/768/1024/1280.
+
+
+## V1.33 — Vitrine responsiva de alta densidade
+
+- 6 cards em telas acima de 1150 px; 5 de 921 a 1150 px; 4 de 601 a 920 px; 3 em 600 px ou menos.
+- Fotografia, preço, desconto, favorito e ação de sacola preservados; conteúdo reorganizado e reduzido no mobile para evitar rolagem horizontal.
+- Suítes Playwright verificam faixas 320/390/600/640/768/920/1024/1150/1280 e elementos contidos nos cards.
