@@ -225,3 +225,12 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Na entrada do rodapé, gradiente estático de creme para rosé, dispensando mudança de cores por JavaScript durante a rolagem.
 - Mantém animações e acessibilidade existentes; sem novos observadores de scroll e sem larguras em `100vw`.
 - Dois testes novos validam cores CSS, imagem, responsividade e ausência de overflow. Rastreio visual captura também a passagem para o rodapé no desktop e mobile.
+
+## V1.25 — Identidade minimalista no rodapé (05/11/2026)
+
+- A versão compacta e transparente da logo Margot substitui somente a imagem dentro de `.footer-brand` no rodapé.
+- PNG original enviado pelo usuário recortado de 1448×1086 para 753×440, preservando a transparência; arquivo otimizado em `assets/margot-logo-minimal-footer.png`.
+- Removida do rodapé a frase `Delicadeza em cada detalhe.`, conforme solicitação.
+- Eliminado o bloco branco de fundo da marca no rodapé, logo limitada a 154 px no desktop e 140 px no mobile.
+- Identidade do cabeçalho e demais componentes intactos.
+- Quatro testes Playwright adicionais: carregamento da nova imagem, remoção do texto, contraste da caixa transparente e geometria em 320/390/1280 px.
