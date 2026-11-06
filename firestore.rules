@@ -41,6 +41,27 @@ service cloud.firestore {
         && p.deleted is bool
         && p.updatedAt is timestamp && p.updatedAt == request.time;
     }
+    function validPublicProduct(p) {
+      return p.keys().hasAll(['name','category','basePrice','description','imageUrls',
+        'imagePaths','stockCount','stockCheckedAt','favorite','bestSellerMonth',
+        'salePrice','saleStart','saleEnd','saleCheckedAt'])
+        && p.keys().hasOnly(['name','category','basePrice','description','imageUrls',
+        'imagePaths','stockCount','stockCheckedAt','favorite','bestSellerMonth',
+        'salePrice','saleStart','saleEnd','saleCheckedAt'])
+        && safeText(p.name, 90) && p.name.size() >= 2
+        && safeText(p.description, 1600)
+        && p.category in ['Brincos','Colares','Pulseiras','Anéis','Kits']
+        && p.basePrice is number && p.basePrice > 0 && p.basePrice <= 100000
+        && p.imageUrls is list && p.imageUrls.size() <= 8
+        && p.imagePaths is list && p.imagePaths.size() <= 8
+        && p.imageUrls.size() == p.imagePaths.size()
+        && (p.stockCount == null || (p.stockCount is int && p.stockCount >= 0 && p.stockCount <= 100000))
+        && validDate(p.stockCheckedAt)
+        && p.favorite is bool
+        && validMonth(p.bestSellerMonth)
+        && (p.salePrice == null || (p.salePrice is number && p.salePrice > 0 && p.salePrice < p.basePrice))
+        && validDate(p.saleStart) && validDate(p.saleEnd) && validDate(p.saleCheckedAt);
+    }
     // Imagens pequenas no Firestore: sem Firebase Storage e sem faturamento Blaze.
     match /productMedia/{mediaId} {
       allow get: if true;
@@ -68,6 +89,19 @@ service cloud.firestore {
         && validProduct(request.resource.data);
       allow delete: if isOwner();
     }
+    // Etapa de transicao: somente a vitrine aprovada fica em publicProducts.
+    match /publicProducts/{productId} {
+      allow get, list: if true;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}
+  }
+}
+)
+        && validPublicProduct(request.resource.data);
+      allow delete: if isOwner();
+    }
+    // A colecao products continua publica APENAS durante a migracao.
+    // Aplique firestore.lockdown.rules apos sincronizar o catalogo.
     // Nenhuma coleção não declarada é acessível por estas regras.
   }
 }
