@@ -22,10 +22,9 @@
   background:var(--card-panel);
   box-shadow:0 7px 22px rgba(124,71,80,.075);
   isolation:isolate;
-  transition:box-shadow .22s ease,transform .22s ease,border-color .22s ease;
+  transition:box-shadow .18s ease,border-color .18s ease;
 }
 .product-card:hover{
-  transform:translateY(-3px);
   border-color:#e4a8b7;
   box-shadow:0 16px 32px rgba(120,60,80,.13);
 }
@@ -107,9 +106,9 @@
   color:#9f405e;
   background:rgba(255,250,250,.95);
   box-shadow:0 5px 13px rgba(66,32,48,.11);
-  transition:background .18s,transform .18s;
+  transition:background .18s;
 }
-.product-card .heart-btn:hover{transform:scale(1.06)}
+.product-card .heart-btn:hover{background:#fff2f3}
 .product-card .heart-btn[aria-pressed="true"]{
   background:#9e4960;
   color:#fff;
@@ -304,12 +303,11 @@
   text-align:left;
   grid-column:auto;
   grid-row:auto;
-  transition:background .18s,box-shadow .18s,transform .18s;
+  transition:background .18s,box-shadow .18s;
 }
 .product-card .product-info .add-to-cart:hover:not(:disabled){
   background:linear-gradient(115deg,#a9405c,#762840);
   box-shadow:0 9px 19px rgba(128,51,71,.24);
-  transform:translateY(-1px);
 }
 .product-card .add-to-cart .icon{
   flex:none;
