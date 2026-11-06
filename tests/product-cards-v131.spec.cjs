@@ -131,7 +131,7 @@ test('foto real apresenta assinatura discreta; fallback não deixa assinatura so
   await expect(card.locator('.product-visual')).toHaveClass(/is-photo-missing/);
 });
 
-test('visual editorial: foto e painel separados com CTA consistente',async({page})=>{
+test('visual editorial compacto: foto e painel separados com CTA consistente',async({page})=>{
   await staticCatalog(page);
   await verifiedOffer(page);
   await page.setViewportSize({width:1280,height:850});
@@ -157,9 +157,9 @@ test('visual editorial: foto e painel separados com CTA consistente',async({page
     };
   });
   expect(visuals.panelFollowsPhoto).toBe(true);
-  expect(visuals.infoPadding).toBeGreaterThanOrEqual(16);
-  expect(visuals.imageRatio).toBeGreaterThan(1.40);
-  expect(visuals.imageRatio).toBeLessThan(1.47);
+  expect(visuals.infoPadding).toBeGreaterThanOrEqual(13);
+  expect(visuals.imageRatio).toBeGreaterThan(1.55);
+  expect(visuals.imageRatio).toBeLessThan(1.61);
   expect(visuals.normalButton).toContain('gradient');
   expect(visuals.specialButton).toContain('gradient');
   expect(visuals.normalButton).toBe(visuals.specialButton);
@@ -190,14 +190,14 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
         titleFontSize:parseFloat(getComputedStyle(card.querySelector('h3')).fontSize),
         width:root.width};
     });
-    const expectedColumns=width<=560?1:Math.max(1,Math.floor((dims.width+dims.gap)/(250+dims.gap)));
+    const expectedColumns=width<=560?1:Math.max(1,Math.floor((dims.width+dims.gap)/(210+dims.gap)));
     expect(dims.columns).toBe(expectedColumns);
-    expect(dims.cardWidth).toBeGreaterThan(width<=560?200:230);
+    expect(dims.cardWidth).toBeGreaterThan(width<=560?200:205);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
-    expect(dims.buttonHeight).toBeGreaterThanOrEqual(49);
+    expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
     expect(dims.buttonText).toBeGreaterThan(75);
-    expect(dims.titleFontSize).toBeGreaterThanOrEqual(19);
-    if(width===1280)expect(dims.cardWidth).toBeGreaterThan(250);
+    expect(dims.titleFontSize).toBeGreaterThanOrEqual(18);
+    if(width===1280)expect(dims.cardWidth).toBeGreaterThan(210);
     if(width===390)expect(dims.cardWidth).toBeGreaterThan(300);
     const contained=await page.evaluate(()=>{
       const cards=[...document.querySelectorAll('#product-grid .product-card')];
@@ -213,7 +213,7 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
     expect(contained).toBe(true);
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
-    const artifact=path.join('test-results','product-cards-v135');
+    const artifact=path.join('test-results','product-cards-v136');
     fs.mkdirSync(artifact,{recursive:true});
     await page.locator('#product-grid').scrollIntoViewIfNeeded();
     await page.locator('#product-grid').screenshot({
