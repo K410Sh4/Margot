@@ -232,3 +232,50 @@ body.pd-page{
     transition:none!important;animation:none!important
   }
 }
+
+/* V1.27 — promoções, histórico de preço confirmado e estoque baixo. */
+.pd-badges{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 13px}
+.pd-badge{
+  display:inline-flex;align-items:center;padding:6px 10px;
+  border-radius:9px;font-size:11px;font-weight:700;line-height:1.3;
+  background:#fae8e9;color:#925063;border:1px solid #efcdcf
+}
+.pd-badge--favorite{background:#fff1ee}
+.pd-badge--bestSeller{background:#f5e7d5;color:#815736;border-color:#e9cbb2}
+.pd-badge--discount{background:#9e4b60;color:#fff;border-color:#9e4b60}
+.pd-old-price{display:block;margin-top:2px;color:#93777d;font-size:13px}
+.pd-saving{display:inline-flex;align-self:flex-start;color:#855065;
+  background:#f9e9eb;font-size:12px;font-weight:700;padding:6px 10px;border-radius:9px}
+.pd-promotion-panel{
+  display:flex;align-items:flex-start;gap:12px;
+  background:linear-gradient(120deg,#fff5f1,#f8e8e8);
+  border:1px solid #edcdd0;border-radius:16px;
+  padding:13px 16px;margin:4px 0 17px
+}
+.pd-promotion-panel__icon{color:#a85669;font-size:26px;line-height:1}
+.pd-promotion-panel strong{display:block;color:#784551;font-size:13px;margin:1px 0 4px}
+.pd-promotion-panel p{margin:0;color:#795e66;font-size:12px;line-height:1.6}
+.pd-availability--low{color:#91465c;font-weight:700}
+.pd-availability--low .pd-availability-dot{background:#af5268}
+.pd-availability--out{color:#9e3c51}
+.pd-availability--out .pd-availability-dot{background:#aa445b}
+.pd-stock-note{font-size:11px;line-height:1.5;color:#8d7075;margin:-11px 0 18px}
+.pd-actions .pd-button:disabled{cursor:not-allowed;opacity:.48;box-shadow:none}
+.pd-offers{padding:30px 0 10px}
+.pd-offers .pd-section-heading{margin-bottom:20px}
+.pd-offers-empty{
+  padding:21px;border:1px solid #efd9d8;background:#fff9f7;
+  border-radius:15px;font-size:13px;color:#87656f;line-height:1.65
+}
+.pd-related-card--offer .pd-related-visual{margin-bottom:11px}
+.pd-related-card--offer strong{margin:0 5px}
+.pd-offer-tag{
+  position:absolute;top:9px;left:9px;border-radius:8px;
+  padding:6px 9px;background:#99475d;color:#fff;font-size:12px;font-weight:700
+}
+.pd-related-old-price{margin:2px 5px 0;color:#a1888b;font-size:12px}
+@media(max-width:700px){
+  .pd-promotion-panel{padding:12px 13px}
+  .pd-offers{padding:22px 0 10px}
+  .pd-offers-empty{font-size:12px}
+}

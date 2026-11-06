@@ -231,6 +231,10 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      await page.reload({waitUntil:'domcontentloaded'});
      await expect(page.locator('html')).toHaveClass(/mobile-nav-ready/);
    },{fullPage:true});
+   await action('Promocoes — sem ofertas confirmadas',async()=>{
+     await page.locator('#promocoes').scrollIntoViewIfNeeded();
+     await expect(page.locator('#promotion-empty')).toBeVisible();
+   },{transition:true});
    await action('Produto V3 mobile 390',async()=>{
      await page.goto('/produto.html?id=brinco-coracao',{waitUntil:'domcontentloaded'});
      await expect(page.locator('#pd-product')).toBeVisible();
@@ -242,6 +246,37 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
    await action('Produto V3 accordion',async()=>{
      await page.locator('.pd-accordions summary').filter({hasText:'Especificações'}).click();
    },{transition:true});
+
+   // SOMENTE NO TESTE: rota interceptada em memória; nenhum registro comercial é publicado.
+   const today=new Date().toISOString().slice(0,10);
+   const future=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+   const oldDay=new Date(Date.now()-86400000).toISOString().slice(0,10);
+   const month=today.slice(0,7);
+   const mock={
+     'brinco-coracao':{
+       inventory:{confirmed:true,source:'Inventário SIMULADO para Playwright',quantity:7,checkedAt:today},
+       promotion:{confirmed:true,source:'Preço SIMULADO para Playwright',
+         originalPrice:24.90,salePrice:14.90,checkedAt:today,startsAt:oldDay,endsAt:future},
+       tags:{confirmed:true,source:'Relatório SIMULADO para Playwright',
+         favorite:true,bestSellerMonth:month,checkedAt:today}
+     }
+   };
+   await page.route('**/merchandising-data.js*',route=>route.fulfill({
+     contentType:'text/javascript',body:'window.MargotCommercialData='+JSON.stringify({products:mock})
+   }));
+   await action('SIMULACAO — cards promocionais (somente teste)',async()=>{
+     await page.goto('/',{waitUntil:'domcontentloaded'});
+     await expect(page.locator('#promotion-grid .product-card')).toHaveCount(1);
+     await page.locator('#promocoes').scrollIntoViewIfNeeded();
+   },{transition:true,fullPage:true});
+   await action('SIMULACAO — produto V3 com etiquetas e estoque',async()=>{
+     await page.goto('/produto.html?id=brinco-coracao',{waitUntil:'domcontentloaded'});
+     await expect(page.locator('#pd-badges .pd-badge')).toHaveCount(3);
+   },{transition:true,fullPage:true});
+   await action('SIMULACAO — produto V3 mobile 390',async()=>{
+     await page.setViewportSize({width:390,height:844});
+   },{transition:true,fullPage:true});
+
 
  }finally{
    try{await context.tracing.stop({path:path.join(dir,'playwright-trace.zip')})}

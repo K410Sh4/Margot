@@ -245,3 +245,15 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - `product-detail.css` mantém a linguagem rosé/bordô Margot e se adapta de 320 a 1280 px, sem alterar a lógica de compactação do cabeçalho da vitrine.
 - Playwright inclui testes de cada produto, links entre páginas, quantidade máxima, integração real com sacola e favoritos, conteúdos verificáveis, acessibilidade, ausência de overflow e capturas desktop/mobile.
 - O workflow de screenshots também documenta a experiência V3; novos CSS/JS/HTML estão registrados nas condições de execução dos workflows.
+
+
+## V1.27 — Painéis de promoções, estoque baixo e classificações
+
+- Painel de promoções na página inicial e seção promocional condicional na V3, com integração real à mesma lista de produtos e aos preços da sacola.
+- Etiquetas condicionais: **Peça favorita**, **Mais vendida do mês**, **Oferta −X%**. Não são inferidas de cliques ou favoritos locais; requerem metadados comerciais confirmados.
+- Estoque verificado de **1 a 10** mostra "Restam X unidades"; **0** identifica indisponibilidade e bloqueia o botão. Sem dados confirmados, não exibe números.
+- Metadados ficam em \`merchandising-data.js\`, inicialmente vazio. O motor \`merchandising.js\` exige confirmação explícita, descrição da fonte e datas atuais, rejeita dados obsoletos ou inconsistentes e respeita o mês das classificações.
+- Descontos atualizam os preços apresentados na vitrine, V3 e subtotal demonstrativo da sacola, sem checkout ou reserva de estoque.
+- Limite adicional de quantidade respeita a contagem informada (no navegador), com comunicação transparente sobre confirmação pela loja.
+- Testes específicos incluem valores 0, 1, 7, 10 e 11, promoções válidas/expiradas, melhor venda mensal, rótulos, preços e responsividade.
+- Documentação de operação: [Promoções e Estoque](docs/PROMOCOES-ESTOQUE.md).

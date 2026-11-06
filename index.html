@@ -10,13 +10,15 @@
   <meta property="og:description" content="Descubra a vitrine da Margot: brincos, colares, pulseiras, anéis e presentes especiais.">
   <title>Margot Acessórios | Delicadeza em cada detalhe</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=official-2">
-  <link rel="stylesheet" href="./styles.css?v=1.25">
+  <link rel="stylesheet" href="./styles.css?v=1.27">
   <link rel="stylesheet" href="./mobile-navigation.css?v=1.20">
   <!-- GSAP carrega antes dos scripts próprios; layout continua funcional sem CDN. -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
   <script src="./catalog-data.js?v=1.26" defer></script>
-  <script src="./store.js?v=1.26" defer></script>
+  <script src="./merchandising-data.js?v=1.27" defer></script>
+  <script src="./merchandising.js?v=1.27" defer></script>
+  <script src="./store.js?v=1.27" defer></script>
   <script src="./carousel.js?v=1.17" defer></script>
   <script src="./motion.js?v=1.23" defer></script>
   <script src="./header.js?v=1.20" defer></script>
@@ -126,6 +128,18 @@
       <div id="product-grid" class="products"></div>
       <p class="empty-results" id="empty-results" hidden>Nenhuma peça encontrada. Experimente outra busca ou categoria.</p>
       <p class="catalog-disclaimer">Catálogo demonstrativo: produtos, disponibilidade e valores serão confirmados antes da abertura das vendas. Os cards sem fotografia exibem a identidade provisória da Margot; preços e disponibilidade são ilustrativos.</p>
+    </section>
+    <section class="promotions-feature wrap" id="promocoes" aria-labelledby="promotions-title">
+      <div class="promotions-feature__heading">
+        <div><p class="eyebrow">DESTAQUES DA COLEÇÃO</p><h2 id="promotions-title">Promoções da Margot</h2><p>Ofertas confirmadas e oportunidades especiais, quando disponíveis.</p></div>
+        <a class="promotions-feature__catalog-link" href="#produtos">Ver coleção completa <span aria-hidden="true">↗</span></a>
+      </div>
+      <div id="promotion-grid" class="products promotion-grid" hidden></div>
+      <div id="promotion-empty" class="promotion-empty">
+        <span class="promotion-empty__symbol" aria-hidden="true">✧</span>
+        <div><strong>Ofertas especiais em preparação</strong><p>Não há promoções confirmadas no momento. Enquanto isso, descubra a coleção Margot.</p></div>
+        <a href="#produtos">Explorar acessórios <span aria-hidden="true">→</span></a>
+      </div>
     </section>
     <section class="gift-feature" id="presentes" aria-labelledby="gift-title" tabindex="-1">
       <img class="gift-photo" src="./assets/presentes-margot-premium.jpg?v=1.21" alt="Caixa de presente rosé com laço de cetim, colar dourado e brincos de pérolas" loading="lazy" decoding="async" width="1021" height="724">
