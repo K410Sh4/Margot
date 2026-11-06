@@ -281,3 +281,12 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Para habilitar fotografias, seguir `docs/PAINEL-ADMIN-FIREBASE.md` e
   ligar a chave operacional `MARGOT_STORAGE_UPLOADS_ENABLED` após
   implantação das regras de segurança.
+
+## V1.30 — Fotos grátis no Firestore Spark
+
+- Nova opção gratuita de fotografias comprimidas sem Firebase Storage e sem Blaze.
+- WebP: até 160 KiB e 1000px para imagem maior; miniatura de até 18 KiB.
+- Documentos productMedia separados, regras somente para proprietário Google verificado.
+- Galeria V3 carrega a versão maior sob demanda, preservando miniaturas na vitrine.
+- Painel libera envio automaticamente após implantar as regras Firestore da V1.30.
+- Leia docs/FOTOS-GRATIS-FIRESTORE.md para ativação e limitações.

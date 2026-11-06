@@ -5,6 +5,11 @@
 let fallback=null;
 const config=window.MARGOT_FIREBASE_CONFIG;
 const PHOTO_PREFIX='https://firebasestorage.googleapis.com/v0/b/margot-acessorios-865987.firebasestorage.app/o/';
+const INLINE_WEBP=/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/;
+const thumbValid=url=>typeof url==='string'&&(
+  (url.startsWith(PHOTO_PREFIX)&&url.includes('product-images%2F'))||
+  (url.length<=30000&&INLINE_WEBP.test(url))
+);
 const TODAY=()=>new Date().toISOString().slice(0,10);
 let overlays=[];
 const safeText=(value,max=100)=>typeof value==='string'?
@@ -22,8 +27,11 @@ function normalize(doc,id,base){
   const title=safeText(doc.name,90);
   if(!title)return base||null;
   const checked=TODAY();
-  const images=Array.isArray(doc.imageUrls)?doc.imageUrls.filter(u=>
-    typeof u==='string'&&u.startsWith(PHOTO_PREFIX)&&u.includes('product-images%2F')).slice(0,8):[];
+  const imagesWithPaths=Array.isArray(doc.imageUrls)?doc.imageUrls.slice(0,8)
+    .map((url,index)=>({url,path:doc.imagePaths?.[index]}))
+    .filter(pair=>thumbValid(pair.url)):[];
+  const images=imagesWithPaths.map(item=>item.url);
+  const imagePaths=imagesWithPaths.map(item=>item.path||'');
   const stock=Number.isInteger(doc.stockCount)&&doc.stockCount>=0&&
     ageOk(doc.stockCheckedAt,7)?doc.stockCount:null;
   const sale=doc.salePrice;
@@ -49,6 +57,7 @@ function normalize(doc,id,base){
     price:promotion?promotion.salePrice:doc.basePrice,
     image:images[0]||undefined,
     images,
+    imagePaths,
     stock,
     stockCheckedAt:stock===null?null:doc.stockCheckedAt,
     labels,promotion
@@ -86,7 +95,29 @@ async function start(){
       import('https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js')
     ]);
     const app=appSdk.getApps().length?appSdk.getApp():appSdk.initializeApp(config);
-    dbSdk.onSnapshot(dbSdk.collection(dbSdk.getFirestore(app),'products'),snapshot=>{
+    const db=dbSdk.getFirestore(app);
+    const mediaCache=new Map();
+    window.MargotMedia=Object.freeze({
+      async getImage(path){
+        const id=typeof path==='string'&&path.startsWith('productMedia/')?
+          path.slice('productMedia/'.length):'';
+        if(!/^[a-f0-9-]{36}$/.test(id))return null;
+        if(!mediaCache.has(id)){
+          const task=dbSdk.getDoc(dbSdk.doc(db,'productMedia',id)).then(snapshot=>{
+            if(!snapshot.exists())return null;
+            const payload=snapshot.data().data;
+            return typeof payload==='string'&&payload.length<=230000&&
+              INLINE_WEBP.test(payload)?payload:null;
+          }).catch(error=>{
+            mediaCache.delete(id);
+            throw error;
+          });
+          mediaCache.set(id,task);
+        }
+        return mediaCache.get(id);
+      }
+    });
+    dbSdk.onSnapshot(dbSdk.collection(db,'products'),snapshot=>{
       overlays=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
       publish();
     },error=>{

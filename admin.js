@@ -10,7 +10,9 @@ const MONTH=()=>TODAY().slice(0,7);
 const PLACEHOLDER='./assets/foto-em-breve.webp';
 const IMAGE_TYPES=['image/jpeg','image/png','image/webp'];
 const STORAGE_READY=window.MARGOT_STORAGE_UPLOADS_ENABLED===true;
-const STORAGE_WARNING='Fotografias indisponíveis: o Firebase Storage ainda não foi configurado. Você pode salvar o produto sem imagem.';
+const STORAGE_WARNING='O envio gratuito de fotos ainda não está autorizado no Firestore. Implante as regras V1.30 no Firebase para habilitá-lo.';
+const FREE_MEDIA_PREFIX='productMedia/';
+let freeMediaReady=false;
 let api=null,auth=null,db=null,storage=null,unsubscribe=null;
 let records=new Map(),editingId=null,selectedImages=[],removedPaths=[],pendingFiles=[];
 let currentProduct=null,busy=false,toastTimer;
@@ -122,12 +124,19 @@ function render(){
 }
 function updateStorageUI(){
   const input=$('field-photos');
-  input.disabled=!STORAGE_READY;
+  const enabled=STORAGE_READY||freeMediaReady;
+  input.disabled=!enabled;
   const area=input.closest('.upload-area');
-  area.classList.toggle('is-unavailable',!STORAGE_READY);
-  area.setAttribute('aria-disabled',String(!STORAGE_READY));
+  area.classList.toggle('is-unavailable',!enabled);
+  area.setAttribute('aria-disabled',String(!enabled));
   $('storage-notice').hidden=STORAGE_READY;
-  $('upload-status').textContent=STORAGE_READY?'':STORAGE_WARNING;
+  $('storage-notice').classList.toggle('is-ready',freeMediaReady);
+  $('image-backend-title').textContent=freeMediaReady?
+    'Fotos grátis ativadas no Firestore.':'Fotografias aguardando autorização.';
+  $('image-backend-description').textContent=freeMediaReady?
+    'As fotografias serão otimizadas para WebP e guardadas em documentos separados do Firestore. O tamanho e a resolução serão reduzidos para respeitar a cota gratuita.':
+    STORAGE_WARNING;
+  $('upload-status').textContent=enabled?'':STORAGE_WARNING;
 }
 function saveStage(value){
   $('save-progress').textContent=value;
@@ -222,26 +231,52 @@ function setBusy(value){
 }
 async function uploadFiles(id){
   if(!pendingFiles.length)return [];
-  if(!STORAGE_READY)throw Error(STORAGE_WARNING);
+  if(!STORAGE_READY&&!freeMediaReady)throw Error(STORAGE_WARNING);
   const created=[];
-  for(let i=0;i<pendingFiles.length;i++){
-    const file=pendingFiles[i];
-    $('upload-status').textContent='Enviando imagem '+(i+1)+' de '+pendingFiles.length+'…';
-    const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
-    const path='product-images/'+id+'/'+crypto.randomUUID()+'.'+ext;
-    const storageRef=api.storageRef(storage,path);
-    await api.uploadBytes(storageRef,file,{contentType:file.type,cacheControl:'public,max-age=3600'});
-    const url=await api.getDownloadURL(storageRef);
-    created.push({path,url});
+  try{
+    for(let i=0;i<pendingFiles.length;i++){
+      const file=pendingFiles[i];
+      $('upload-status').textContent='Preparando fotografia '+(i+1)+' de '+pendingFiles.length+'…';
+      if(freeMediaReady&&!STORAGE_READY){
+        if(!window.MargotImageTools)throw Error('O compactador de imagens não foi carregado.');
+        const optimized=await window.MargotImageTools.optimize(file);
+        const mediaId=crypto.randomUUID();
+        const path=FREE_MEDIA_PREFIX+mediaId;
+        $('upload-status').textContent='Gravando fotografia '+(i+1)+' de '+pendingFiles.length+' no Firestore…';
+        await api.setDoc(api.doc(db,'productMedia',mediaId),{
+          productId:id,
+          data:optimized.full.data,
+          createdAt:api.serverTimestamp()
+        });
+        created.push({path,url:optimized.thumb.data});
+      }else{
+        const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+        const path='product-images/'+id+'/'+crypto.randomUUID()+'.'+ext;
+        const storageRef=api.storageRef(storage,path);
+        await api.uploadBytes(storageRef,file,{contentType:file.type,cacheControl:'public,max-age=3600'});
+        const url=await api.getDownloadURL(storageRef);
+        created.push({path,url});
+      }
+    }
+    return created;
+  }catch(error){
+    // Fotos criadas nesta tentativa não podem ficar órfãs em caso de falha parcial.
+    if(created.length)await removeStoredImages(created.map(item=>item.path));
+    throw error;
   }
-  return created;
 }
 async function removeStoredImages(paths){
-  if(!STORAGE_READY)return paths.length;
   let failures=0;
   for(const path of paths){
-    try{await api.deleteObject(api.storageRef(storage,path))}
-    catch{failures++;}
+    try{
+      if(path.startsWith(FREE_MEDIA_PREFIX)){
+        const id=path.slice(FREE_MEDIA_PREFIX.length);
+        if(!/^[a-f0-9-]{36}$/.test(id))throw Error('Identificador de foto inválido');
+        await api.deleteDoc(api.doc(db,'productMedia',id));
+      }else if(STORAGE_READY){
+        await api.deleteObject(api.storageRef(storage,path));
+      }else failures++;
+    }catch{failures++}
   }
   return failures;
 }
@@ -333,6 +368,17 @@ async function archive(){
     toast(error?.message||'Falha ao alterar a visibilidade.');
   }finally{setBusy(false);}
 }
+async function checkFreeImageAccess(){
+  if(STORAGE_READY){freeMediaReady=false;return}
+  try{
+    // Leitura de um documento inexistente: nenhuma gravação ou alteração de dados.
+    await api.getDoc(api.doc(db,'productMedia','00000000-0000-0000-0000-000000000000'));
+    freeMediaReady=true;
+  }catch(error){
+    freeMediaReady=false;
+  }
+  if(dialog.open)updateStorageUI();
+}
 function authorizedUser(user){
   return Boolean(user&&user.emailVerified&&user.email?.toLowerCase()===OWNER&&
     user.providerData?.some(provider=>provider.providerId==='google.com'));
@@ -376,7 +422,8 @@ async function start(){
       signInWithPopup:authSdk.signInWithPopup,GoogleAuthProvider:authSdk.GoogleAuthProvider,
       signOut:authSdk.signOut,
       onSnapshot:dbSdk.onSnapshot,collection:dbSdk.collection,doc:dbSdk.doc,
-      setDoc:dbSdk.setDoc,serverTimestamp:dbSdk.serverTimestamp,
+      setDoc:dbSdk.setDoc,getDoc:dbSdk.getDoc,deleteDoc:dbSdk.deleteDoc,
+      serverTimestamp:dbSdk.serverTimestamp,
       storageRef:storageSdk?.ref,uploadBytes:storageSdk?.uploadBytes,
       getDownloadURL:storageSdk?.getDownloadURL,deleteObject:storageSdk?.deleteObject
     };
@@ -396,6 +443,7 @@ async function start(){
       $('admin-account').textContent=user.email||'Administradora';
       status('Conferindo permissões no Firebase…');
       listen();
+      checkFreeImageAccess();
     },()=>status('Não foi possível verificar a conta Google.',true));
   }catch(error){
     status('Não foi possível carregar a conexão Firebase. Verifique a rede.',true);
@@ -429,7 +477,7 @@ form.addEventListener('submit',save);
 $('archive-product').addEventListener('click',archive);
 $('field-photos').addEventListener('change',event=>{
   try{
-    if(!STORAGE_READY)throw Error(STORAGE_WARNING);
+    if(!STORAGE_READY&&!freeMediaReady)throw Error(STORAGE_WARNING);
     const files=Array.from(event.target.files||[]);
     assertFiles(files);
     pendingFiles.push(...files);

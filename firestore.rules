@@ -41,6 +41,59 @@ service cloud.firestore {
         && p.deleted is bool
         && p.updatedAt is timestamp && p.updatedAt == request.time;
     }
+    // Imagens pequenas e comprimidas, guardadas separadamente do catálogo.
+    // Solução provisória para o plano Spark: não substitui um CDN de imagens.
+    match /productMedia/{mediaId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isOwner()
+        && mediaId.matches('^[a-f0-9-]{36}
+      // Leitura pública apenas do catálogo, sem dados privados ou transações.
+      allow get, list: if true;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
+        && validProduct(request.resource.data);
+      allow delete: if isOwner();
+    }
+    // Nenhuma coleção não declarada é acessível por estas regras.
+  }
+}
+)
+        && request.resource.data.keys().hasAll(['productId','data','createdAt'])
+        && request.resource.data.keys().hasOnly(['productId','data','createdAt'])
+        && request.resource.data.productId is string
+        && request.resource.data.productId.matches('^[a-z0-9][a-z0-9-]{0,63}
+      // Leitura pública apenas do catálogo, sem dados privados ou transações.
+      allow get, list: if true;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
+        && validProduct(request.resource.data);
+      allow delete: if isOwner();
+    }
+    // Nenhuma coleção não declarada é acessível por estas regras.
+  }
+}
+)
+        && request.resource.data.data is string
+        && request.resource.data.data.size() > 100
+        && request.resource.data.data.size() <= 230000
+        && request.resource.data.data.matches('^data:image/webp;base64,[A-Za-z0-9+/=]+
+      // Leitura pública apenas do catálogo, sem dados privados ou transações.
+      allow get, list: if true;
+      allow create, update: if isOwner()
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
+        && validProduct(request.resource.data);
+      allow delete: if isOwner();
+    }
+    // Nenhuma coleção não declarada é acessível por estas regras.
+  }
+}
+)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if isOwner();
+    }
     match /products/{productId} {
       // Leitura pública apenas do catálogo, sem dados privados ou transações.
       allow get, list: if true;
