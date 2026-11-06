@@ -59,9 +59,11 @@
     const next=Number.isFinite(value)?Math.min(limit,Math.max(1,Math.trunc(value))):1;
     input.value=String(next);
     input.max=String(limit);
-    input.disabled=available===0;
-    $('pd-decrease').disabled=available===0||next<=1;
-    $('pd-increase').disabled=available===0||next>=limit;
+    input.disabled=inCart||available===0;
+    $('pd-decrease').disabled=inCart||available===0||next<=1;
+    $('pd-increase').disabled=inCart||available===0||next>=limit;
+    $('pd-qty-hint').textContent=inCart?'Para mudar a quantidade, abra a sacola.':
+      Number.isInteger(product.stock)?'Limite do estoque informado: '+product.stock+(product.stock===1?' unidade':' unidades'):'Até 99 unidades por peça';
     // Mantém o botão clicável para informar o limite; estoque zero é a exceção.
     $('pd-add').disabled=product.stock===0&&!inCart;
     $('pd-add').classList.toggle('is-in-cart',inCart);
