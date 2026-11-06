@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#fff6f2">
+  <title>Painel da loja | Margot Acessórios</title>
+  <link rel="stylesheet" href="./admin.css?v=1.28">
+  <script src="./firebase-config.js" defer></script>
+  <script src="./catalog-data.js?v=1.26" defer></script>
+  <script src="./admin.js?v=1.28" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#admin-content">Ir para o conteúdo</a>
+  <div id="admin-gate" class="gate">
+    <div class="gate-card">
+      <img src="./assets/margot-logo-minimal-footer.png?v=1.25" alt="Margot Acessórios" width="753" height="440" class="gate-logo">
+      <span class="kicker">ÁREA RESTRITA</span>
+      <h1>Gerencie sua loja com tranquilidade.</h1>
+      <p>Entre com a conta Google autorizada para editar produtos, fotografias, estoques e promoções. As alterações salvas serão exibidas no site em tempo real.</p>
+      <button id="admin-login" class="btn btn-primary" type="button" disabled>Entrar com Google</button>
+      <p id="gate-status" role="status" aria-live="polite">Verificando configuração da loja…</p>
+      <a href="./index.html" class="gate-back">Voltar à loja</a>
+    </div>
+  </div>
+
+  <div id="admin-app" class="admin-layout" hidden>
+    <aside class="sidebar">
+      <a href="./index.html" class="side-brand" aria-label="Margot Acessórios — vitrine">
+        <img src="./assets/margot-logo-minimal-footer.png?v=1.25" width="753" height="440" alt="Margot Acessórios">
+        <span>PAINEL DA LOJA</span>
+      </a>
+      <nav class="side-nav" aria-label="Painel administrativo">
+        <a href="#resumo" class="side-link is-current"><span aria-hidden="true">◈</span> Visão geral</a>
+        <a href="#produtos" class="side-link"><span aria-hidden="true">▦</span> Produtos</a>
+        <a href="#instrucoes" class="side-link"><span aria-hidden="true">ⓘ</span> Instruções</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="sidebar-caption">ACESSO PROTEGIDO</span>
+        <p>Alterações protegidas por autenticação Google e regras Firebase.</p>
+        <a href="./index.html" target="_blank" rel="noopener">Abrir vitrine ↗</a>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div>
+          <span class="kicker">MARGOT · ADMINISTRAÇÃO</span>
+          <h1>Seu espaço de gestão</h1>
+        </div>
+        <div class="top-actions">
+          <span id="connection-state" class="connection-state" role="status">Conectando…</span>
+          <span id="admin-account" class="admin-account"></span>
+          <button id="admin-logout" class="btn btn-muted" type="button">Sair</button>
+        </div>
+      </header>
+      <main id="admin-content">
+        <section class="intro" id="resumo" aria-labelledby="intro-title">
+          <div><span class="kicker">CONTROLE EM TEMPO REAL</span>
+            <h2 id="intro-title">Tudo da sua loja, em um só lugar.</h2>
+            <p>Atualize sua coleção sem mexer no código. Os dados são sincronizados após salvar, sem atualizar a página.</p>
+          </div>
+          <button id="new-product" class="btn btn-primary" type="button">+ Novo produto</button>
+        </section>
+        <section class="metrics" aria-label="Resumo do catálogo">
+          <article class="metric"><span>Produtos ativos</span><strong id="metric-products">—</strong><small>Peças visíveis na vitrine</small></article>
+          <article class="metric"><span>Estoque baixo</span><strong id="metric-low">—</strong><small>De 1 a 10 unidades</small></article>
+          <article class="metric"><span>Promoções ativas</span><strong id="metric-sales">—</strong><small>Condições verificadas</small></article>
+          <article class="metric"><span>Fotos cadastradas</span><strong id="metric-images">—</strong><small>Fotografias dos produtos</small></article>
+        </section>
+        <section class="management" id="produtos" aria-labelledby="products-title">
+          <div class="section-head">
+            <div><span class="kicker">SUA COLEÇÃO</span><h2 id="products-title">Produtos cadastrados</h2><p>Selecione uma peça para alterar informações ou gerenciar imagens.</p></div>
+            <button id="new-product-secondary" class="btn btn-outline" type="button">Adicionar produto</button>
+          </div>
+          <div class="toolbar">
+            <label class="search-label" for="admin-search">Buscar produto
+              <input id="admin-search" type="search" autocomplete="off" placeholder="Nome, ID ou categoria">
+            </label>
+            <label class="filter-label" for="admin-filter">Exibir
+              <select id="admin-filter"><option value="active">Produtos ativos</option><option value="all">Todos</option><option value="archived">Arquivados</option><option value="low">Estoque baixo</option><option value="offer">Com promoção</option></select>
+            </label>
+          </div>
+          <div id="admin-list" class="product-list" aria-live="polite"></div>
+          <div id="admin-empty" class="empty-state" hidden><strong>Nenhum produto encontrado.</strong><p>Experimente outro filtro ou adicione uma peça à coleção.</p></div>
+        </section>
+        <section class="help" id="instrucoes">
+          <div>
+            <span class="kicker">COMO FUNCIONA</span>
+            <h2>Informações transparentes para suas clientes.</h2>
+            <p>Produtos com estoque confirmado de 1 a 10 unidades mostram a quantidade restante. Descontos exigem preço atual, preço promocional e datas. Os selos de peça favorita e mais vendida são definidos por você, com base em informações reais da loja.</p>
+          </div>
+          <div class="help-details">
+            <p><strong>Atualização:</strong> ao salvar, o Firestore envia as alterações para visitantes conectados.</p>
+            <p><strong>Imagens:</strong> PNG, JPEG ou WebP, com limite de 5 MB por foto e até 8 fotos por produto.</p>
+            <p><strong>Importante:</strong> a vitrine ainda não realiza vendas nem reserva unidades em tempo real.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="product-dialog" class="editor" aria-labelledby="editor-title">
+    <form id="product-form">
+      <header class="editor-head">
+        <div><span class="kicker">EDITOR DE PRODUTOS</span><h2 id="editor-title">Editar produto</h2><p id="editor-subtitle">Alterações entram no site quando você salvar.</p></div>
+        <button id="close-editor" class="close-editor" type="button" aria-label="Fechar edição">×</button>
+      </header>
+      <div class="editor-body">
+        <section class="editor-section" aria-labelledby="general-title">
+          <h3 id="general-title">Informações principais</h3>
+          <div class="form-grid">
+            <label class="wide">Nome do produto <input id="field-name" name="name" maxlength="90" required></label>
+            <label>Categoria <select id="field-category"><option>Brincos</option><option>Colares</option><option>Pulseiras</option><option>Anéis</option><option>Kits</option></select></label>
+            <label>Preço de referência (R$) <input id="field-price" type="number" min="0.01" max="100000" step="0.01" required></label>
+            <label class="wide">Descrição <textarea id="field-description" maxlength="1600" rows="3" placeholder="Descreva a peça e os materiais confirmados."></textarea></label>
+          </div>
+        </section>
+        <section class="editor-section" aria-labelledby="stock-title">
+          <h3 id="stock-title">Estoque</h3>
+          <p class="section-hint">Informe apenas quantidades conferidas. Deixe vazio se o estoque não for conhecido.</p>
+          <div class="form-grid">
+            <label>Unidades disponíveis <input id="field-stock" type="number" min="0" max="100000" step="1" placeholder="Não informado"></label>
+            <label class="checkbox-label"><input id="field-recheck" type="checkbox"> Confirmar contagem nesta atualização</label>
+          </div>
+          <p class="section-hint" id="stock-last-checked"></p>
+        </section>
+        <section class="editor-section" aria-labelledby="sale-title">
+          <h3 id="sale-title">Promoção</h3>
+          <p class="section-hint">O preço anterior é o preço de referência acima. Descontos só aparecem no período preenchido.</p>
+          <div class="form-grid">
+            <label>Preço promocional (R$) <input id="field-sale-price" type="number" min="0.01" step="0.01" placeholder="Sem promoção"></label>
+            <label>Início da oferta <input id="field-sale-start" type="date"></label>
+            <label>Fim da oferta <input id="field-sale-end" type="date"></label>
+          </div>
+        </section>
+        <section class="editor-section" aria-labelledby="badges-title">
+          <h3 id="badges-title">Classificações</h3>
+          <div class="checkbox-stack">
+            <label><input id="field-favorite" type="checkbox"><span><strong>Peça favorita</strong><small>Destacar como escolha editorial da Margot.</small></span></label>
+            <label><input id="field-best-seller" type="checkbox"><span><strong>Mais vendida do mês</strong><small>Marque somente se houver dados de vendas do mês atual.</small></span></label>
+          </div>
+        </section>
+        <section class="editor-section" aria-labelledby="photos-title">
+          <h3 id="photos-title">Fotografias</h3>
+          <p class="section-hint">A primeira imagem será a capa na vitrine. As demais aparecerão na galeria.</p>
+          <div id="editor-photos" class="editor-photos"></div>
+          <label class="upload-area" for="field-photos">
+            <span aria-hidden="true">＋</span><strong>Adicionar fotografias</strong><small>JPEG, PNG ou WebP · até 5 MB por imagem</small>
+            <input id="field-photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+          </label>
+          <p id="upload-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+      <footer class="editor-actions">
+        <button id="archive-product" type="button" class="btn btn-danger">Retirar da vitrine</button>
+        <span class="action-spacer"></span>
+        <button id="cancel-edit" type="button" class="btn btn-muted">Cancelar</button>
+        <button id="save-product" type="submit" class="btn btn-primary">Salvar alterações</button>
+      </footer>
+    </form>
+  </dialog>
+  <div id="admin-toast" class="admin-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

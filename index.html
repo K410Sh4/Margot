@@ -10,7 +10,7 @@
   <meta property="og:description" content="Descubra a vitrine da Margot: brincos, colares, pulseiras, anéis e presentes especiais.">
   <title>Margot Acessórios | Delicadeza em cada detalhe</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=official-2">
-  <link rel="stylesheet" href="./styles.css?v=1.27">
+  <link rel="stylesheet" href="./styles.css?v=1.28">
   <link rel="stylesheet" href="./mobile-navigation.css?v=1.20">
   <!-- GSAP carrega antes dos scripts próprios; layout continua funcional sem CDN. -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
@@ -24,6 +24,7 @@
   <script src="./header.js?v=1.20" defer></script>
   <script src="./mobile-nav.js?v=1.17" defer></script>
   <script src="./firebase-config.js" defer></script>
+  <script src="./site-live.js?v=1.28" type="module"></script>
   <script src="./account.js" type="module"></script>
 </head>
 <body>
@@ -191,6 +192,7 @@
         <div><strong id="account-name"></strong><span id="account-email"></span></div>
       </div>
       <p class="account-saved-note">Sua conta está conectada. Por enquanto, sacola e favoritos continuam salvos somente neste navegador, sem sincronização entre dispositivos.</p>
+      <a href="./admin.html" id="admin-account-link" class="account-admin-link" hidden>Gerenciar loja <span aria-hidden="true">↗</span></a>
       <button class="account-signout" type="button" id="google-signout">Sair da conta</button>
       <p class="account-auth-status" id="account-signout-status" role="status" aria-live="polite"></p>
     </div>

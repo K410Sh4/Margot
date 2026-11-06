@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const photoFallback=get('account-photo-fallback');
   const cfg=window.MARGOT_FIREBASE_CONFIG;
   const configured=Boolean(cfg&&['apiKey','authDomain','projectId','appId'].every(k=>typeof cfg[k]==='string'&&cfg[k].trim()&&!cfg[k].includes('SUBSTITUIR')));
+  const adminLink=get('admin-account-link');
+  const ownerEmail='elgator833@gmail.com';
   let auth=null, sdk=null;
   const say=s=>{status.textContent=s};
   accountButton.addEventListener('click',()=>{if(!dialog.open)dialog.showModal()});
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isIn=Boolean(user);
     signedOut.hidden=isIn;
     signedIn.hidden=!isIn;
+    if(adminLink)adminLink.hidden=!(isIn&&user.emailVerified&&user.email?.toLowerCase()===ownerEmail&&user.providerData?.some(p=>p.providerId==='google.com'));
     const hasImage=isIn&&typeof user.photoURL==='string'&&user.photoURL.startsWith('https://');
     avatar.hidden=!hasImage;
     // SVGElement não reflete a propriedade .hidden como um HTMLElement.
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     import('https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js')
   ]).then(([appSdk,authSdk])=>{
     sdk=authSdk;
-    auth=authSdk.getAuth(appSdk.initializeApp(cfg));
+    auth=authSdk.getAuth(appSdk.getApps().length?appSdk.getApp():appSdk.initializeApp(cfg));
     authSdk.onAuthStateChanged(auth,user=>{
       render(user);
       if(!user)say('Escolha sua conta Google para entrar ou criar seu cadastro.');

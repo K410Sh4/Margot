@@ -319,3 +319,15 @@
   .product-visual .product-badges{right:37px}
   .product-badge{font-size:8px}
 }
+
+/* V1.28 — acesso à administração mostrado somente ao proprietário autenticado.
+ * As permissões reais de gravação permanecem nas regras do Firebase.
+ */
+.account-admin-link{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:10px 16px;margin:12px 0 8px;
+  background:#f8e9eb;border:1px solid #e5c4cd;border-radius:12px;
+  color:#87485b;font-size:13px;font-weight:700;text-decoration:none
+}
+.account-admin-link:hover{background:#f4dde2}
+.account-admin-link[hidden]{display:none!important}
