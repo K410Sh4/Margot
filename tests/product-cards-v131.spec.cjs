@@ -131,6 +131,36 @@ test('foto real apresenta assinatura discreta; fallback não deixa assinatura so
   await expect(card.locator('.product-visual')).toHaveClass(/is-photo-missing/);
 });
 
+test('visual premium: foto, painel sobreposto e CTA preservam estados reais',async({page})=>{
+  await staticCatalog(page);
+  await verifiedOffer(page);
+  await page.setViewportSize({width:1280,height:850});
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const normal=page.locator('#product-grid .product-card').nth(1);
+  const special=page.locator('#product-grid .product-card').first();
+  await expect(special).toHaveClass(/product-card--signature/);
+  await expect(special.locator('.product-savings strong')).toHaveText('R$ 10,00');
+  await expect(special.locator('.product-badge--bestseller')).toBeVisible();
+  await expect(normal.locator('.product-savings')).toHaveCount(0);
+  const visuals=await page.evaluate(()=>{
+    const normal=document.querySelectorAll('#product-grid .product-card')[1];
+    const special=document.querySelector('#product-grid .product-card--signature');
+    const info=normal.querySelector('.product-info').getBoundingClientRect();
+    const photo=normal.querySelector('.product-visual').getBoundingClientRect();
+    return {
+      photoOverlapsInfo:info.top<photo.bottom,
+      normalButton:getComputedStyle(normal.querySelector('.add-to-cart')).backgroundImage,
+      specialButton:getComputedStyle(special.querySelector('.add-to-cart')).backgroundImage,
+      brandMissing:normal.querySelector('.product-photo-signature')===null
+    };
+  });
+  expect(visuals.photoOverlapsInfo).toBe(true);
+  expect(visuals.normalButton).toContain('gradient');
+  expect(visuals.specialButton).toContain('gradient');
+  expect(visuals.normalButton).not.toBe(visuals.specialButton);
+  expect(visuals.brandMissing).toBe(true);
+});
+
 for(const width of [320,390,600,640,768,920,1024,1150,1280]){
   test('layout premium sem overflow, CTA legível e grid correto em '+width+'px',async({page})=>{
     await staticCatalog(page);
