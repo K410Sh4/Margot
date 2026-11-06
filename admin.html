@@ -6,10 +6,11 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#fff6f2">
   <title>Painel da loja | Margot Acessórios</title>
-  <link rel="stylesheet" href="./admin.css?v=1.29">
+  <link rel="stylesheet" href="./admin.css?v=1.30">
   <script src="./firebase-config.js?v=1.29" defer></script>
   <script src="./catalog-data.js?v=1.26" defer></script>
-  <script src="./admin.js?v=1.29" type="module"></script>
+  <script src="./image-optimizer.js?v=1.30" defer></script>
+  <script src="./admin.js?v=1.30" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#admin-content">Ir para o conteúdo</a>
@@ -144,14 +145,14 @@
         <section class="editor-section" aria-labelledby="photos-title">
           <h3 id="photos-title">Fotografias</h3>
           <p id="storage-notice" class="storage-notice" role="status" hidden>
-            <strong>Fotografias indisponíveis por enquanto.</strong>
-            O Firebase Storage ainda não foi ativado. É possível salvar produtos,
-            estoque e promoções normalmente, sem enviar imagens.
+            <strong id="image-backend-title">Preparando fotografias…</strong>
+            <span id="image-backend-description">O envio gratuito usa o Firestore com fotos compactadas.
+            Você poderá selecionar imagens assim que as novas regras de segurança forem ativadas.</span>
           </p>
-          <p class="section-hint">A primeira imagem será a capa na vitrine. As demais aparecerão na galeria.</p>
+          <p class="section-hint">A primeira imagem será a capa na vitrine. As demais aparecerão na galeria. Fotos em modo gratuito são convertidas para WebP e otimizadas automaticamente (limite de qualidade e resolução).</p>
           <div id="editor-photos" class="editor-photos"></div>
           <label class="upload-area" for="field-photos">
-            <span aria-hidden="true">＋</span><strong>Adicionar fotografias</strong><small>JPEG, PNG ou WebP · até 5 MB por imagem</small>
+            <span aria-hidden="true">＋</span><strong>Adicionar fotografias</strong><small>JPEG, PNG ou WebP · até 5 MB por arquivo · imagens compactadas</small>
             <input id="field-photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
           </label>
           <p id="upload-status" role="status" aria-live="polite"></p>

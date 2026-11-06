@@ -18,6 +18,8 @@
   let product=null;
   let gallery=[];
   let activeImage=0;
+  let galleryRevision=0;
+  let requestedFullImages=new Set();
   let toastTimeout;
 
   function toast(message){
@@ -211,6 +213,24 @@
     $('pd-thumbnails').querySelectorAll('button').forEach((btn,i)=>{
       btn.setAttribute('aria-pressed',String(i===activeImage));
     });
+    const photoPath=product.imagePaths?.[activeImage];
+    if(!photoPath?.startsWith('productMedia/')||
+       requestedFullImages.has(photoPath)||!window.MargotMedia)return;
+    requestedFullImages.add(photoPath);
+    const revision=galleryRevision;
+    const productId=product.id;
+    const requestedIndex=activeImage;
+    window.MargotMedia.getImage(photoPath).then(full=>{
+      if(!full||revision!==galleryRevision||product?.id!==productId)return;
+      gallery[requestedIndex]=full;
+      if(activeImage===requestedIndex){
+        $('pd-main-image').src=full;
+        $('pd-dialog-image').src=full;
+      }
+    }).catch(()=>{
+      // Conserva a miniatura carregada, sem bloquear as outras fotos.
+      if(revision===galleryRevision)requestedFullImages.delete(photoPath);
+    });
   }
   function showPlaceholder(){
     gallery=[fallbackImage];
@@ -223,6 +243,8 @@
     $('pd-thumbnails').replaceChildren();
   }
   function renderGallery(){
+    galleryRevision++;
+    requestedFullImages=new Set();
     const pictures=normalizedImages(product);
     if(!pictures.length){
       showPlaceholder();
