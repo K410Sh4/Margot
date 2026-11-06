@@ -331,6 +331,8 @@
       return;
     }
     document.title=product.name+' | Margot Acessórios';
+    const question='Olá! Vi '+product.name+' no site da Margot Acessórios e gostaria de confirmar o preço, a disponibilidade e a entrega.';
+    $('pd-contact-whatsapp').href='https://wa.me/5535997450100?text='+encodeURIComponent(question);
     $('pd-crumb-category').textContent=product.category;
     $('pd-crumb-category').href='./index.html?categoria='+encodeURIComponent(product.category)+'#produtos';
     $('pd-crumb-name').textContent=product.name;
