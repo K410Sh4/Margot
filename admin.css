@@ -86,7 +86,7 @@ input:focus,select:focus,textarea:focus{border-color:#b46e85}
   gap:14px;align-items:center;padding:11px 14px;text-align:left;background:#fffaf8;
   border:1px solid #f1e1df;border-radius:14px;color:inherit}
 .product-row:hover{border-color:#d2aab3;background:#fff5f4}
-.product-row[aria-disabled="true"]{opacity:.63}
+.product-row[data-archived="true"]{opacity:.68}
 .product-row img{width:59px;height:59px;border-radius:11px;background:#f7e7e3;object-fit:cover}
 .product-row .product-primary{display:flex;flex-direction:column;gap:4px;min-width:0}
 .product-row strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -152,6 +152,14 @@ input[type="checkbox"]{width:18px;height:18px;accent-color:#a05269;padding:0;fle
 }
 @media(max-width:700px){
   .admin-layout{display:block}
+  .sidebar{max-width:100%;gap:8px;padding:11px 10px;overflow:hidden}
+  .side-brand{width:76px;flex:0 0 76px;min-width:0}
+  .side-brand img{width:74px}
+  .side-brand span{font-size:7px;white-space:nowrap;letter-spacing:.05em}
+  .side-nav{min-width:0;gap:2px}
+  .side-link{font-size:10px;padding:8px 5px;white-space:nowrap}
+  .side-link span{display:none}
+
   .sidebar{position:static;height:auto;display:flex;flex-direction:row;align-items:center;gap:14px;padding:12px 16px}
   .side-brand{width:102px;margin:0;flex:none}
   .side-brand img{width:95px}
@@ -203,4 +211,15 @@ input[type="checkbox"]{width:18px;height:18px;accent-color:#a05269;padding:0;fle
 }
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+/* V1.28.1 — impede sobra horizontal em visualização mobile estreita. */
+@media(max-width:400px){
+  .sidebar{padding:10px 8px;gap:7px}
+  .side-brand{width:66px;flex-basis:66px}
+  .side-brand img{width:64px}
+  .side-brand span{font-size:6px;letter-spacing:0}
+  .side-link{font-size:9px;padding:7px 4px}
+  .topbar{min-width:0}
+  .top-actions{min-width:0}
 }

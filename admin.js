@@ -93,7 +93,7 @@ function render(){
     const button=document.createElement('button');
     button.type='button';button.className='product-row';
     button.dataset.id=p.id;button.setAttribute('aria-label','Editar '+p.name);
-    if(p.deleted)button.setAttribute('aria-disabled','true');
+    if(p.deleted)button.dataset.archived='true';
     const img=document.createElement('img');
     img.src=p.imageUrls?.[0]||PLACEHOLDER;
     img.alt='';img.loading='lazy';img.addEventListener('error',()=>{img.src=PLACEHOLDER},{once:true});
@@ -111,7 +111,7 @@ function render(){
     else if(p.stockCount===0)stock.textContent='Sem estoque';
     else if(p.stockCount<=10){stock.textContent=p.stockCount+' unidades';stock.classList.add('is-low')}
     else stock.textContent='Estoque informado';
-    const edit=document.createElement('span');edit.className='row-edit';edit.textContent='Editar ↗';
+    const edit=document.createElement('span');edit.className='row-edit';edit.textContent=p.deleted?'Restaurar ↗':'Editar ↗';
     button.append(img,basic,price,stock,edit);
     button.addEventListener('click',()=>openEditor(p.id));
     root.append(button);
