@@ -453,11 +453,15 @@ test('fotografia da conexão carrega e substitui a logo da assinatura no desktop
     const photo=document.querySelector('.closing-note__photo');
     return {panelX:panel.x,panelWidth:panel.width,copyX:copy.x,
       // clientWidth é a largura do layout; getBoundingClientRect inclui o scale do GSAP.
-      photoWidth:photo.clientWidth,doc:document.documentElement.scrollWidth,
+      photoWidth:photo.clientWidth,
+      mediaWidth:document.querySelector('.closing-note__media').clientWidth,
+      doc:document.documentElement.scrollWidth,
       viewport:document.documentElement.clientWidth};
   });
   expect(layout.copyX).toBeGreaterThan(layout.panelX+layout.panelWidth*.45);
-  expect(Math.abs(layout.photoWidth-layout.panelWidth)).toBeLessThanOrEqual(2);
+  expect(Math.abs(layout.photoWidth-layout.mediaWidth)).toBeLessThanOrEqual(2);
+  expect(layout.mediaWidth).toBeGreaterThan(layout.panelWidth*.44);
+  expect(layout.mediaWidth).toBeLessThan(layout.panelWidth*.53);
   expect(layout.doc).toBeLessThanOrEqual(layout.viewport+1);
 });
 
@@ -513,19 +517,22 @@ test('paleta de encerramento conecta marfim e vinho com o rodapé rosé',async({
       message:cs('.closing-note__message').color,
       eyebrow:cs('.closing-note__eyebrow').color,
       link:cs('.closing-note__link').color,
-      fade:cs('.closing-note__panel').getPropertyValue('background-color'),
-      overlay:getComputedStyle(document.querySelector('.closing-note__panel'),'::after').backgroundImage,
+      panelGradient:cs('.closing-note__panel').backgroundImage,
+      photoFilter:cs('.closing-note__photo').filter,
+      frame:getComputedStyle(document.querySelector('.closing-note__panel'),'::after').borderStyle,
       footer:cs('.footer').backgroundImage,
       documentWidth:document.documentElement.scrollWidth,
       viewportWidth:document.documentElement.clientWidth
     };
   });
-  expect(colors.panel).toBe('rgb(249, 245, 240)');
-  expect(colors.title).toBe('rgb(117, 74, 85)');
-  expect(colors.message).toBe('rgb(100, 92, 84)');
-  expect(colors.eyebrow).toBe('rgb(95, 117, 94)');
-  expect(colors.link).toBe('rgb(117, 74, 85)');
-  expect(colors.overlay).toContain('rgba(249, 245, 240, 0.98)');
+  expect(colors.panel).toBe('rgb(255, 247, 244)');
+  expect(colors.title).toBe('rgb(113, 68, 80)');
+  expect(colors.message).toBe('rgb(114, 95, 99)');
+  expect(colors.eyebrow).toBe('rgb(163, 85, 99)');
+  expect(colors.link).toBe('rgb(255, 255, 255)');
+  expect(colors.panelGradient).toContain('linear-gradient');
+  expect(colors.photoFilter).toContain('grayscale(1)');
+  expect(colors.frame).toBe('solid');
   expect(colors.footer).toContain('linear-gradient');
   expect(colors.footer).toContain('rgb(242, 222, 219)');
   expect(colors.documentWidth).toBeLessThanOrEqual(colors.viewportWidth+1);
@@ -551,8 +558,8 @@ test('mobile mantém foto livre e contraste no texto com paleta rosé',async({pa
       viewport:document.documentElement.clientWidth
     };
   });
-  expect(state.background).toBe('rgb(249, 245, 240)');
-  expect(state.title).toBe('rgb(117, 74, 85)');
+  expect(state.background).toBe('rgb(255, 249, 246)');
+  expect(state.title).toBe('rgb(113, 68, 80)');
   expect(state.imgLoaded).toBe(true);
   expect(state.copyTop).toBeGreaterThanOrEqual(state.imageBottom-2);
   expect(state.footerGradient).toContain('linear-gradient');
