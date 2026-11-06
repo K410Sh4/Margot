@@ -94,3 +94,23 @@ Fontes oficiais:
 - https://firebase.google.com/docs/storage/security
 - https://firebase.google.com/docs/rules/manage-deploy
 - https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024
+
+## V1.29 — Upload suspenso enquanto Storage não estiver ativo
+
+O projeto está no plano Spark e, após a implantação apenas de Firestore, o
+Firebase Storage ainda não foi configurado. Para evitar que o envio de imagens
+fique aguardando repetidas tentativas, o administrador agora apresenta um aviso
+explícito e desativa o campo de fotografias até a infraestrutura ser ativada.
+Os produtos continuam podendo ser cadastrados, alterados e arquivados sem fotos.
+
+O indicador público `window.MARGOT_STORAGE_UPLOADS_ENABLED = false`, em
+`firebase-config.js`, é uma **chave operacional de interface**, não uma regra
+de segurança. Para voltar a enviar fotos, configure o bucket e o faturamento
+correspondente, implante `storage.rules`, valide as permissões com a conta
+administradora e **somente então** mude a chave para `true` e publique o
+frontend. Nunca ative apenas a interface sem ter configurado as regras.
+
+Quando essa chave estiver ligada, o SDK limitará as tentativas de upload a
+15 segundos e de outras operações a 10 segundos. Os arquivos não são
+silenciosamente descartados: operações de upload com erro não confirmam a
+criação/alteração do produto.

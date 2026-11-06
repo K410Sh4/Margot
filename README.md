@@ -269,3 +269,15 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Os dados no Firebase não foram acessados nem publicados nesta execução: a ativação requer implantação das regras pela conta proprietária.
 - **Guia de ativação:** docs/PAINEL-ADMIN-FIREBASE.md. O GitHub Pages publica o frontend; as regras exigem deploy separado no Firebase.
 - Testes Playwright: autenticação de usuário autorizado/não autorizado com SDK simulado, cadastro, arquivamento, edição, fotos, vitrine em tempo real e mobile.
+
+## V1.29 — Correção de salvamento de imagens
+
+- Após ativar somente o Firestore, o painel não tenta mais enviar imagens
+  para um Storage não configurado: o seletor fica inativo com aviso.
+- O salvamento de nome, estoque, preço e promoções continua operacional sem
+  fotografia; o usuário recebe mensagens por etapa.
+- Futuras tentativas de upload, após ativação do serviço, terão duração máxima
+  de novas tentativas configurada no SDK.
+- Para habilitar fotografias, seguir `docs/PAINEL-ADMIN-FIREBASE.md` e
+  ligar a chave operacional `MARGOT_STORAGE_UPLOADS_ENABLED` após
+  implantação das regras de segurança.

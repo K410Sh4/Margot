@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#fff6f2">
   <title>Painel da loja | Margot Acessórios</title>
-  <link rel="stylesheet" href="./admin.css?v=1.28">
-  <script src="./firebase-config.js" defer></script>
+  <link rel="stylesheet" href="./admin.css?v=1.29">
+  <script src="./firebase-config.js?v=1.29" defer></script>
   <script src="./catalog-data.js?v=1.26" defer></script>
-  <script src="./admin.js?v=1.28" type="module"></script>
+  <script src="./admin.js?v=1.29" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#admin-content">Ir para o conteúdo</a>
@@ -143,6 +143,11 @@
         </section>
         <section class="editor-section" aria-labelledby="photos-title">
           <h3 id="photos-title">Fotografias</h3>
+          <p id="storage-notice" class="storage-notice" role="status" hidden>
+            <strong>Fotografias indisponíveis por enquanto.</strong>
+            O Firebase Storage ainda não foi ativado. É possível salvar produtos,
+            estoque e promoções normalmente, sem enviar imagens.
+          </p>
           <p class="section-hint">A primeira imagem será a capa na vitrine. As demais aparecerão na galeria.</p>
           <div id="editor-photos" class="editor-photos"></div>
           <label class="upload-area" for="field-photos">
@@ -154,7 +159,7 @@
       </div>
       <footer class="editor-actions">
         <button id="archive-product" type="button" class="btn btn-danger">Retirar da vitrine</button>
-        <span class="action-spacer"></span>
+        <span class="action-spacer"></span><span id="save-progress" class="save-progress" role="status" aria-live="polite"></span>
         <button id="cancel-edit" type="button" class="btn btn-muted">Cancelar</button>
         <button id="save-product" type="submit" class="btn btn-primary">Salvar alterações</button>
       </footer>

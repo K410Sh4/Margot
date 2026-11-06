@@ -9,6 +9,8 @@ const TODAY=()=>new Date().toISOString().slice(0,10);
 const MONTH=()=>TODAY().slice(0,7);
 const PLACEHOLDER='./assets/foto-em-breve.webp';
 const IMAGE_TYPES=['image/jpeg','image/png','image/webp'];
+const STORAGE_READY=window.MARGOT_STORAGE_UPLOADS_ENABLED===true;
+const STORAGE_WARNING='Fotografias indisponíveis: o Firebase Storage ainda não foi configurado. Você pode salvar o produto sem imagem.';
 let api=null,auth=null,db=null,storage=null,unsubscribe=null;
 let records=new Map(),editingId=null,selectedImages=[],removedPaths=[],pendingFiles=[];
 let currentProduct=null,busy=false,toastTimer;
@@ -118,6 +120,18 @@ function render(){
   }
   $('admin-empty').hidden=shown.length!==0;
 }
+function updateStorageUI(){
+  const input=$('field-photos');
+  input.disabled=!STORAGE_READY;
+  const area=input.closest('.upload-area');
+  area.classList.toggle('is-unavailable',!STORAGE_READY);
+  area.setAttribute('aria-disabled',String(!STORAGE_READY));
+  $('storage-notice').hidden=STORAGE_READY;
+  $('upload-status').textContent=STORAGE_READY?'':STORAGE_WARNING;
+}
+function saveStage(value){
+  $('save-progress').textContent=value;
+}
 function resetUpload(){
   selectedImages=[];removedPaths=[];pendingFiles=[];
   $('field-photos').value='';
@@ -128,6 +142,8 @@ function openEditor(id=null){
   editingId=id;
   currentProduct=id?currentRecord(id):null;
   resetUpload();
+  updateStorageUI();
+  saveStage('');
   const p=currentProduct||{
     name:'',category:'Brincos',basePrice:0,description:'',stockCount:null,stockCheckedAt:'',
     salePrice:null,saleStart:'',saleEnd:'',saleCheckedAt:'',
@@ -205,6 +221,8 @@ function setBusy(value){
   $('save-product').textContent=value?'Salvando…':'Salvar alterações';
 }
 async function uploadFiles(id){
+  if(!pendingFiles.length)return [];
+  if(!STORAGE_READY)throw Error(STORAGE_WARNING);
   const created=[];
   for(let i=0;i<pendingFiles.length;i++){
     const file=pendingFiles[i];
@@ -219,6 +237,7 @@ async function uploadFiles(id){
   return created;
 }
 async function removeStoredImages(paths){
+  if(!STORAGE_READY)return paths.length;
   let failures=0;
   for(const path of paths){
     try{await api.deleteObject(api.storageRef(storage,path))}
@@ -266,21 +285,30 @@ async function save(event){
   let newUploads=[],saved=false;
   setBusy(true);
   try{
+    saveStage('Validando informações…');
     const docData=readForm();
     const id=editingId||makeId(docData.name);
     assertFiles([]);
+    if(pendingFiles.length)saveStage('Enviando fotografias…');
     newUploads=await uploadFiles(id);
     const images=[...selectedImages,...newUploads];
     docData.imageUrls=images.map(i=>i.url);
     docData.imagePaths=images.map(i=>i.path);
+    saveStage('Gravando produto no Firestore…');
     await api.setDoc(api.doc(db,'products',id),docData);
     saved=true;
+    saveStage('Produto salvo.');
     const failed=await removeStoredImages(removedPaths);
     dialog.close();
     toast(failed?'Produto salvo. Algumas fotos antigas exigem limpeza manual.':'Produto salvo e sincronizado.');
   }catch(error){
-    toast(error?.message?.includes('permission')?'Sem permissão de gravação. Confirme as regras Firebase.':
-      (error?.message||'Não foi possível salvar o produto.'));
+    const message=error?.code?.startsWith('storage/')?
+      'Não foi possível enviar as fotos: verifique o Firebase Storage e suas permissões.':
+      error?.message?.includes('permission')?
+      'Sem permissão de gravação. Confirme as regras Firebase.':
+      (error?.message||'Não foi possível salvar o produto.');
+    saveStage('Falha: '+message);
+    toast(message);
   }finally{
     if(!saved&&newUploads.length)await removeStoredImages(newUploads.map(i=>i.path));
     setBusy(false);
@@ -334,19 +362,23 @@ async function start(){
       import('https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js'),
       import('https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js'),
       import('https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js'),
-      import('https://www.gstatic.com/firebasejs/13.2.0/firebase-storage.js')
+      STORAGE_READY?import('https://www.gstatic.com/firebasejs/13.2.0/firebase-storage.js'):Promise.resolve(null)
     ]);
     const app=appSdk.getApps().length?appSdk.getApp():appSdk.initializeApp(config);
     auth=authSdk.getAuth(app);
     db=dbSdk.getFirestore(app);
-    storage=storageSdk.getStorage(app);
+    storage=storageSdk?.getStorage(app)||null;
+    if(storage){
+      storageSdk.setMaxUploadRetryTime(storage,15000);
+      storageSdk.setMaxOperationRetryTime(storage,10000);
+    }
     api={
       signInWithPopup:authSdk.signInWithPopup,GoogleAuthProvider:authSdk.GoogleAuthProvider,
       signOut:authSdk.signOut,
       onSnapshot:dbSdk.onSnapshot,collection:dbSdk.collection,doc:dbSdk.doc,
       setDoc:dbSdk.setDoc,serverTimestamp:dbSdk.serverTimestamp,
-      storageRef:storageSdk.ref,uploadBytes:storageSdk.uploadBytes,
-      getDownloadURL:storageSdk.getDownloadURL,deleteObject:storageSdk.deleteObject
+      storageRef:storageSdk?.ref,uploadBytes:storageSdk?.uploadBytes,
+      getDownloadURL:storageSdk?.getDownloadURL,deleteObject:storageSdk?.deleteObject
     };
     $('admin-login').disabled=false;
     status('Entre com a conta administradora para continuar.');
@@ -397,6 +429,7 @@ form.addEventListener('submit',save);
 $('archive-product').addEventListener('click',archive);
 $('field-photos').addEventListener('change',event=>{
   try{
+    if(!STORAGE_READY)throw Error(STORAGE_WARNING);
     const files=Array.from(event.target.files||[]);
     assertFiles(files);
     pendingFiles.push(...files);

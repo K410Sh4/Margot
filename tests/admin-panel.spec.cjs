@@ -28,7 +28,8 @@ const sdk={
   'firebase-storage.js':"export const getStorage=()=>({});export const ref=(storage,p)=>({fullPath:p});"+
     "export const uploadBytes=async()=>({});"+
     "export const getDownloadURL=async r=>'https://firebasestorage.googleapis.com/v0/b/margot-acessorios-865987.firebasestorage.app/o/'+encodeURIComponent(r.fullPath)+'?alt=media&token=test';"+
-    "export const deleteObject=async()=>{};"
+    "export const deleteObject=async()=>{};"+
+    "export const setMaxUploadRetryTime=()=>{};export const setMaxOperationRetryTime=()=>{};"
 };
 async function mockFirebase(page,{email=null,docs={}}={}){
   await page.addInitScript(({email,docs})=>{window.__fakeEmail=email;window.__fakeDocs=docs;},{email,docs});
@@ -37,6 +38,14 @@ async function mockFirebase(page,{email=null,docs={}}={}){
     const code=sdk[key];
     return route.fulfill({status:code?200:404,contentType:'text/javascript',
       headers:{'access-control-allow-origin':'*'},body:code||'// missing'});
+  });
+}
+async function enabledStorageMock(page){
+  // Somente na execução automatizada: na loja pública o Storage continua desativado.
+  await page.route('**/firebase-config.js*',async route=>{
+    const response=await route.fetch();
+    const body=await response.text();
+    await route.fulfill({response,body:body+'\nwindow.MARGOT_STORAGE_UPLOADS_ENABLED=true;'});
   });
 }
 async function noOverflow(page){
@@ -109,8 +118,29 @@ test('criar produto, arquivar e restaurar',async({page})=>{
   await page.locator('#admin-filter').selectOption('active');
   await expect(page.locator('.product-row')).toHaveCount(9);
 });
+test('Storage não configurado: bloqueia imagens sem impedir cadastro de produtos',async({page})=>{
+  await mockFirebase(page,{email:owner});
+  await page.goto('/admin.html',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#admin-app')).toBeVisible();
+  await page.locator('#new-product').click();
+  await expect(page.locator('#storage-notice')).toBeVisible();
+  await expect(page.locator('#field-photos')).toBeDisabled();
+  await expect(page.locator('#upload-status')).toContainText('Storage');
+  await page.locator('#field-name').fill('Brinco Sem Fotografia');
+  await page.locator('#field-price').fill('19.90');
+  await page.locator('#field-stock').fill('5');
+  await page.locator('#save-product').click();
+  await expect(page.locator('#product-dialog')).toBeHidden();
+  await expect(page.locator('#admin-toast')).toContainText('Produto salvo');
+  const product=await page.evaluate(()=>window.__fakeDocs['brinco-sem-fotografia']);
+  expect(product.name).toBe('Brinco Sem Fotografia');
+  expect(product.stockCount).toBe(5);
+  expect(product.imageUrls).toEqual([]);
+});
+
 test('fotos são adicionadas e retiradas apenas ao salvar',async({page})=>{
   await mockFirebase(page,{email:owner});
+  await enabledStorageMock(page);
   await page.goto('/admin.html',{waitUntil:'domcontentloaded'});
   await expect(page.locator('#admin-app')).toBeVisible();
   await page.locator('.product-row').first().click();
