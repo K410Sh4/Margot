@@ -3,21 +3,8 @@
  * Checkout não é integrado: o pedido é copiado para atendimento manual.
  */
 'use strict';
-const STORE = {
-  name: 'Margot Acessórios',
-  currency: 'BRL',
-  preview: true,
-  products: [
-    {id:'brinco-coracao',name:'Brinco Coração Dourado',category:'Brincos',price:14.90,art:'heart-earrings'},
-    {id:'colar-perola',name:'Colar Pérola Delicada',category:'Colares',price:21.90,art:'pearl-necklace'},
-    {id:'pulseira-coracao',name:'Pulseira Coração',category:'Pulseiras',price:18.90,art:'heart-bracelet'},
-    {id:'argola-classica',name:'Argola Clássica',category:'Brincos',price:14.90,art:'hoop-earrings'},
-    {id:'anel-onda',name:'Anel Onda Dourado',category:'Anéis',price:15.90,art:'rings'},
-    {id:'brinco-luz',name:'Brinco Ponto de Luz',category:'Brincos',price:14.90,art:'pearl-earrings'},
-    {id:'colar-coracao',name:'Colar Coração',category:'Colares',price:27.90,art:'heart-necklace'},
-    {id:'kit-delicado',name:'Kit Delicadeza',category:'Kits',price:39.90,art:'gift'}
-  ]
-};
+const STORE = window.MargotCatalog;
+
 const ICONS = {
   menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
   close:'<path d="M5 5l14 14M19 5L5 19"/>',
@@ -106,7 +93,7 @@ function applyProductPhotoFallback(root){
   }, true);
 }
 function syncSearchBadge(){const el=$('active-search');if(el){el.hidden=!query;el.querySelector('[data-search-term]').textContent=query}}
-function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag"${hasProductPhoto(p)?' hidden':''}>Foto em breve</span>${productImage(p)}<button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3>${p.name}</h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;syncSearchBadge();document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
+function renderProducts(){const found=filteredProducts();$('product-grid').innerHTML=found.map(p=>`<article class="product-card"><div class="product-visual"><span class="demo-tag"${hasProductPhoto(p)?' hidden':''}>Foto em breve</span><a class="product-open" href="./produto.html?id=${encodeURIComponent(p.id)}" aria-label="Ver detalhes de ${p.name}">${productImage(p)}</a><button class="heart-btn" type="button" data-favorite="${p.id}" aria-pressed="${favorites.has(p.id)}" aria-label="${favorites.has(p.id)?'Remover dos':'Adicionar aos'} favoritos: ${p.name}"><span class="icon" data-icon="heart"></span></button></div><div class="product-info"><span class="category-label">${p.category}</span><h3><a class="product-title-link" href="./produto.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3><span class="price">${money(p.price)}</span><button class="add-to-cart" type="button" data-add="${p.id}" aria-label="Adicionar ${p.name} à sacola"><span class="icon" data-icon="bag"></span></button></div></article>`).join('');populateIcons($('product-grid'));$('catalog-status').textContent=`${found.length} ${found.length===1?'produto':'produtos'} em exibição`;$('empty-results').hidden=found.length>0;syncSearchBadge();document.querySelectorAll('[data-add]').forEach(el=>el.addEventListener('click',()=>addToCart(el.dataset.add)));document.querySelectorAll('[data-favorite]').forEach(el=>el.addEventListener('click',()=>toggleFavorite(el.dataset.favorite)))}
 function chooseCategory(c,scroll=true){
   if(c!=='Todos'&&!categories.includes(c))return;
   query='';$('search-input').value='';$('clear-search').hidden=true;
@@ -132,4 +119,13 @@ function copyOrder(){const lines=Object.keys(cart).map(id=>`• ${getItem(id).na
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function closeMobileMenu(){window.dispatchEvent(new CustomEvent('margot:menu-close'))}
 function init(){applyProductPhotoFallback($('product-grid'));applyProductPhotoFallback($('drawer-items'));populateIcons();renderCategories();renderFilters();renderProducts();updateCounts();$('drawer').inert=true;$('year').textContent=new Date().getFullYear();$('cart-open').addEventListener('click',()=>openDrawer('cart'));$('favorites-open').addEventListener('click',()=>openDrawer('favorites'));$('drawer-close').addEventListener('click',closeDrawer);$('overlay').addEventListener('click',closeDrawer);$('show-all').addEventListener('click',()=>chooseCategory('Todos'));$('search-input').addEventListener('input',e=>{query=e.target.value.trim();$('clear-search').hidden=!query;renderProducts()});$('search-form').addEventListener('submit',e=>{e.preventDefault();window.dispatchEvent(new CustomEvent('margot:search-close'));$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:'smooth'});$('search-input').blur()});$('clear-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts();$('search-input').focus()});$('clear-active-search').addEventListener('click',()=>{query='';$('search-input').value='';$('clear-search').hidden=true;renderProducts()});document.querySelectorAll('[data-category-link]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();chooseCategory(link.dataset.categoryLink)}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('drawer').classList.contains('open'))closeDrawer();if(e.key==='Tab'&&$('drawer').classList.contains('open')){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),a[href],input:not([disabled])')].filter(n=>n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}})}
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded',()=>{
+  init();
+  // Link vindo da página individual: sacola do MESMO armazenamento local.
+  const url=new URL(location.href);
+  if(url.searchParams.get('sacola')==='1'){
+    url.searchParams.delete('sacola');
+    history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+    openDrawer('cart');
+  }
+});

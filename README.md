@@ -234,3 +234,14 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Eliminado o bloco branco de fundo da marca no rodapé, logo limitada a 154 px no desktop e 140 px no mobile.
 - Identidade do cabeçalho e demais componentes intactos.
 - Quatro testes Playwright adicionais: carregamento da nova imagem, remoção do texto, contraste da caixa transparente e geometria em 320/390/1280 px.
+
+## V1.26 — Página individual de produto V3 (05/11/2026)
+
+- Nova página `produto.html?id=<id>`, com layout moderno e completo para cada um dos oito itens do catálogo atual. Fotos e títulos no catálogo principal passam a abrir a página individual; o botão de adicionar à sacola continua funcionando sem navegação.
+- `catalog-data.js` centraliza o catálogo utilizado por `store.js` e por `product-detail.js`, eliminando o risco de os produtos divergirem entre páginas.
+- Página individual inclui: galeria preparada para fotos reais (miniaturas e zoom quando houver fotos), preço de referência, quantidade de 1 a 99, favoritos, sacola compartilhada, especificações, cuidados, avaliações sem dados fabricados, recomendações e link para informações da loja.
+- O catálogo atual continua demonstrativo: **não há estoque confirmado, avaliações verificadas, condições de parcelamento, checkout real ou fotos individuais dos produtos**. A interface deixa isso explícito.
+- A página individual usa o mesmo armazenamento local `margot-cart` e `margot-favorites`; link `index.html?sacola=1#produtos` abre a sacola existente e limpa o parâmetro de URL.
+- `product-detail.css` mantém a linguagem rosé/bordô Margot e se adapta de 320 a 1280 px, sem alterar a lógica de compactação do cabeçalho da vitrine.
+- Playwright inclui testes de cada produto, links entre páginas, quantidade máxima, integração real com sacola e favoritos, conteúdos verificáveis, acessibilidade, ausência de overflow e capturas desktop/mobile.
+- O workflow de screenshots também documenta a experiência V3; novos CSS/JS/HTML estão registrados nas condições de execução dos workflows.

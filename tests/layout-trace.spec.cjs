@@ -4,6 +4,7 @@ const path=require('node:path');
 const {test,expect}=require('@playwright/test');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference'});
 const targets=[
+ ['Produto V3','.pd-grid'],['Foto produto V3','.pd-picture-frame'],['Compra V3','.pd-buy-panel'],
  ['Cabeçalho','.site-header'],['Grid cabeçalho','.header-main'],
  ['Logo','.brand'],['Imagem logo','.brand img'],['Botão menu','#menu-open'],
  ['Conta','#account-open'],['Menu','#main-nav'],['Barra inferior','#mobile-bottom-nav'],
@@ -230,6 +231,18 @@ test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>
      await page.reload({waitUntil:'domcontentloaded'});
      await expect(page.locator('html')).toHaveClass(/mobile-nav-ready/);
    },{fullPage:true});
+   await action('Produto V3 mobile 390',async()=>{
+     await page.goto('/produto.html?id=brinco-coracao',{waitUntil:'domcontentloaded'});
+     await expect(page.locator('#pd-product')).toBeVisible();
+   },{transition:true,fullPage:true});
+   await action('Produto V3 desktop 1280',async()=>{
+     await page.setViewportSize({width:1280,height:850});
+     await expect(page.locator('#pd-title')).toBeVisible();
+   },{transition:true,fullPage:true});
+   await action('Produto V3 accordion',async()=>{
+     await page.locator('.pd-accordions summary').filter({hasText:'Especificações'}).click();
+   },{transition:true});
+
  }finally{
    try{await context.tracing.stop({path:path.join(dir,'playwright-trace.zip')})}
    catch(e){errors.push('Trace: '+String(e))}

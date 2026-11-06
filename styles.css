@@ -233,6 +233,12 @@
 }
 
 
+
+/* V1.26: acesso às páginas individuais sem intervir nos botões da vitrine. */
+.product-open{display:block;position:absolute;inset:0;z-index:0}
+.product-open:focus-visible{outline:3px solid #a35563;outline-offset:-5px;border-radius:14px}
+.product-title-link{text-decoration:none}
+.product-title-link:hover,.product-title-link:focus-visible{text-decoration:underline;text-underline-offset:3px}
 /* V1.17: estilos do cabeçalho centralizados em mobile-navigation.css. */
 /* O texto de um slide anterior não pode permanecer durante o crossfade. */
 .hero-slide:not(.is-active) .hero-copy{visibility:hidden!important;opacity:0!important}
