@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#fbefeb">
+  <meta name="description" content="Conheça os detalhes dos acessórios da Margot. Consulte informações e salve suas peças favoritas.">
+  <title>Detalhes do produto | Margot Acessórios</title>
+  <link rel="icon" href="./assets/favicon-32.png?v=official-2" type="image/png">
+  <link rel="stylesheet" href="./styles.css?v=1.26">
+  <link rel="stylesheet" href="./product-detail.css?v=1.26">
+  <script src="./catalog-data.js?v=1.26" defer></script>
+  <script src="./product-detail.js?v=1.26" defer></script>
+</head>
+<body class="pd-page">
+  <a class="skip-link" href="#conteudo">Ir para detalhes do produto</a>
+  <div class="pd-topnote">Margot Acessórios <span aria-hidden="true">·</span> Loja 100% online <span aria-hidden="true">·</span> Vitrine em pré-lançamento</div>
+  <header class="pd-header">
+    <div class="pd-header-row wrap">
+      <a class="pd-back" href="./index.html#produtos" aria-label="Voltar para a vitrine">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg>
+        <span>Voltar</span>
+      </a>
+      <a class="pd-brand" href="./index.html#inicio" aria-label="Margot Acessórios — página inicial">
+        <img src="./assets/margot-logo.webp?v=official-2" width="800" height="606" alt="Margot Acessórios" decoding="async">
+      </a>
+      <div class="pd-header-actions">
+        <a class="pd-icon-link" href="./index.html#produtos" aria-label="Explorar coleção">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
+        </a>
+        <a class="pd-icon-link pd-cart-link" href="./index.html?sacola=1#produtos" aria-label="Ver sacola">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1.3 12H5.3L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          <span class="pd-count" id="pd-cart-count" hidden></span>
+        </a>
+      </div>
+    </div>
+    <nav class="pd-category-nav wrap" aria-label="Coleções">
+      <a href="./index.html#produtos">Coleção completa</a>
+      <a href="./index.html?categoria=Brincos#produtos">Brincos</a>
+      <a href="./index.html?categoria=Colares#produtos">Colares</a>
+      <a href="./index.html?categoria=Pulseiras#produtos">Pulseiras</a>
+      <a href="./index.html?categoria=An%C3%A9is#produtos">Anéis</a>
+      <a href="./index.html?categoria=Kits#produtos">Kits</a>
+    </nav>
+  </header>
+
+  <main class="pd-main wrap" id="conteudo">
+    <p id="pd-loading" class="pd-loading" role="status">Preparando detalhes da peça…</p>
+    <section id="pd-not-found" class="pd-not-found" hidden aria-labelledby="pd-not-found-title">
+      <span class="pd-not-found-icon" aria-hidden="true">✧</span>
+      <h1 id="pd-not-found-title">Não encontramos essa peça.</h1>
+      <p>O endereço pode estar desatualizado. Você pode explorar novamente a coleção Margot.</p>
+      <a class="pd-button pd-button-primary" href="./index.html#produtos">Voltar para a vitrine</a>
+    </section>
+
+    <div id="pd-product" hidden>
+      <nav class="pd-breadcrumb" aria-label="Caminho da página">
+        <a href="./index.html#inicio">Início</a><span aria-hidden="true">/</span>
+        <a id="pd-crumb-category" href="./index.html#produtos">Coleção</a><span aria-hidden="true">/</span>
+        <span id="pd-crumb-name" aria-current="page"></span>
+      </nav>
+
+      <section class="pd-grid" aria-labelledby="pd-title">
+        <div class="pd-gallery">
+          <div class="pd-picture-frame">
+            <span class="pd-photo-note" id="pd-photo-note">Foto em breve</span>
+            <img id="pd-main-image" src="./assets/foto-em-breve.webp" alt="Fotografia do produto ainda não disponível" width="900" height="900" decoding="async">
+            <button id="pd-zoom" class="pd-zoom" type="button" hidden aria-label="Ampliar fotografia do produto">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg>
+            </button>
+          </div>
+          <div class="pd-thumbnails" id="pd-thumbnails" role="group" aria-label="Fotografias do produto" hidden></div>
+          <p class="pd-image-disclaimer" id="pd-image-disclaimer">As fotografias individuais ainda estão sendo preparadas. Não utilizamos imagens de outros produtos.</p>
+        </div>
+
+        <div class="pd-buy-panel">
+          <p class="pd-overline">MARGOT <span aria-hidden="true">·</span> <span id="pd-category"></span></p>
+          <h1 class="pd-title" id="pd-title"></h1>
+          <p class="pd-lead">Um detalhe para acompanhar seus momentos.</p>
+          <div class="pd-price-block">
+            <strong id="pd-price" class="pd-price"></strong>
+            <span class="pd-preview-price">Valor ilustrativo · sujeito à confirmação</span>
+          </div>
+          <p class="pd-availability"><span class="pd-availability-dot" aria-hidden="true"></span>Disponibilidade e detalhes a confirmar com a loja</p>
+          <div class="pd-qty-row">
+            <div>
+              <label for="pd-qty-input">Quantidade</label>
+              <p class="pd-qty-hint">Até 99 unidades por peça</p>
+            </div>
+            <div class="pd-qty-control">
+              <button id="pd-decrease" type="button" aria-label="Diminuir quantidade">−</button>
+              <input id="pd-qty-input" inputmode="numeric" type="number" min="1" max="99" step="1" value="1" aria-label="Quantidade" />
+              <button id="pd-increase" type="button" aria-label="Aumentar quantidade">+</button>
+            </div>
+          </div>
+          <div class="pd-actions">
+            <button id="pd-add" type="button" class="pd-button pd-button-primary">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1.3 12H5.3L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+              Adicionar à sacola
+            </button>
+            <button id="pd-favorite" type="button" class="pd-button pd-button-outline" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.6c0 4.4-8.8 10.7-8.8 10.7S3.2 13 3.2 8.6a4.7 4.7 0 0 1 8.8-2.1 4.7 4.7 0 0 1 8.8 2.1Z"/></svg>
+              <span id="pd-favorite-text">Salvar favorito</span>
+            </button>
+          </div>
+          <a class="pd-view-cart" id="pd-view-cart" href="./index.html?sacola=1#produtos" hidden>Ver sacola atualizada <span aria-hidden="true">↗</span></a>
+          <p class="pd-disclosure">Esta é uma vitrine de pré-lançamento: adicionar à sacola não efetua compra, pagamento ou reserva de estoque.</p>
+
+          <div class="pd-promises" aria-label="Informações da vitrine">
+            <div><span class="pd-promise-icon" aria-hidden="true">♡</span><strong>Escolha com calma</strong><small>Salve os seus favoritos</small></div>
+            <div><span class="pd-promise-icon" aria-hidden="true">✧</span><strong>Detalhes antes do pedido</strong><small>Confirme as informações</small></div>
+            <div><span class="pd-promise-icon" aria-hidden="true">✓</span><strong>Sem cobrança agora</strong><small>Lista de interesse</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pd-details" aria-labelledby="pd-details-title">
+        <div class="pd-section-heading">
+          <p class="pd-overline">CONHEÇA SUA PEÇA</p>
+          <h2 id="pd-details-title">Cada detalhe importa</h2>
+          <p>Informações claras para você escolher com tranquilidade.</p>
+        </div>
+        <div class="pd-accordions">
+          <details open>
+            <summary>Descrição <span aria-hidden="true">+</span></summary>
+            <div class="pd-accordion-content"><p id="pd-description"></p></div>
+          </details>
+          <details>
+            <summary>Especificações <span aria-hidden="true">+</span></summary>
+            <div class="pd-accordion-content">
+              <dl>
+                <dt>Categoria</dt><dd id="pd-spec-category"></dd>
+                <dt>Material e acabamento</dt><dd>A confirmar com a loja</dd>
+                <dt>Dimensões</dt><dd>A confirmar com a loja</dd>
+                <dt>Disponibilidade</dt><dd>Sob consulta</dd>
+              </dl>
+            </div>
+          </details>
+          <details>
+            <summary>Cuidados com a peça <span aria-hidden="true">+</span></summary>
+            <div class="pd-accordion-content"><p>Como orientação geral, mantenha a peça seca e longe de perfumes, cremes e produtos de limpeza. Confirme as recomendações específicas após identificar o material.</p></div>
+          </details>
+          <details>
+            <summary>Avaliações <span aria-hidden="true">+</span></summary>
+            <div class="pd-accordion-content"><p>Ainda não há avaliações verificadas disponíveis para esta peça.</p></div>
+          </details>
+        </div>
+      </section>
+
+      <section class="pd-related" aria-labelledby="pd-related-title">
+        <div class="pd-section-heading">
+          <p class="pd-overline">CONTINUE DESCOBRINDO</p>
+          <h2 id="pd-related-title">Você também pode gostar</h2>
+          <p>Outros detalhes da seleção Margot.</p>
+        </div>
+        <div class="pd-related-grid" id="pd-related-grid"></div>
+      </section>
+
+      <aside class="pd-help">
+        <div><p class="pd-overline">PRECISA DE MAIS INFORMAÇÕES?</p><h2>Estamos preparando o atendimento.</h2><p>Enquanto a loja está em pré-lançamento, você pode explorar a vitrine e salvar suas escolhas.</p></div>
+        <a class="pd-button pd-button-outline" href="./index.html#atendimento">Informações da loja <span aria-hidden="true">↗</span></a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="pd-footer">
+    <div class="wrap pd-footer-inner">
+      <a href="./index.html#inicio" aria-label="Margot Acessórios — início"><img src="./assets/margot-logo-minimal-footer.png?v=1.25" width="753" height="440" loading="lazy" alt="Margot Acessórios"></a>
+      <p>Vitrine demonstrativa · <a href="./privacidade.html">Privacidade</a></p>
+    </div>
+  </footer>
+  <dialog class="pd-image-dialog" id="pd-image-dialog" aria-label="Fotografia ampliada">
+    <button id="pd-image-close" type="button" aria-label="Fechar fotografia">×</button>
+    <img id="pd-dialog-image" alt="" />
+  </dialog>
+  <div class="pd-toast" id="pd-toast" role="status" aria-live="polite"></div>
+  <noscript><p class="pd-noscript">Ative o JavaScript para visualizar os detalhes e utilizar a sacola.</p></noscript>
+</body>
+</html>
