@@ -101,8 +101,10 @@ test('não duplica quantidade acima de 99 e preserva o limite da vitrine',async(
   await page.locator('#pd-qty-input').blur();
   await page.locator('#pd-add').click();
   await expect(page.locator('#pd-cart-count')).toHaveText('99');
+  await expect(page.locator('#pd-add-label')).toHaveText('Adicionado ao carrinho');
   await page.locator('#pd-add').click();
-  await expect(page.locator('#pd-cart-count')).toHaveText('99');
+  await expect(page.locator('#drawer')).toHaveClass(/open/);
+  await expect(page.locator('#cart-count')).toHaveText('99');
   const cart=await page.evaluate(()=>JSON.parse(localStorage.getItem('margot-cart')));
   expect(cart['brinco-coracao']).toBe(99);
 });
