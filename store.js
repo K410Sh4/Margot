@@ -191,6 +191,58 @@ function chooseCategory(c,scroll=true){
   if(scroll){$('produtos').focus({preventScroll:true});$('produtos').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 }
 function updateCounts(){const num=Object.values(cart).reduce((a,n)=>a+n,0);$('cart-count').textContent=num;$('cart-count').hidden=!num;$('favorite-count').textContent=favorites.size;$('favorite-count').hidden=!favorites.size}
+
+/* Preserve o foco quando cards e linhas da sacola são recriados. */
+function captureActionFocus(){
+  const el=document.activeElement;
+  const root=el?.closest?.('#product-grid,#promotion-grid,#drawer-items');
+  if(!root)return null;
+  for(const key of ['add','favorite','qty','remove','favAdd','favRemove']){
+    if(el.dataset?.[key])return {rootId:root.id,key,id:el.dataset[key],delta:el.dataset.delta};
+  }
+  return null;
+}
+function restoreActionFocus(focus){
+  if(!focus)return;
+  const root=$(focus.rootId);
+  const elements=[...root?.querySelectorAll('button')||[]];
+  const same=elements.find(el=>el.dataset[focus.key]===focus.id&&
+    (focus.key!=='qty'||el.dataset.delta===focus.delta)&&!el.disabled);
+  const fallback=focus.key==='qty'?
+    elements.find(el=>el.dataset.qty===focus.id&&!el.disabled):null;
+  (same||fallback||(focus.rootId==='drawer-items'?$('drawer-close'):null))
+    ?.focus({preventScroll:true});
+}
+function refreshShoppingView(){
+  const focus=captureActionFocus();
+  updateCounts();
+  renderProducts();
+  renderPromotionPanel();
+  if($('drawer').classList.contains('open'))renderDrawer();
+  restoreActionFocus(focus);
+}
+function syncExternalStorage(event){
+  if(event.storageArea&&event.storageArea!==localStorage)return;
+  if(event.key!==null&&event.key!=='margot-cart'&&event.key!=='margot-favorites')return;
+  if(event.key===null||event.key==='margot-cart'){
+    const data=readStorage('cart',{});
+    const valid=data&&typeof data==='object'&&!Array.isArray(data)?data:{};
+    for(const id of Object.keys(cart))delete cart[id];
+    for(const [id,qty] of Object.entries(valid)){
+      if(getItem(id)&&Number.isInteger(qty)&&qty>0&&qty<100)cart[id]=qty;
+    }
+  }
+  if(event.key===null||event.key==='margot-favorites'){
+    const data=readStorage('favorites',[]);
+    favorites.clear();
+    if(Array.isArray(data))for(const id of data){
+      if(getItem(id))favorites.add(id);
+    }
+  }
+  if($('product-grid'))refreshShoppingView();
+}
+window.addEventListener('storage',syncExternalStorage);
+
 function addToCart(id){
   const p=getItem(id);
   if(!p)return;
@@ -202,13 +254,10 @@ function addToCart(id){
   }
   cart[id]=(cart[id]||0)+1;
   saveStorage('cart',cart);
-  updateCounts();
-  renderProducts();
-  renderPromotionPanel();
+  refreshShoppingView();
   notify('Peça adicionada à sacola');
-  if($('drawer').classList.contains('open'))renderDrawer();
 }
-function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);updateCounts();renderProducts();renderPromotionPanel();if($('drawer').classList.contains('open'))renderDrawer();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
+function toggleFavorite(id){favorites.has(id)?favorites.delete(id):favorites.add(id);saveStorage('favorites',[...favorites]);refreshShoppingView();notify(favorites.has(id)?'Adicionado aos favoritos':'Removido dos favoritos')}
 function changeQuantity(id,delta){
   const p=getItem(id);if(!p)return;
   const next=(cart[id]||0)+delta;
@@ -218,7 +267,7 @@ function changeQuantity(id,delta){
     if(next>cap){notify('Quantidade acima do estoque informado. Confirme a disponibilidade.');return;}
     cart[id]=Math.min(99,next);
   }else cart[id]=Math.min(99,next);
-  saveStorage('cart',cart);updateCounts();renderProducts();renderPromotionPanel();renderDrawer();
+  saveStorage('cart',cart);refreshShoppingView();
 }
 function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}
 function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${p.id}">${(cart[p.id]||0)>0?'Ver na sacola':'Adicionar à sacola'}</button></div><button type="button" class="remove" data-fav-remove="${p.id}" aria-label="Remover ${p.name} dos favoritos">×</button></div>`}
@@ -244,10 +293,7 @@ function applyCatalogLive(){
   if(favoritesChanged)saveStorage('favorites',[...favorites]);
   renderCategories();
   renderFilters();
-  renderProducts();
-  renderPromotionPanel();
-  updateCounts();
-  if($('drawer').classList.contains('open'))renderDrawer();
+  refreshShoppingView();
 }
 window.addEventListener('margot:catalog-updated',()=>{
   if($('product-grid'))applyCatalogLive();
