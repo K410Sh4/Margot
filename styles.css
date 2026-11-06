@@ -439,3 +439,7 @@
 }
 .account-admin-link:hover{background:#f4dde2}
 .account-admin-link[hidden]{display:none!important}
+
+/* Contato WhatsApp da loja — visual compatível com o rodapé Margot. */
+.footer .margot-whatsapp-contact{display:inline-flex;align-items:center;gap:6px;width:fit-content;max-width:100%;font-weight:700!important;color:#8b3b56!important;text-decoration:underline;text-underline-offset:3px}
+.footer .margot-whatsapp-contact:hover{color:#6c2942!important}
