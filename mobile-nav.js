@@ -179,25 +179,22 @@
           current = id;
         }
       }
-      // Uma seção de produtos mais compacta pode continuar visível quando
-      // o início da seção seguinte se aproxima do topo. Enquanto produtos
-      // ainda estiverem abaixo do cabeçalho, mantemos a navegação coerente
-      // com a categoria efetivamente visível.
-      if (current === 'presentes') {
-        const products = get('produtos')?.getBoundingClientRect();
-        const headerBottom = header.getBoundingClientRect().bottom;
-        if (products && products.bottom > headerBottom + 16 && products.top < window.innerHeight * .72) {
-          return 'produtos';
-        }
-      }
       return current;
     }
     function updateActive() {
       ticking = false;
-      const section = currentSection();
       const selectedCategory = new URLSearchParams(window.location.search).get('categoria');
       const categoryName = ['Brincos','Colares','Pulseiras','Anéis','Kits'].includes(selectedCategory)
         ? selectedCategory : 'Todos';
+      // Uma categoria filtrada deve aparecer ativa enquanto o catálogo está
+      // efetivamente na área visível, mesmo quando o catálogo compacto
+      // aproxima a seção seguinte do cabeçalho.
+      const catalog = get('produtos')?.getBoundingClientRect();
+      const catalogVisible = catalog &&
+        catalog.bottom > header.getBoundingClientRect().bottom &&
+        catalog.top < window.innerHeight;
+      const section = categoryName !== 'Todos' && catalogVisible
+        ? 'produtos' : currentSection();
       // Nenhum link permanece marcado artificialmente fora da seção correspondente.
       for (const link of nav.querySelectorAll('a[href]')) {
         const selection = link.dataset.categoryLink;
