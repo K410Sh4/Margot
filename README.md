@@ -325,3 +325,12 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - 6 cards em telas acima de 1150 px; 5 de 921 a 1150 px; 4 de 601 a 920 px; 3 em 600 px ou menos.
 - Fotografia, preço, desconto, favorito e ação de sacola preservados; conteúdo reorganizado e reduzido no mobile para evitar rolagem horizontal.
 - Suítes Playwright verificam faixas 320/390/600/640/768/920/1024/1150/1280 e elementos contidos nos cards.
+
+
+## V1.34 — Cards premium próximos aos modelos aprovados
+
+- Fotografia mais protagonista com degradê sutil, assinatura Margot em painel translúcido apenas quando a peça tem foto real e selo de favoritos.
+- Bloco de informações parcialmente sobreposto à foto, com preços, economia validada e ação de sacola mais destacada.
+- Card especial bordô/dourado reservado a produtos com selo confirmado de mais vendido no mês.
+- Preservadas as faixas de 6/5/4/3 colunas, catálogo Firestore, fotos existentes, sacola e favoritos.
+- Sem avaliações, números de reviews nem alegações comerciais inventadas.
