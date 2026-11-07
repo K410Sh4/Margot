@@ -10,3 +10,7 @@ window.MARGOT_FIREBASE_CONFIG = {
 
 // Ativar somente após configurar Firebase Storage e publicar storage.rules.
 window.MARGOT_STORAGE_UPLOADS_ENABLED = false;
+
+// Opcional: chave publica de site do reCAPTCHA Enterprise (Firebase App Check).
+// Configure no Firebase Console antes de preencher; nao ativar enforcement sem testar.
+window.MARGOT_APP_CHECK_SITE_KEY = '';
