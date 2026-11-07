@@ -345,7 +345,7 @@ test('visual editorial compacto: foto e painel separados com CTA consistente',as
   expect(visuals.brandMissing).toBe(true);
 });
 
-for(const width of [320,390,600,640,768,920,1024,1150,1280]){
+for(const width of [320,360,390,430,560,600,640,700,768,920,1024,1150,1280]){
   test('layout editorial sem overflow, CTA legível e grade adaptativa em '+width+'px',async({page})=>{
     await staticCatalog(page);
     await verifiedOffer(page);
@@ -369,15 +369,15 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
         titleFontSize:parseFloat(getComputedStyle(card.querySelector('h3')).fontSize),
         width:root.width};
     });
-    const expectedColumns=width<=560?1:Math.max(1,Math.floor((dims.width+dims.gap)/(210+dims.gap)));
+    const expectedColumns=width<=700?3:Math.max(1,Math.floor((dims.width+dims.gap)/(210+dims.gap)));
     expect(dims.columns).toBe(expectedColumns);
-    expect(dims.cardWidth).toBeGreaterThan(width<=560?200:205);
+    expect(dims.cardWidth).toBeGreaterThan(width<=700?80:205);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
     expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
-    expect(dims.buttonText).toBeGreaterThan(75);
-    expect(dims.titleFontSize).toBeGreaterThanOrEqual(18);
+    expect(dims.buttonText).toBeGreaterThan(width<=700?35:75);
+    expect(dims.titleFontSize).toBeGreaterThanOrEqual(width<=700?10:18);
     if(width===1280)expect(dims.cardWidth).toBeGreaterThan(210);
-    if(width===390)expect(dims.cardWidth).toBeGreaterThan(300);
+    if(width===390)expect(dims.cardWidth).toBeLessThan(140);
     const contained=await page.evaluate(()=>{
       const cards=[...document.querySelectorAll('#product-grid .product-card')];
       return cards.every(card=>{
@@ -390,6 +390,23 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
       });
     });
     expect(contained).toBe(true);
+    if(width<=700){
+      // Três cards reais na primeira linha e nenhuma invasão lateral.
+      const firstRow=await page.evaluate(()=>{
+        const cards=[...document.querySelectorAll('#product-grid .product-card')].slice(0,4);
+        const rects=cards.map(card=>card.getBoundingClientRect());
+        return {
+          aligned:Math.abs(rects[0].top-rects[1].top)<2&&Math.abs(rects[1].top-rects[2].top)<2,
+          nextRow:rects[3].top>rects[0].top,
+          smallEnough:rects[0].width<225,
+          targets:cards.slice(0,3).every(card=>card.querySelector('.add-to-cart').getBoundingClientRect().height>=44)
+        };
+      });
+      expect(firstRow.aligned).toBe(true);
+      expect(firstRow.nextRow).toBe(true);
+      expect(firstRow.smallEnough).toBe(true);
+      expect(firstRow.targets).toBe(true);
+    }
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
     const artifact=path.join('test-results','product-cards-v136');
