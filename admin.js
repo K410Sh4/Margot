@@ -315,6 +315,53 @@ function readForm(){
     updatedAt:api.serverTimestamp()
   };
 }
+// Somente os campos necessarios para a vitrine sao publicados.
+// Registros arquivados nao ficam acessiveis na colecao publica.
+function publicRecord(data){
+  const {deleted,updatedAt,...visible}=data;
+  return visible;
+}
+async function publishOne(id,data){
+  const ref=api.doc(db,'publicProducts',id);
+  if(data.deleted===true)await api.deleteDoc(ref);
+  else await api.setDoc(ref,publicRecord(data));
+}
+async function syncPublicCatalog(){
+  if(!authorized||busy)return;
+  const button=$('sync-public-catalog');
+  button.disabled=true;
+  try{
+    status('Sincronizando vitrine publica…');
+    const snapshot=await api.getDocs(api.collection(db,'publicProducts'));
+    const stale=new Set(snapshot.docs.map(doc=>doc.id));
+    const operations=[];
+    for(const [id,data] of records){
+      if(data.deleted===true){
+        if(stale.has(id))operations.push({id,remove:true});
+      }else{
+        operations.push({id,data:publicRecord(data)});
+      }
+      stale.delete(id);
+    }
+    for(const id of stale)operations.push({id,remove:true});
+    // Limite seguro por lote para nao exceder o numero de operacoes do Firestore.
+    for(let i=0;i<operations.length;i+=200){
+      const batch=api.writeBatch(db);
+      for(const operation of operations.slice(i,i+200)){
+        const ref=api.doc(db,'publicProducts',operation.id);
+        if(operation.remove)batch.delete(ref);
+        else batch.set(ref,operation.data);
+      }
+      await batch.commit();
+    }
+    status('Vitrine publica sincronizada');
+    toast('Catalogo publico sincronizado: '+operations.length+' registros revisados.');
+  }catch(error){
+    status('Falha ao sincronizar vitrine publica',true);
+    toast('Nao foi possivel publicar o catalogo. Implante primeiro firestore.rules e tente novamente.');
+    console.warn('Falha na sincronizacao publica:',error?.code||'unknown');
+  }finally{button.disabled=false;}
+}
 async function save(event){
   event.preventDefault();
   if(!authorized||busy)return;
@@ -333,10 +380,14 @@ async function save(event){
     saveStage('Gravando produto no Firestore…');
     await api.setDoc(api.doc(db,'products',id),docData);
     saved=true;
-    saveStage('Produto salvo.');
+    // Publicacao em segundo passo: uma falha nao desfaz o cadastro privado.
+    let publicError=null;
+    try{await publishOne(id,docData)}catch(error){publicError=error}
+    saveStage(publicError?'Produto salvo; vitrine publica pendente.':'Produto salvo.');
     const failed=await removeStoredImages(removedPaths);
     dialog.close();
-    toast(failed?'Produto salvo. Algumas fotos antigas exigem limpeza manual.':'Produto salvo e sincronizado.');
+    toast(publicError?'Produto salvo no painel; sincronize a vitrine publica apos implantar as regras.':
+      failed?'Produto salvo. Algumas fotos antigas exigem limpeza manual.':'Produto salvo e sincronizado.');
   }catch(error){
     const message=error?.code?.startsWith('storage/')?
       'Não foi possível enviar as fotos: verifique o Firebase Storage e suas permissões.':
@@ -363,8 +414,11 @@ async function archive(){
     data.updatedAt=api.serverTimestamp();
     data.deleted=!restore;
     await api.setDoc(api.doc(db,'products',editingId),data);
+    let publicError=null;
+    try{await publishOne(editingId,data)}catch(error){publicError=error}
     dialog.close();
-    toast(restore?'Produto restaurado na vitrine.':'Produto retirado da vitrine.');
+    toast(publicError?'Arquivo atualizado, mas a vitrine publica precisa ser sincronizada.':
+      restore?'Produto restaurado na vitrine.':'Produto retirado da vitrine.');
   }catch(error){
     toast(error?.message||'Falha ao alterar a visibilidade.');
   }finally{setBusy(false);}
@@ -423,7 +477,8 @@ async function start(){
       signInWithPopup:authSdk.signInWithPopup,GoogleAuthProvider:authSdk.GoogleAuthProvider,
       signOut:authSdk.signOut,
       onSnapshot:dbSdk.onSnapshot,collection:dbSdk.collection,doc:dbSdk.doc,
-      setDoc:dbSdk.setDoc,getDoc:dbSdk.getDoc,deleteDoc:dbSdk.deleteDoc,
+      setDoc:dbSdk.setDoc,getDoc:dbSdk.getDoc,getDocs:dbSdk.getDocs,
+      writeBatch:dbSdk.writeBatch,deleteDoc:dbSdk.deleteDoc,
       serverTimestamp:dbSdk.serverTimestamp,
       storageRef:storageSdk?.ref,uploadBytes:storageSdk?.uploadBytes,
       getDownloadURL:storageSdk?.getDownloadURL,deleteObject:storageSdk?.deleteObject
@@ -471,6 +526,7 @@ $('new-product').addEventListener('click',()=>openEditor());
 $('new-product-secondary').addEventListener('click',()=>openEditor());
 $('admin-search').addEventListener('input',render);
 $('admin-filter').addEventListener('change',render);
+$('sync-public-catalog').addEventListener('click',syncPublicCatalog);
 $('close-editor').addEventListener('click',()=>{if(!busy)dialog.close()});
 $('cancel-edit').addEventListener('click',()=>{if(!busy)dialog.close()});
 dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault()});
