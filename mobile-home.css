@@ -525,3 +525,67 @@
 }
 
 @media(min-width:701px){#categorias .category-scroll-hint{display:none}}
+
+
+/* V1.41 — apenas cartões fotográficos selecionam categorias no mobile.
+   O segundo conjunto de chips permanece no DOM para o desktop, mas fica
+   completamente oculto em celulares. */
+@media(max-width:700px){
+  #categorias.section{
+    padding-top:13px;
+    padding-bottom:4px;
+  }
+  #categorias .section-heading.center{margin-bottom:8px}
+  #categorias .section-heading .eyebrow{font-size:8px;margin-bottom:2px}
+  #categorias .section-heading h2{font-size:clamp(21px,5.8vw,26px)}
+  #categorias .category-scroll-hint{display:none}
+
+  #categorias #category-grid{
+    display:grid;
+    grid-template-columns:none;
+    grid-auto-flow:column;
+    grid-auto-columns:clamp(78px,22vw,94px);
+    gap:7px;
+    padding:2px 2px 6px;
+    margin-bottom:0;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+  }
+  #categorias #category-grid .category-card-photo{
+    width:100%;
+    min-width:0;
+    border-radius:11px;
+  }
+  #categorias #category-grid .category-photo{
+    aspect-ratio:300/404;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    border-radius:11px;
+    box-shadow:0 3px 10px rgba(105,63,77,.075);
+  }
+  #categorias #category-grid .category-card-photo[aria-pressed="true"] .category-photo{
+    outline:2px solid #9b4f66;
+    outline-offset:0;
+    box-shadow:0 4px 12px rgba(139,55,82,.22);
+  }
+
+  #produtos.products-section{padding-top:6px}
+  #produtos .section-heading{margin-bottom:8px}
+  #produtos .catalog-tools{
+    margin:0 0 9px;
+    gap:0;
+  }
+  #produtos #catalog-status{font-size:10px}
+  /* A filtragem continua funcional pelas imagens acima. */
+  #produtos #category-chips{display:none}
+}
+@media(max-width:360px){
+  #categorias #category-grid{
+    grid-auto-columns:78px;
+    gap:6px;
+  }
+  #categorias .section-heading h2{font-size:21px}
+}
