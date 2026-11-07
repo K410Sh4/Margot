@@ -119,7 +119,7 @@ test('após adicionar o card muda de estado e abre a sacola sem duplicar a unida
   await expect(page.locator('#product-grid .product-card').first().locator('.product-cart-label')).toHaveText('Adicionado ao carrinho');
 });
 
-test('WhatsApp da sacola prepara mensagem atualizada sem enviar automaticamente',async({page})=>{
+test('sacola monta seleção e subtotal para envio seguro via SAITE',async({page})=>{
   await staticCatalog(page);
   await page.goto('/',{waitUntil:'domcontentloaded'});
   await page.locator('#product-grid [data-add="brinco-coracao"]').click();
@@ -127,44 +127,28 @@ test('WhatsApp da sacola prepara mensagem atualizada sem enviar automaticamente'
   await page.locator('#cart-open').click();
   const link=page.locator('#whatsapp-order');
   await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute('target','_blank');
-  await expect(link).toHaveAttribute('rel',/noopener/);
-  const parseLink=async()=>{
-    const href=await link.getAttribute('href');
-    const url=new URL(href);
-    expect(url.origin).toBe('https://wa.me');
-    expect(url.pathname).toBe('/5535997450100');
-    return url.searchParams.get('text');
-  };
-  let message=await parseLink();
-  expect(message).toContain('Brinco Coração Dourado');
-  expect(message).toContain('Colar Pérola Delicada');
-  expect(message).toContain('1 unidade');
-  expect(message).toContain('R$ 14,90');
-  expect(message).toContain('R$ 21,90');
-  expect(message).toContain('Subtotal estimado: R$ 36,80');
-  expect(message).toContain('confirmar disponibilidade');
-  expect(message).toContain('\n');
+  await expect(link).toHaveAttribute('href','https://k410sh4.github.io/SAITE/contato.html?origem=margot');
+  await expect(link).toHaveAttribute('target','_self');
+  await expect(link).toContainText('Enviar pedido por e-mail');
+  await expect(page.locator('#drawer-items')).toContainText('Brinco Coração Dourado');
+  await expect(page.locator('#drawer-items')).toContainText('Colar Pérola Delicada');
+  await expect(page.locator('#drawer-footer .subtotal')).toContainText('R$ 36,80');
   await page.locator('#drawer-items [data-qty="brinco-coracao"][data-delta="1"]').click();
-  message=await parseLink();
-  expect(message).toContain('Brinco Coração Dourado — 2 unidades');
-  expect(message).toContain('Subtotal estimado: R$ 51,70');
+  await expect(page.locator('#drawer-footer .subtotal')).toContainText('R$ 51,70');
+  await expect(page.locator('#drawer-items .quantity span').first()).toHaveText('2');
   await page.locator('#drawer-items [data-remove="colar-perola"]').click();
-  message=await parseLink();
-  expect(message).not.toContain('Colar Pérola Delicada');
-  expect(message).toContain('Subtotal estimado: R$ 29,80');
+  await expect(page.locator('#drawer-footer .subtotal')).toContainText('R$ 29,80');
   await page.locator('#drawer-items [data-remove="brinco-coracao"]').click();
   await expect(link).toHaveCount(0);
   await expect(page.locator('#drawer-items')).toContainText('Sua sacola ainda está vazia');
 });
 
-test('rodapé disponibiliza contato WhatsApp comercial sem finalização automática',async({page})=>{
+test('rodapé oferece contato seguro pela central privada',async({page})=>{
   await staticCatalog(page);
   await page.goto('/',{waitUntil:'domcontentloaded'});
   const contact=page.locator('#atendimento .margot-whatsapp-contact');
-  await expect(contact).toHaveAttribute('href','https://wa.me/5535997450100');
-  await expect(contact).toHaveAttribute('target','_blank');
-  await expect(contact).toContainText('(35) 99745-0100');
+  await expect(contact).toHaveAttribute('href','https://k410sh4.github.io/SAITE/contato.html?origem=margot');
+  await expect(contact).toContainText('Enviar mensagem à Margot');
   await expect(page.locator('.online-notice')).toContainText('não finaliza pagamentos nem reserva estoque');
 });
 
@@ -288,7 +272,7 @@ test('produto sem estoque desabilita ação e mantém detalhes e favoritos',asyn
 test('foto real apresenta assinatura discreta; fallback não deixa assinatura sobre placeholder',async({page})=>{
   await staticCatalog(page);
   await page.goto('/',{waitUntil:'domcontentloaded'});
-  const photo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+PAb8AAAAASUVORK5CYII=';
+  const photo='./assets/hero-1.webp';
   await page.evaluate(image=>{
     const base=window.MargotCatalog;
     window.MargotCatalog={...base,products:base.products.map(p=>
@@ -345,7 +329,7 @@ test('visual editorial compacto: foto e painel separados com CTA consistente',as
   expect(visuals.brandMissing).toBe(true);
 });
 
-for(const width of [320,390,600,640,768,920,1024,1150,1280]){
+for(const width of [320,360,390,430,560,600,640,700,768,920,1024,1150,1280]){
   test('layout editorial sem overflow, CTA legível e grade adaptativa em '+width+'px',async({page})=>{
     await staticCatalog(page);
     await verifiedOffer(page);
@@ -369,15 +353,15 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
         titleFontSize:parseFloat(getComputedStyle(card.querySelector('h3')).fontSize),
         width:root.width};
     });
-    const expectedColumns=width<=560?1:Math.max(1,Math.floor((dims.width+dims.gap)/(210+dims.gap)));
+    const expectedColumns=width<=700?3:Math.max(1,Math.floor((dims.width+dims.gap)/(210+dims.gap)));
     expect(dims.columns).toBe(expectedColumns);
-    expect(dims.cardWidth).toBeGreaterThan(width<=560?200:205);
+    expect(dims.cardWidth).toBeGreaterThan(width<=700?80:205);
     expect(dims.buttonWidth).toBeGreaterThan(dims.cardWidth*.75);
     expect(dims.buttonHeight).toBeGreaterThanOrEqual(44);
-    expect(dims.buttonText).toBeGreaterThan(75);
-    expect(dims.titleFontSize).toBeGreaterThanOrEqual(18);
+    expect(dims.buttonText).toBeGreaterThan(width<=700?35:75);
+    expect(dims.titleFontSize).toBeGreaterThanOrEqual(width<=700?10:18);
     if(width===1280)expect(dims.cardWidth).toBeGreaterThan(210);
-    if(width===390)expect(dims.cardWidth).toBeGreaterThan(300);
+    if(width===390)expect(dims.cardWidth).toBeLessThan(140);
     const contained=await page.evaluate(()=>{
       const cards=[...document.querySelectorAll('#product-grid .product-card')];
       return cards.every(card=>{
@@ -390,6 +374,26 @@ for(const width of [320,390,600,640,768,920,1024,1150,1280]){
       });
     });
     expect(contained).toBe(true);
+    if(width<=700){
+      // Três cards reais na primeira linha e nenhuma invasão lateral.
+      const firstRow=await page.evaluate(()=>{
+        const cards=[...document.querySelectorAll('#product-grid .product-card')].slice(0,4);
+        const rects=cards.map(card=>card.getBoundingClientRect());
+        return {
+          // offsetTop reflete a grade; getBoundingClientRect acompanha o
+          // movimento transitório dos cards durante as animações de entrada.
+          aligned:Math.abs(cards[0].offsetTop-cards[1].offsetTop)<2&&
+            Math.abs(cards[1].offsetTop-cards[2].offsetTop)<2,
+          nextRow:cards[3].offsetTop>cards[0].offsetTop,
+          smallEnough:rects[0].width<225,
+          targets:cards.slice(0,3).every(card=>card.querySelector('.add-to-cart').getBoundingClientRect().height>=44)
+        };
+      });
+      expect(firstRow.aligned).toBe(true);
+      expect(firstRow.nextRow).toBe(true);
+      expect(firstRow.smallEnough).toBe(true);
+      expect(firstRow.targets).toBe(true);
+    }
     await page.locator('#promocoes').scrollIntoViewIfNeeded();
     await widthCheck(page);
     const artifact=path.join('test-results','product-cards-v136');

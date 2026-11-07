@@ -89,6 +89,12 @@ function reports(dir,snapshots,errors){
 test('@visual-trace: prints e dimensões em cada ação',async({page,context})=>{
  test.setTimeout(180000);
  page.setDefaultTimeout(6000);
+ // Diagnóstico visual determinístico: dados locais para não depender da carga
+ // assíncrona do Firestore durante o rastreamento da interface.
+ await page.route('**/site-live.js*',route=>route.fulfill({
+   status:200,contentType:'text/javascript; charset=utf-8',
+   body:'// catálogo estático para capturas do layout'
+ }));
  const dir=path.resolve('test-results/layout-trace');
  fs.mkdirSync(dir,{recursive:true});
  const snapshots=[],errors=[];

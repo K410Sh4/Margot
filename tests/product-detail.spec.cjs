@@ -53,18 +53,14 @@ for(const [id,name,price] of items){
   });
 }
 
-test('detalhes oferecem WhatsApp com contexto da peça selecionada',async({page})=>{
+test('detalhes oferecem contato seguro com contexto via central privada',async({page})=>{
   await openProduct(page,'colar-perola');
   const contact=page.locator('#pd-contact-whatsapp');
   await expect(contact).toBeVisible();
-  await expect(contact).toHaveAttribute('target','_blank');
-  const href=await contact.getAttribute('href');
-  const url=new URL(href);
-  expect(url.origin).toBe('https://wa.me');
-  expect(url.pathname).toBe('/5535997450100');
-  expect(url.searchParams.get('text')).toContain('Colar Pérola Delicada');
-  expect(url.searchParams.get('text')).toContain('disponibilidade');
-  await expect(page.locator('.pd-help')).toContainText('Fale com a Margot pelo WhatsApp');
+  await expect(contact).toHaveAttribute('target','_self');
+  await expect(contact).toHaveAttribute('href','https://k410sh4.github.io/SAITE/contato.html?origem=margot');
+  await expect(contact).toContainText('Perguntar sobre esta peça');
+  await expect(page.locator('.pd-help')).toContainText('Fale com a Margot por e-mail');
 });
 
 test('link inválido mostra estado vazio sem falha de JavaScript',async({page})=>{
@@ -103,7 +99,7 @@ test('adicionar na página individual aparece na sacola real da vitrine',async({
   await expect(page.locator('#drawer-items')).toContainText('Brinco Coração Dourado');
   await expect(page.locator('#drawer-items .quantity span')).toHaveText('2');
   await expect(page.locator('#drawer-footer')).toContainText('Subtotal estimado');
-  await expect(page.locator('#drawer-footer')).toContainText('Valores ilustrativos');
+  await expect(page.locator('#drawer-footer')).toContainText('Valores estimados');
   await page.locator('#drawer-close').click();
   await expect(page.locator('#drawer')).not.toHaveClass(/open/);
   await expect(page).not.toHaveURL(/sacola=1/);
