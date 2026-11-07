@@ -602,3 +602,55 @@ for(const width of [320,390,1280]){
     expect(m.documentWidth).toBeLessThanOrEqual(m.viewport+1);
   });
 }
+
+
+/* V1.39 — a composição nova preserva os cinco atalhos e os 3 slides. */
+for(const width of [320,390,430,700]){
+  test('layout de entrada V1.39 em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:850});
+    await ready(page);
+    await expect(page.locator('.hero-slide')).toHaveCount(3);
+    await expect(page.locator('.hero-slide.is-active .hero-copy .button')).toBeVisible();
+    await expect(page.locator('.benefit-grid > div')).toHaveCount(4);
+    const values=await page.evaluate(()=>{
+      const read=s=>document.querySelector(s);
+      const hero=read('#inicio');
+      const panel=read('#inicio .hero-slide.is-active .hero-copy');
+      const benefits=read('.benefit-grid');
+      const firstBenefit=benefits.firstElementChild;
+      const header=read('.header-main');
+      const nav=read('#mobile-bottom-nav');
+      const doc=document.documentElement;
+      const cols=getComputedStyle(benefits).gridTemplateColumns.trim().split(/\s+/);
+      return {
+        pageWidth:doc.scrollWidth,viewport:doc.clientWidth,
+        headerHeight:header.getBoundingClientRect().height,
+        heroHeight:hero.getBoundingClientRect().height,
+        panelWidth:panel.getBoundingClientRect().width,
+        panelBorderRadius:parseFloat(getComputedStyle(panel).borderTopLeftRadius),
+        panelBackground:getComputedStyle(panel).backgroundColor,
+        heroButtonHeight:panel.querySelector('.button').getBoundingClientRect().height,
+        benefitsColumns:cols.length,
+        benefitRadius:parseFloat(getComputedStyle(firstBenefit).borderTopLeftRadius),
+        benefitShadow:getComputedStyle(firstBenefit).boxShadow,
+        navVisible:nav.getBoundingClientRect().height>0,
+        navItems:nav.querySelectorAll('.mobile-nav-action').length
+      };
+    });
+    expect(values.pageWidth).toBeLessThanOrEqual(values.viewport+1);
+    expect(values.heroHeight).toBeGreaterThanOrEqual(410);
+    expect(values.panelWidth).toBeGreaterThan(210);
+    expect(values.panelBorderRadius).toBeGreaterThanOrEqual(18);
+    expect(values.headerHeight).toBeGreaterThanOrEqual(76);
+    expect(values.heroButtonHeight).toBeGreaterThanOrEqual(44);
+    expect(values.benefitsColumns).toBe(2);
+    expect(values.benefitRadius).toBeGreaterThanOrEqual(15);
+    expect(values.benefitShadow).not.toBe('none');
+    expect(values.navVisible).toBe(true);
+    expect(values.navItems).toBe(5);
+    await page.locator('.hero-next').click();
+    await expect(page.locator('.hero-slide.is-active')).toHaveAttribute('aria-label',/2 de 3/);
+    await page.locator('.hero-prev').click();
+    await expect(page.locator('.hero-slide.is-active')).toHaveAttribute('aria-label',/1 de 3/);
+  });
+}
