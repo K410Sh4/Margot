@@ -83,7 +83,20 @@ function renderCategories(){
   $('category-grid').innerHTML=categories.map(c=>`<button class="category-card category-card-photo" type="button" data-cat="${c}" aria-label="Ver ${c}"><img class="category-photo" src="./assets/categories/${images[c]}.webp" alt="" width="300" height="404" loading="lazy" decoding="async"></button>`).join('');
   $('category-grid').querySelectorAll('[data-cat]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.cat)))
 }
-function renderFilters(){ $('category-chips').innerHTML=['Todos',...categories].map(c=>`<button type="button" class="chip" data-filter="${c}" aria-pressed="${category===c}">${c}</button>`).join('');$('category-chips').querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.filter,false)))}
+function renderFilters(){
+  // A galeria de fotos é o seletor de categoria visível no mobile.
+  // A lista de chips continua disponível apenas na versão desktop.
+  const photos=$('category-grid');
+  if(photos){
+    photos.querySelectorAll('[data-cat]').forEach(el=>{
+      const selected=el.dataset.cat===category;
+      el.setAttribute('aria-pressed',String(selected));
+      el.classList.toggle('is-selected',selected);
+    });
+  }
+  $('category-chips').innerHTML=['Todos',...categories].map(c=>`<button type="button" class="chip" data-filter="${c}" aria-pressed="${category===c}">${c}</button>`).join('');
+  $('category-chips').querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.filter,false)));
+}
 function filteredProducts(){return STORE.products.filter(p=>(category==='Todos'||p.category===category)&&`${p.name} ${p.category}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR')))}
 const PRODUCT_PLACEHOLDER = './assets/foto-em-breve.webp';
 function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
