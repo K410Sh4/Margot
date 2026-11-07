@@ -35,14 +35,16 @@ test('categoria, histórico e atualização preservam filtro',async({page})=>{
   await page.locator('#menu-open').click();
   await expect(page.locator('#main-nav [data-category-link]')).toHaveCount(0);
   await page.locator('#main-nav a[href="#produtos"]').click();
-  await page.locator('#category-chips [data-filter="Brincos"]').click();
+  await page.locator('#category-grid [data-cat="Brincos"]').click();
   await expect(page).toHaveURL(/categoria=Brincos#produtos/);
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
   await page.reload({waitUntil:'domcontentloaded'});
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
-  // O filtro fica apenas nos chips da vitrine, não no menu do cabeçalho.
+  // No mobile, o filtro visível fica somente nas imagens; os chips ficam ocultos.
   await page.locator('#produtos').scrollIntoViewIfNeeded();
   await expect(page.locator('#category-chips [data-filter="Brincos"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#category-grid [data-cat="Brincos"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#category-chips')).toBeHidden();
   await expect(page.locator('#main-nav [data-category-link]')).toHaveCount(0);
 });
 
@@ -52,7 +54,7 @@ test('troca de categoria limpa pesquisa anterior, mostrando filtro ativo',async(
   await page.locator('#search-input').fill('colar');
   await expect(page.locator('#active-search')).toBeVisible();
   await expect(page.locator('#product-grid .product-card')).toHaveCount(2);
-  await page.locator('#category-chips [data-filter="Brincos"]').click();
+  await page.locator('#category-grid [data-cat="Brincos"]').click();
   await expect(page.locator('#active-search')).toBeHidden();
   await expect(page.locator('#search-input')).toHaveValue('');
   await expect(page.locator('#product-grid .product-card')).toHaveCount(3);
@@ -658,7 +660,7 @@ for(const width of [320,390,430,700]){
 
 /* V1.40: cards de categorias menores, navegação intacta e vitrine próxima. */
 for(const width of [320,360,390,430,700]){
-  test('categorias e filtros compactos no mobile em '+width+'px',async({page})=>{
+  test('categorias fotográficas compactas sem chips duplicados em '+width+'px',async({page})=>{
     await page.setViewportSize({width,height:844});
     await ready(page);
     const cards=page.locator('#category-grid .category-card-photo');
@@ -686,29 +688,36 @@ for(const width of [320,360,390,430,700]){
         catalogGap:section.getBoundingClientRect().top-cat.getBoundingClientRect().bottom,
         headingSize:parseFloat(getComputedStyle(heading).fontSize),
         chipHeight:firstChip.getBoundingClientRect().height,
-        chipScrollWidth:chips.scrollWidth,
-        chipVisibleWidth:chips.clientWidth,
+        chipsDisplay:getComputedStyle(chips).display,
+        selectedImages:grid.querySelectorAll('[aria-pressed="true"]').length,
         categoryVisibleWidth:area.width
       };
     });
     expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport+1);
     expect(layout.categoriesHeight).toBeLessThan(305);
-    expect(layout.categoryCardWidth).toBeGreaterThanOrEqual(97);
-    expect(layout.categoryCardWidth).toBeLessThanOrEqual(126);
-    expect(layout.categoryCardHeight).toBeLessThan(177);
+    expect(layout.categoryCardWidth).toBeGreaterThanOrEqual(77);
+    expect(layout.categoryCardWidth).toBeLessThanOrEqual(96);
+    expect(layout.categoryCardHeight).toBeLessThan(130);
     expect(layout.categoryTitleSize).toBeLessThanOrEqual(29);
     expect(layout.categoryHasOverflow).toBe(width<700);
     expect(layout.categoryVisibleWidth).toBeLessThanOrEqual(layout.viewport);
     expect(layout.catalogGap).toBeLessThan(5);
     expect(layout.headingSize).toBeLessThanOrEqual(28);
-    expect(layout.chipHeight).toBeGreaterThanOrEqual(34);
+    expect(layout.chipsDisplay).toBe('none');
+    expect(layout.chipHeight).toBe(0);
+    expect(layout.selectedImages).toBe(0);
     if(layout.categoryHasOverflow){
       await page.evaluate(()=>document.querySelector('#category-grid').scrollTo({left:500,behavior:'instant'}));
       const moved=await page.evaluate(()=>document.querySelector('#category-grid').scrollLeft);
       expect(moved).toBeGreaterThan(0);
     }
     await page.locator('#category-grid [data-cat="Colares"]').click();
+    await expect(page.locator('#category-grid [data-cat="Colares"]')).toHaveAttribute('aria-pressed','true');
     await expect(page.locator('#category-chips [data-filter="Colares"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#category-chips')).toBeHidden();
     await expect(page).toHaveURL(/categoria=Colares/);
+    await page.locator('#show-all').click();
+    await expect(page.locator('#category-grid [data-cat="Colares"]')).toHaveAttribute('aria-pressed','false');
+    await expect(page).not.toHaveURL(/categoria=Colares/);
   });
 }
