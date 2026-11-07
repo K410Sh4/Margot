@@ -79,10 +79,18 @@ function renderCategories(){
 function renderFilters(){ $('category-chips').innerHTML=['Todos',...categories].map(c=>`<button type="button" class="chip" data-filter="${c}" aria-pressed="${category===c}">${c}</button>`).join('');$('category-chips').querySelectorAll('[data-filter]').forEach(el=>el.addEventListener('click',()=>chooseCategory(el.dataset.filter,false)))}
 function filteredProducts(){return STORE.products.filter(p=>(category==='Todos'||p.category===category)&&`${p.name} ${p.category}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR')))}
 const PRODUCT_PLACEHOLDER = './assets/foto-em-breve.webp';
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function safeImageSource(value){
+  if(typeof value!=='string')return PRODUCT_PLACEHOLDER;
+  if(/^\.\/assets\/[a-zA-Z0-9_./-]+\.(webp|png|jpe?g|svg)(\?[a-zA-Z0-9._=&-]+)?$/.test(value))return value;
+  if(/^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/margot-acessorios-865987\.firebasestorage\.app\/o\//.test(value))return value;
+  if(value.length<=30000&&/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(value))return value;
+  return PRODUCT_PLACEHOLDER;
+}
 const hasProductPhoto = p => typeof p.image === 'string' && p.image.trim().length > 0;
 function productImage(p){
   const hasPhoto = hasProductPhoto(p);
-  return `<img class="product-photo" src="${hasPhoto ? p.image : PRODUCT_PLACEHOLDER}" alt="${hasPhoto ? `Foto de ${p.name}` : `Foto de ${p.name} em breve`}" loading="lazy" decoding="async">`;
+  return `<img class="product-photo" src="${escapeHtml(safeImageSource(hasPhoto ? p.image : PRODUCT_PLACEHOLDER))}" alt="${escapeHtml(hasPhoto ? `Foto de ${p.name}` : `Foto de ${p.name} em breve`)}" loading="lazy" decoding="async">`;
 }
 function applyProductPhotoFallback(root){
   root.addEventListener('error', event => {
@@ -125,30 +133,33 @@ function canAdd(p){
 }
 function productCard(p){
   const hasPhoto=hasProductPhoto(p);
+  const escapedName=escapeHtml(p.name);
+  const escapedCategory=escapeHtml(p.category);
+  const escapedId=escapeHtml(p.id);
   const available=canAdd(p);
   const inCart=(cart[p.id]||0)>0;
   const actionable=inCart||available;
   const stockMarkup=lowStockMarkup(p);
   const savings=p.promotion?money(p.promotion.originalPrice-p.price):'';
   const buttonLabel=inCart?'Adicionado ao carrinho':p.stock===0?'Indisponível':available?'Adicionar à sacola':'Limite atingido';
-  const buttonAria=inCart?'Ver '+p.name+' na sacola':available?'Adicionar '+p.name+' à sacola':'Não é possível adicionar '+p.name+' à sacola';
+  const buttonAria=inCart?'Ver '+escapedName+' na sacola':available?'Adicionar '+escapedName+' à sacola':'Não é possível adicionar '+escapedName+' à sacola';
   return '<article class="product-card'+(p.promotion?' product-card--offer':'')+(p.labels?.includes('bestSeller')?' product-card--signature':'')+'">'+
     '<div class="product-visual'+(hasPhoto?'':' is-photo-missing')+'">'+
       '<span class="demo-tag"'+(hasPhoto?' hidden':'')+'>Foto em breve</span>'+
-      '<a class="product-open" href="./produto.html?id='+encodeURIComponent(p.id)+'" aria-label="Ver detalhes de '+p.name+'">'+productImage(p)+'</a>'+
+      '<a class="product-open" href="./produto.html?id='+encodeURIComponent(p.id)+'" aria-label="Ver detalhes de '+escapedName+'">'+productImage(p)+'</a>'+
       (hasPhoto?'<span class="product-photo-signature" aria-hidden="true"><strong>MARGOT</strong><small>acessórios</small></span>':'')+
       badgesMarkup(p)+
-      '<button class="heart-btn" type="button" data-favorite="'+p.id+'" aria-pressed="'+favorites.has(p.id)+'" aria-label="'+(favorites.has(p.id)?'Remover dos':'Adicionar aos')+' favoritos: '+p.name+'"><span class="icon" data-icon="heart"></span></button>'+
+      '<button class="heart-btn" type="button" data-favorite="'+escapedId+'" aria-pressed="'+favorites.has(p.id)+'" aria-label="'+(favorites.has(p.id)?'Remover dos':'Adicionar aos')+' favoritos: '+escapedName+'"><span class="icon" data-icon="heart"></span></button>'+
     '</div>'+
     '<div class="product-info">'+
-      '<span class="category-label">'+p.category+'</span>'+
-      '<h3><a class="product-title-link" href="./produto.html?id='+encodeURIComponent(p.id)+'">'+p.name+'</a></h3>'+
+      '<span class="category-label">'+escapedCategory+'</span>'+
+      '<h3><a class="product-title-link" href="./produto.html?id='+encodeURIComponent(p.id)+'">'+escapedName+'</a></h3>'+
       '<div class="product-price-summary">'+
         '<div class="product-price-line">'+priceMarkup(p)+'</div>'+
         (p.promotion?'<span class="product-savings">Economize <strong>'+savings+'</strong></span>':'')+
       '</div>'+
       (stockMarkup||'<span class="product-stock-spacer" aria-hidden="true"></span>')+
-       '<button class="add-to-cart'+(inCart?' is-in-cart':'')+'" type="button" data-add="'+p.id+'" aria-label="'+buttonAria+'"'+(actionable?'':' disabled')+'>'+
+       '<button class="add-to-cart'+(inCart?' is-in-cart':'')+'" type="button" data-add="'+escapedId+'" aria-label="'+escapeHtml(buttonAria)+'"'+(actionable?'':' disabled')+'>'+
         '<span class="icon" data-icon="'+(inCart?'check':'bag')+'"></span><span class="product-cart-label">'+buttonLabel+'</span><span class="product-cart-arrow" aria-hidden="true">→</span>'+
       '</button>'+
     '</div></article>';
@@ -271,8 +282,8 @@ function changeQuantity(id,delta){
   }else cart[id]=Math.min(99,next);
   saveStorage('cart',cart);refreshShoppingView();
 }
-function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="Remover uma unidade de ${p.name}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${p.id}" data-delta="1" aria-label="Adicionar uma unidade de ${p.name}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${p.id}" aria-label="Excluir ${p.name} da sacola">×</button></div>`}
-function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${p.name}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${p.id}">${(cart[p.id]||0)>0?'Ver na sacola':'Adicionar à sacola'}</button></div><button type="button" class="remove" data-fav-remove="${p.id}" aria-label="Remover ${p.name} dos favoritos">×</button></div>`}
+function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${escapeHtml(p.name)}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${escapeHtml(p.id)}" data-delta="-1" aria-label="Remover uma unidade de ${escapeHtml(p.name)}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${escapeHtml(p.id)}" data-delta="1" aria-label="Adicionar uma unidade de ${escapeHtml(p.name)}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${escapeHtml(p.id)}" aria-label="Excluir ${escapeHtml(p.name)} da sacola">×</button></div>`}
+function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${escapeHtml(p.name)}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${escapeHtml(p.id)}">${(cart[p.id]||0)>0?'Ver na sacola':'Adicionar à sacola'}</button></div><button type="button" class="remove" data-fav-remove="${escapeHtml(p.id)}" aria-label="Remover ${escapeHtml(p.name)} dos favoritos">×</button></div>`}
 function renderDrawer(){const isCart=drawerMode==='cart';$('drawer-title').textContent=isCart?'Sua sacola':'Meus favoritos';let items=isCart?Object.keys(cart).map(getItem):[...favorites].map(getItem);items=items.filter(Boolean);$('drawer-items').innerHTML=items.length?items.map(isCart?cartLine:favoriteLine).join(''):`<div class="drawer-empty"><span class="icon" data-icon="${isCart?'bag':'heart'}"></span><p>${isCart?'Sua sacola ainda está vazia.':'Você ainda não salvou favoritos.'}</p><p>Descubra os detalhes da coleção Margot.</p></div>`;populateIcons($('drawer-items'));if(isCart&&items.length){const subtotal=items.reduce((s,p)=>s+p.price*cart[p.id],0);$('drawer-footer').innerHTML=`<div class="subtotal"><span>Subtotal estimado</span><span>${money(subtotal)}</span></div><p class="checkout-note">Valores ilustrativos. Não há cobrança automática nem reserva de estoque. O pedido deve ser confirmado com a loja.</p><a id="whatsapp-order" class="button primary whatsapp-checkout" href="${whatsappOrderUrl()}" target="_blank" rel="noopener noreferrer" aria-label="Enviar seleção da sacola à Margot pelo WhatsApp (abre em nova aba)">Enviar seleção pelo WhatsApp ↗</a><button type="button" id="copy-order" class="button outline">Copiar lista de interesse</button><button type="button" id="continue-shopping" class="button outline">Continuar olhando</button>`;$('copy-order').addEventListener('click',copyOrder);$('continue-shopping').addEventListener('click',closeDrawer)}else{$('drawer-footer').innerHTML=`<button class="button outline" type="button" id="continue-shopping">Explorar coleção</button>`;$('continue-shopping').addEventListener('click',closeDrawer)}$('drawer-items').querySelectorAll('[data-qty]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.qty,Number(btn.dataset.delta))));$('drawer-items').querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.remove,-99)));$('drawer-items').querySelectorAll('[data-fav-remove]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(btn.dataset.favRemove)));$('drawer-items').querySelectorAll('[data-fav-add]').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.favAdd)))}
 function openDrawer(mode){if($('drawer').classList.contains('open')){drawerMode=mode;renderDrawer();$('drawer-close').focus();return;}previousFocus=document.activeElement;previousFocusSnapshot=captureActionFocus();drawerMode=mode;renderDrawer();$('drawer').inert=false;$('drawer').setAttribute('aria-hidden','false');$('overlay').hidden=false;requestAnimationFrame(()=>{$('drawer').classList.add('open');$('overlay').classList.add('show')});document.body.style.overflow='hidden';$('drawer-close').focus()}
 function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classList.remove('show');$('drawer').inert=true;$('drawer').setAttribute('aria-hidden','true');$('overlay').hidden=true;document.body.style.overflow='';if(previousFocus&&document.contains(previousFocus))previousFocus.focus();else restoreActionFocus(previousFocusSnapshot);previousFocusSnapshot=null}
