@@ -380,8 +380,11 @@ for(const width of [320,360,390,430,560,600,640,700,768,920,1024,1150,1280]){
         const cards=[...document.querySelectorAll('#product-grid .product-card')].slice(0,4);
         const rects=cards.map(card=>card.getBoundingClientRect());
         return {
-          aligned:Math.abs(rects[0].top-rects[1].top)<2&&Math.abs(rects[1].top-rects[2].top)<2,
-          nextRow:rects[3].top>rects[0].top,
+          // offsetTop reflete a grade; getBoundingClientRect acompanha o
+          // movimento transitório dos cards durante as animações de entrada.
+          aligned:Math.abs(cards[0].offsetTop-cards[1].offsetTop)<2&&
+            Math.abs(cards[1].offsetTop-cards[2].offsetTop)<2,
+          nextRow:cards[3].offsetTop>cards[0].offsetTop,
           smallEnough:rects[0].width<225,
           targets:cards.slice(0,3).every(card=>card.querySelector('.add-to-cart').getBoundingClientRect().height>=44)
         };
