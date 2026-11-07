@@ -342,3 +342,8 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Cards compactos com fotos quadradas, títulos e preços menores, descontos e botão de 44px; cartões não ultrapassam o contêiner.
 - Preserva catálogo, ações de sacola/favoritos, confirmação de estoque e a grade desktop anterior.
 - Testes responsivos ampliados, inclusive alinhamento da primeira linha e ausência de overflow.
+
+
+## V1.39 — Página inicial premium no mobile
+
+O novo `mobile-home.css`, carregado após os CSS existentes, reproduz a direção visual aprovada para telas de até 700px: faixa online elegante, logo oficial centralizada, hero fotográfico ampliado com painel translúcido, ornamento e CTA, indicadores refinados, quatro benefícios em cards 2×2 e navegação inferior rosé. Reutiliza imagens do carrossel e mantém a mesma lógica de login, busca, sacola e favoritos. Não altera o desktop, os dados comerciais nem as três colunas da vitrine mobile.

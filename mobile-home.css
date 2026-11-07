@@ -1,0 +1,332 @@
+/* Margot V1.39 — Página inicial mobile baseada na proposta aprovada.
+   Só altera apresentação; carrossel, conta, busca, navegação e catálogo
+   continuam utilizando os componentes e eventos originais. */
+@media (max-width:700px){
+  html{scroll-padding-top:96px}
+  body{
+    background:linear-gradient(180deg,#fffaf8 0%,#fff3f2 42%,#fffaf8 100%);
+  }
+
+  /* Faixa informativa superior. */
+  .topnote{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:3px 8px;
+    min-height:33px;
+    padding:6px 9px;
+    font-size:clamp(9px,2.55vw,11px);
+    line-height:1.35;
+    letter-spacing:.015em;
+    background:linear-gradient(105deg,#a65768,#8c4c5c);
+    color:#fffaf8;
+  }
+  .topnote strong{font-weight:750}
+  .topnote span{padding:0 3px;color:#f6d6a8}
+
+  /* Logo oficial centralizada: o cabeçalho conserva a mesma altura no scroll. */
+  .site-header{
+    background:rgba(255,250,248,.97);
+    border-bottom:1px solid rgba(217,176,183,.34);
+    box-shadow:0 6px 22px rgba(105,56,69,.065);
+  }
+  .site-header .header-main,
+  .site-header.is-compact .header-main{
+    grid-template-columns:44px minmax(0,1fr) 44px;
+    min-height:84px;
+    height:84px;
+    max-height:84px;
+    gap:8px;
+  }
+  .site-header .brand,
+  .site-header.is-compact .brand{
+    width:146px;
+    max-width:100%;
+  }
+  .site-header .brand img,
+  .site-header.is-compact .brand img{
+    display:block;
+    width:146px;
+    height:80px;
+    max-height:80px;
+    object-fit:contain;
+  }
+  .site-header .menu-toggle,
+  .site-header.is-compact .menu-toggle{
+    width:44px;
+    height:44px;
+    color:#703944;
+  }
+  .site-header .menu-toggle .icon{width:28px;height:28px}
+  .site-header .header-actions .account-trigger,
+  .site-header.is-compact .header-actions .account-trigger{
+    width:44px;
+    height:44px;
+    border:1px solid #d9a8b3;
+    border-radius:50%;
+    background:#fff9f8;
+  }
+  .site-header .account-trigger > #account-avatar,
+  .site-header.is-compact .account-trigger > #account-avatar{
+    width:36px;
+    height:36px;
+  }
+
+  /* Banner: foto preservada, cartão editorial translúcido e CTA acessível. */
+  #inicio.hero-carousel{
+    display:block;
+    width:100%;
+    height:clamp(420px,116vw,540px);
+    min-height:420px;
+    aspect-ratio:auto;
+    overflow:hidden;
+    background:#f2d0c9;
+    isolation:isolate;
+  }
+  #inicio .hero-slides,#inicio .hero-slide{height:100%}
+  #inicio .hero-slide{
+    display:grid;
+    align-items:center;
+  }
+  #inicio .hero-slide>img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:73% center;
+  }
+  #inicio .hero-slide::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:linear-gradient(90deg,
+      rgba(255,238,232,.48) 0%,
+      rgba(255,238,232,.27) 48%,
+      rgba(82,39,49,.07) 100%);
+  }
+  #inicio .hero-slide .hero-copy{
+    position:relative;
+    z-index:2;
+    box-sizing:border-box;
+    width:min(calc(100% - 74px),365px);
+    max-width:none;
+    min-height:0;
+    margin:0 auto 0 6%;
+    padding:22px 19px 21px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    border:1px solid rgba(255,255,255,.69);
+    border-radius:23px;
+    background:rgba(255,246,243,.77);
+    box-shadow:0 13px 30px rgba(100,53,66,.13);
+    -webkit-backdrop-filter:blur(7px) saturate(1.05);
+    backdrop-filter:blur(7px) saturate(1.05);
+  }
+  #inicio .hero-slide .hero-copy .eyebrow{
+    margin:0 0 14px;
+    font-size:clamp(9px,2.7vw,11px);
+    font-weight:750;
+    line-height:1.5;
+    letter-spacing:.16em;
+    color:#963c52;
+  }
+  #inicio .hero-slide .hero-copy .eyebrow::after{
+    content:"♡";
+    display:block;
+    margin:7px 0 -2px;
+    width:100%;
+    text-align:center;
+    color:#bb8a5c;
+    font-size:22px;
+    font-weight:400;
+    line-height:1;
+    letter-spacing:0;
+    background:
+      linear-gradient(#dfb8a7,#dfb8a7) left center / 37% 1px no-repeat,
+      linear-gradient(#dfb8a7,#dfb8a7) right center / 37% 1px no-repeat;
+  }
+  #inicio .hero-slide h1,
+  #inicio .hero-slide h2{
+    max-width:100%;
+    margin:0 0 13px;
+    color:#843d4c;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(37px,10.25vw,54px);
+    font-weight:400;
+    line-height:1.02;
+    letter-spacing:-.047em;
+    overflow-wrap:normal;
+    text-wrap:balance;
+  }
+  #inicio .hero-slide h1 em{
+    font-style:italic;
+    font-weight:400;
+  }
+  #inicio .hero-slide .hero-copy>p:not(.eyebrow){
+    width:100%;
+    max-width:290px;
+    margin:0 0 18px;
+    font-size:clamp(13px,3.75vw,16px);
+    line-height:1.43;
+    color:#53353a;
+  }
+  #inicio .hero-slide .hero-copy .button{
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    width:min(100%,240px);
+    min-height:49px;
+    margin:0;
+    padding:10px 17px;
+    gap:15px;
+    border:1px solid #c47b87;
+    border-radius:999px;
+    background:linear-gradient(115deg,#b74b67,#993e58);
+    box-shadow:0 5px 13px rgba(126,54,73,.16);
+    color:#fff;
+    font-size:clamp(12px,3.5vw,15px);
+    font-weight:750;
+    white-space:normal;
+    text-align:center;
+  }
+  #inicio .hero-slide .hero-copy .button:hover{
+    background:linear-gradient(115deg,#a73f5d,#85334c);
+  }
+  #inicio .hero-arrow{
+    top:53%;
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.8);
+    background:rgba(255,250,247,.87);
+    color:#8c4152;
+    box-shadow:0 5px 15px rgba(88,40,56,.12);
+    font-size:26px;
+  }
+  #inicio .hero-prev{left:5px}
+  #inicio .hero-next{right:5px}
+  #inicio .hero-pagination{
+    bottom:17px;
+    gap:10px;
+  }
+  #inicio .hero-pagination button{
+    width:13px;
+    height:13px;
+    border:1.5px solid #995466;
+    background:rgba(255,252,251,.83);
+    box-shadow:0 1px 4px rgba(52,25,35,.08);
+  }
+  #inicio .hero-pagination button.is-active{
+    background:#a85165;
+    border-color:#fff4f0;
+    box-shadow:0 0 0 2px rgba(255,248,244,.87);
+  }
+
+  /* Benefícios como quatro cards organizados em 2x2. */
+  .benefits{
+    padding:18px 0 21px;
+    border-bottom:1px solid #f0d8d6;
+    background:linear-gradient(180deg,#fff5f3,#fff0ee);
+  }
+  .benefits .benefit-grid{
+    width:calc(100% - 24px);
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    padding:0;
+  }
+  .benefits .benefit-grid>div{
+    display:flex;
+    min-width:0;
+    min-height:118px;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    padding:15px 8px 13px;
+    border:1px solid #edc8c8;
+    border-radius:19px;
+    background:linear-gradient(160deg,rgba(255,252,250,.9),rgba(255,241,240,.88));
+    box-shadow:0 6px 16px rgba(131,65,81,.075);
+    color:#863d4d;
+    text-align:center;
+  }
+  .benefits .benefit-grid .icon{
+    width:31px;
+    height:31px;
+    margin:0 0 3px;
+    color:#933e52;
+  }
+  .benefits .benefit-grid .icon svg{
+    width:100%;
+    height:100%;
+    stroke-width:1.55;
+  }
+  .benefits .benefit-grid strong{
+    font-size:clamp(11px,3.2vw,13px);
+    font-weight:750;
+    line-height:1.24;
+  }
+  .benefits .benefit-grid small{
+    color:#796169;
+    font-size:clamp(10px,2.6vw,11px);
+    line-height:1.3;
+  }
+
+  /* Barra de navegação inferior da referência, sem perder os cinco atalhos. */
+  html.mobile-nav-ready .mobile-bottom-nav{
+    border-top:1px solid rgba(217,177,183,.55);
+    border-radius:22px 22px 0 0;
+    background:rgba(255,248,247,.97);
+    box-shadow:0 -8px 24px rgba(90,44,59,.12);
+  }
+  html.mobile-nav-ready .mobile-nav-action{
+    gap:3px;
+    border-radius:15px;
+    color:#65525a;
+  }
+  html.mobile-nav-ready .mobile-nav-action.is-active{
+    color:#943d56;
+    background:linear-gradient(150deg,#fbe0e3,#f9edec);
+  }
+  html.mobile-nav-ready .mobile-nav-action svg{
+    width:24px;
+    height:24px;
+  }
+  html.mobile-nav-ready .mobile-nav-count{
+    background:#b64865;
+  }
+}
+
+@media (max-width:360px){
+  .site-header .header-main,
+  .site-header.is-compact .header-main{
+    min-height:76px;height:76px;max-height:76px;
+  }
+  .site-header .brand,
+  .site-header.is-compact .brand{width:128px}
+  .site-header .brand img,
+  .site-header.is-compact .brand img{width:128px;height:73px;max-height:73px}
+  #inicio.hero-carousel{
+    height:clamp(413px,122vw,447px);
+    min-height:413px;
+  }
+  #inicio .hero-slide .hero-copy{
+    width:calc(100% - 62px);
+    padding:16px 15px 17px;
+    margin-left:6%;
+    border-radius:18px;
+  }
+  #inicio .hero-slide h1,
+  #inicio .hero-slide h2{font-size:clamp(32px,10vw,40px)}
+  #inicio .hero-slide .hero-copy>p:not(.eyebrow){font-size:13px}
+  #inicio .hero-slide .hero-copy .button{min-height:46px;font-size:12px}
+  .benefits .benefit-grid>div{padding:12px 6px;min-height:111px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #inicio .hero-slide .hero-copy .button{transition:none}
+}
