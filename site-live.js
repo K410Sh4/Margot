@@ -13,6 +13,7 @@ const thumbValid=url=>typeof url==='string'&&(
 const STORE_DATE_FORMAT=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'});
 const TODAY=()=>STORE_DATE_FORMAT.format(new Date());
 let overlays=[];
+let secureCatalogReady=false;
 const safeText=(value,max=100)=>typeof value==='string'?
   value.replace(/[<>&"']/g,'').trim().slice(0,max):'';
 const money=value=>typeof value==='number'&&Number.isFinite(value)&&value>0;
@@ -67,6 +68,15 @@ function normalize(doc,id,base){
 function publish(){
   const byId=new Map(overlays.map(({id,...doc})=>[id,doc]));
   const products=[];
+  // No modo seguro, a colecao publica e a fonte unica de verdade.
+  // Um produto arquivado, ausente da colecao, nao reaparece do catalogo local.
+  if(secureCatalogReady){
+    const baseById=new Map(fallback.products.map(p=>[p.id,p]));
+    for(const [id,doc] of byId){
+      const normalized=normalize(doc,id,baseById.get(id)||null);
+      if(normalized)products.push(normalized);
+    }
+  }else{
   for(const base of fallback.products){
     if(!byId.has(base.id)){products.push(base);continue;}
     const doc=byId.get(base.id);byId.delete(base.id);
@@ -76,6 +86,7 @@ function publish(){
   for(const [id,doc] of byId){
     const normalized=normalize(doc,id,null);
     if(normalized)products.push(normalized);
+  }
   }
   window.MargotCatalog={...fallback,products};
   window.MargotMerchandising={
@@ -118,12 +129,30 @@ async function start(){
         return mediaCache.get(id);
       }
     });
-    dbSdk.onSnapshot(dbSdk.collection(db,'products'),snapshot=>{
-      overlays=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
-      publish();
+    let legacyUnsubscribe=null;
+    function listenLegacy(){
+      if(legacyUnsubscribe||secureCatalogReady)return;
+      legacyUnsubscribe=dbSdk.onSnapshot(dbSdk.collection(db,'products'),snapshot=>{
+        if(secureCatalogReady)return;
+        overlays=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+        publish();
+      },error=>{
+        console.warn('Margot: catalogo legado indisponivel:',error.code||error.message);
+        window.dispatchEvent(new CustomEvent('margot:catalog-error',{detail:{code:error.code||'unknown'}}));
+      });
+    }
+    // Migracao sem interrupcao: preferir publicProducts, com fallback ao
+    // catalogo legado ate o proprietario sincronizar e implantar as regras.
+    dbSdk.onSnapshot(dbSdk.collection(db,'publicProducts'),snapshot=>{
+      if(snapshot.docs.length||secureCatalogReady){
+        secureCatalogReady=true;
+        if(legacyUnsubscribe){legacyUnsubscribe();legacyUnsubscribe=null;}
+        overlays=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+        publish();
+      }else listenLegacy();
     },error=>{
-      console.warn('Margot: sincronização do catálogo não disponível:',error.code||error.message);
-      window.dispatchEvent(new CustomEvent('margot:catalog-error',{detail:{code:error.code||'unknown'}}));
+      console.warn('Margot: vitrine segura ainda nao configurada:',error.code||error.message);
+      listenLegacy();
     });
     setInterval(()=>{if(overlays.length)publish()},120000);
   }catch(error){
