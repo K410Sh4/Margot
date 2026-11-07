@@ -654,3 +654,59 @@ for(const width of [320,390,430,700]){
     await expect(page.locator('.hero-slide.is-active')).toHaveAttribute('aria-label',/1 de 3/);
   });
 }
+
+
+/* V1.40: cards de categorias menores, navegação intacta e vitrine próxima. */
+for(const width of [320,360,390,430,700]){
+  test('categorias e filtros compactos no mobile em '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:844});
+    await ready(page);
+    const cards=page.locator('#category-grid .category-card-photo');
+    await expect(cards).toHaveCount(5);
+    const layout=await page.evaluate(()=>{
+      const cat=document.querySelector('#categorias');
+      const grid=document.querySelector('#category-grid');
+      const card=grid.querySelector('.category-card-photo');
+      const categoryTitle=document.querySelector('#categories-heading');
+      const section=document.querySelector('#produtos');
+      const heading=document.querySelector('#products-heading');
+      const chips=document.querySelector('#category-chips');
+      const firstChip=chips.querySelector('.chip');
+      const area=grid.getBoundingClientRect();
+      const rect=card.getBoundingClientRect();
+      return {
+        viewport:document.documentElement.clientWidth,
+        pageWidth:document.documentElement.scrollWidth,
+        categoriesHeight:cat.getBoundingClientRect().height,
+        categoryTitleSize:parseFloat(getComputedStyle(categoryTitle).fontSize),
+        categoryCardWidth:rect.width,
+        categoryCardHeight:rect.height,
+        imageRatio:card.querySelector('img').naturalWidth / card.querySelector('img').naturalHeight,
+        categoryHasOverflow:grid.scrollWidth>grid.clientWidth,
+        catalogGap:section.getBoundingClientRect().top-cat.getBoundingClientRect().bottom,
+        headingSize:parseFloat(getComputedStyle(heading).fontSize),
+        chipHeight:firstChip.getBoundingClientRect().height,
+        chipScrollWidth:chips.scrollWidth,
+        chipVisibleWidth:chips.clientWidth,
+        categoryVisibleWidth:area.width
+      };
+    });
+    expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport+1);
+    expect(layout.categoriesHeight).toBeLessThan(255);
+    expect(layout.categoryCardWidth).toBeGreaterThanOrEqual(97);
+    expect(layout.categoryCardWidth).toBeLessThanOrEqual(126);
+    expect(layout.categoryCardHeight).toBeLessThan(177);
+    expect(layout.categoryTitleSize).toBeLessThanOrEqual(29);
+    expect(layout.categoryHasOverflow).toBe(true);
+    expect(layout.categoryVisibleWidth).toBeLessThanOrEqual(layout.viewport);
+    expect(layout.catalogGap).toBeLessThan(5);
+    expect(layout.headingSize).toBeLessThanOrEqual(28);
+    expect(layout.chipHeight).toBeGreaterThanOrEqual(34);
+    await page.evaluate(()=>document.querySelector('#category-grid').scrollTo({left:500,behavior:'instant'}));
+    const moved=await page.evaluate(()=>document.querySelector('#category-grid').scrollLeft);
+    expect(moved).toBeGreaterThan(0);
+    await page.locator('#category-grid [data-cat="Colares"]').click();
+    await expect(page.locator('#category-chips [data-filter="Colares"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page).toHaveURL(/categoria=Colares/);
+  });
+}
