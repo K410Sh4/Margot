@@ -93,10 +93,7 @@ service cloud.firestore {
     match /publicProducts/{productId} {
       allow get, list: if true;
       allow create, update: if isOwner()
-        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}
-  }
-}
-)
+        && productId.matches('^[a-z0-9][a-z0-9-]{0,63}$')
         && validPublicProduct(request.resource.data);
       allow delete: if isOwner();
     }
