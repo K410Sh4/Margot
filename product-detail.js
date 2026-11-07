@@ -332,7 +332,8 @@
     }
     document.title=product.name+' | Margot Acessórios';
     const question='Olá! Vi '+product.name+' no site da Margot Acessórios e gostaria de confirmar o preço, a disponibilidade e a entrega.';
-    $('pd-contact-whatsapp').href='https://wa.me/5535997450100?text='+encodeURIComponent(question);
+    $('pd-contact-whatsapp').href='https://k410sh4.github.io/SAITE/contato.html?origem=margot';
+    $('pd-contact-whatsapp').target='_self';
     $('pd-crumb-category').textContent=product.category;
     $('pd-crumb-category').href='./index.html?categoria='+encodeURIComponent(product.category)+'#produtos';
     $('pd-crumb-name').textContent=product.name;
@@ -353,6 +354,18 @@
   }
   function init(){
     renderCurrentProduct();
+    $('pd-contact-whatsapp').addEventListener('click',event=>{
+      if(!product)return;
+      event.preventDefault();
+      const subject='Dúvida sobre '+product.name;
+      const message='Olá! Vi '+product.name+' no catálogo da Margot e gostaria de confirmar preço, disponibilidade e entrega.';
+      try{
+        sessionStorage.setItem('saite:pending-request:v1',JSON.stringify({
+          source:'margot',subject:subject.slice(0,120),message:message.slice(0,3000),timestamp:Date.now()
+        }));
+      }catch(error){console.warn('Pre-preenchimento nao pode ser guardado nesta aba.')}
+      window.location.assign('https://k410sh4.github.io/SAITE/contato.html?origem=margot');
+    });
     $('pd-decrease').addEventListener('click',()=>{
       $('pd-qty-input').value=String(quantity()-1);
       quantity();
