@@ -355,3 +355,12 @@ O novo `mobile-home.css`, carregado após os CSS existentes, reproduz a direçã
 - Título, espaçamentos e cabeçalho do catálogo menores, deixando a vitrine aparecer mais cedo.
 - Filtros compactos com os mesmos eventos e estados; nenhum dado de produtos ou lógica de conta/sacola foi alterado.
 - Testes responsivos 320/360/390/430/700px conferem dimensões, scroll, ausência de overflow horizontal e funcionamento do filtro.
+
+
+## V1.41 — Apenas categorias fotográficas no mobile
+
+- Oculta a segunda linha de chips por texto em telas até 700px; mantém os chips no desktop e a mesma lógica de filtragem.
+- Reduz a faixa de imagens de categorias para 78–94 px por card, preservando todas as fotos e seus rótulos incorporados.
+- Indica visualmente a categoria selecionada na própria fotografia, com `aria-pressed` sincronizado nos cards e com o histórico da URL.
+- Mantém o botão Ver todos para voltar ao catálogo completo e reduz o espaço antes da vitrine.
+- Verificações mobile cobrem 320 a 700px, categoria selecionada, ausência de chips duplicados e botão de retorno à lista completa.
