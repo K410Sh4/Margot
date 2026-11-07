@@ -107,6 +107,17 @@ async function start(){
       import('https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js')
     ]);
     const app=appSdk.getApps().length?appSdk.getApp():appSdk.initializeApp(config);
+    // App Check opcional; nao bloqueia a vitrine sem uma chave configurada.
+    const appCheckKey=window.MARGOT_APP_CHECK_SITE_KEY;
+    if(typeof appCheckKey==='string'&&appCheckKey.trim()){
+      try{
+        const sdk=await import('https://www.gstatic.com/firebasejs/13.2.0/firebase-app-check.js');
+        sdk.initializeAppCheck(app,{
+          provider:new sdk.ReCaptchaEnterpriseProvider(appCheckKey.trim()),
+          isTokenAutoRefreshEnabled:true
+        });
+      }catch(error){console.warn('Margot: App Check nao foi inicializado.',error?.code||'unknown')}
+    }
     const db=dbSdk.getFirestore(app);
     const mediaCache=new Map();
     window.MargotMedia=Object.freeze({
