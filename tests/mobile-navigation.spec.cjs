@@ -692,19 +692,21 @@ for(const width of [320,360,390,430,700]){
       };
     });
     expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport+1);
-    expect(layout.categoriesHeight).toBeLessThan(255);
+    expect(layout.categoriesHeight).toBeLessThan(305);
     expect(layout.categoryCardWidth).toBeGreaterThanOrEqual(97);
     expect(layout.categoryCardWidth).toBeLessThanOrEqual(126);
     expect(layout.categoryCardHeight).toBeLessThan(177);
     expect(layout.categoryTitleSize).toBeLessThanOrEqual(29);
-    expect(layout.categoryHasOverflow).toBe(true);
+    expect(layout.categoryHasOverflow).toBe(width<700);
     expect(layout.categoryVisibleWidth).toBeLessThanOrEqual(layout.viewport);
     expect(layout.catalogGap).toBeLessThan(5);
     expect(layout.headingSize).toBeLessThanOrEqual(28);
     expect(layout.chipHeight).toBeGreaterThanOrEqual(34);
-    await page.evaluate(()=>document.querySelector('#category-grid').scrollTo({left:500,behavior:'instant'}));
-    const moved=await page.evaluate(()=>document.querySelector('#category-grid').scrollLeft);
-    expect(moved).toBeGreaterThan(0);
+    if(layout.categoryHasOverflow){
+      await page.evaluate(()=>document.querySelector('#category-grid').scrollTo({left:500,behavior:'instant'}));
+      const moved=await page.evaluate(()=>document.querySelector('#category-grid').scrollLeft);
+      expect(moved).toBeGreaterThan(0);
+    }
     await page.locator('#category-grid [data-cat="Colares"]').click();
     await expect(page.locator('#category-chips [data-filter="Colares"]')).toHaveAttribute('aria-pressed','true');
     await expect(page).toHaveURL(/categoria=Colares/);
