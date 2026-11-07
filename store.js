@@ -142,7 +142,7 @@ function productCard(p){
   const stockMarkup=lowStockMarkup(p);
   const savings=p.promotion?money(p.promotion.originalPrice-p.price):'';
   const buttonLabel=inCart?'Adicionado ao carrinho':p.stock===0?'Indisponível':available?'Adicionar à sacola':'Limite atingido';
-  const buttonAria=inCart?'Ver '+escapedName+' na sacola':available?'Adicionar '+escapedName+' à sacola':'Não é possível adicionar '+escapedName+' à sacola';
+  const buttonAria=inCart?'Ver '+p.name+' na sacola':available?'Adicionar '+p.name+' à sacola':'Não é possível adicionar '+p.name+' à sacola';
   return '<article class="product-card'+(p.promotion?' product-card--offer':'')+(p.labels?.includes('bestSeller')?' product-card--signature':'')+'">'+
     '<div class="product-visual'+(hasPhoto?'':' is-photo-missing')+'">'+
       '<span class="demo-tag"'+(hasPhoto?' hidden':'')+'>Foto em breve</span>'+
