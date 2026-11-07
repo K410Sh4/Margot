@@ -330,3 +330,198 @@
 @media (prefers-reduced-motion:reduce){
   #inicio .hero-slide .hero-copy .button{transition:none}
 }
+
+
+/* V1.40 — Coleções e introdução do catálogo mais compactas no celular.
+   Reutiliza as cinco imagens aprovadas; nenhuma ação/filtro é recriada. */
+@media(max-width:700px){
+  #categorias.section{
+    padding-top:22px;
+    padding-bottom:13px;
+    margin-bottom:0;
+  }
+  #categorias .section-heading.center{
+    display:block;
+    margin:0 0 9px;
+    text-align:center;
+  }
+  #categorias .section-heading .eyebrow{
+    margin:0 0 4px;
+    color:#9c6973;
+    font-size:9px;
+    font-weight:750;
+    letter-spacing:.13em;
+    line-height:1.35;
+  }
+  #categorias .section-heading h2{
+    margin:0;
+    color:#64404b;
+    font-size:clamp(23px,6.2vw,28px);
+    font-weight:400;
+    line-height:1.16;
+    letter-spacing:-.035em;
+  }
+  #categorias .section-heading .line-heart{
+    display:inline-block;
+    margin-left:2px;
+    color:#ba8191;
+    font-size:.82em;
+    vertical-align:2px;
+  }
+  #categorias .category-scroll-hint{
+    margin:0 2px 7px;
+    color:#916d76;
+    font-size:10px;
+    line-height:1.2;
+    letter-spacing:.025em;
+    text-align:right;
+  }
+  #categorias #category-grid{
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:clamp(98px,28vw,124px);
+    grid-template-columns:none;
+    justify-content:start;
+    align-items:start;
+    gap:9px;
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:2px 2px 8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x mandatory;
+    scroll-padding-inline:2px;
+    scrollbar-width:none;
+  }
+  #categorias #category-grid::-webkit-scrollbar{display:none}
+  #categorias #category-grid .category-card-photo{
+    display:block;
+    width:100%;
+    min-width:0;
+    height:auto;
+    margin:0;
+    padding:0;
+    border:0;
+    border-radius:14px;
+    background:transparent;
+    scroll-snap-align:start;
+    box-shadow:none;
+    overflow:visible;
+  }
+  #categorias #category-grid .category-photo{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:300/404;
+    object-fit:contain;
+    border:1px solid rgba(211,169,172,.6);
+    border-radius:14px;
+    box-shadow:0 5px 12px rgba(114,61,77,.085);
+  }
+  #categorias #category-grid .category-card-photo:hover .category-photo,
+  #categorias #category-grid .category-card-photo:focus-visible .category-photo{
+    transform:none;
+    box-shadow:0 6px 14px rgba(114,61,77,.14);
+  }
+  #categorias #category-grid .category-card-photo:focus-visible{
+    outline:2px solid #985267;
+    outline-offset:2px;
+  }
+
+  /* Título e filtros: iniciar a vitrine logo abaixo das coleções. */
+  #produtos.products-section{
+    padding-top:12px;
+    padding-bottom:42px;
+  }
+  #produtos .section-heading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    column-gap:8px;
+    row-gap:3px;
+    margin:0 0 10px;
+  }
+  #produtos .section-heading>div{min-width:0}
+  #produtos .section-heading .eyebrow{
+    margin:0 0 3px;
+    color:#9a6672;
+    font-size:9px;
+    letter-spacing:.10em;
+    line-height:1.35;
+  }
+  #produtos .section-heading h2{
+    margin:0;
+    color:#53343f;
+    font-size:clamp(21px,5.55vw,27px);
+    line-height:1.12;
+    letter-spacing:-.04em;
+    text-wrap:balance;
+  }
+  #produtos #show-all{
+    align-self:end;
+    min-height:36px;
+    padding:7px 0 3px 5px;
+    color:#92505e;
+    font-size:11px;
+    white-space:nowrap;
+    line-height:1.2;
+  }
+  #produtos .catalog-tools{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:6px;
+    margin:0 0 12px;
+  }
+  #produtos #catalog-status{
+    margin:0;
+    color:#8c7177;
+    font-size:11px;
+    line-height:1.25;
+  }
+  #produtos #category-chips{
+    display:flex;
+    max-width:100%;
+    gap:6px;
+    margin:0;
+    padding:1px 0 4px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    scroll-snap-type:x proximity;
+  }
+  #produtos #category-chips::-webkit-scrollbar{display:none}
+  #produtos #category-chips .chip{
+    flex:none;
+    min-height:36px;
+    padding:7px 13px;
+    border:1px solid #e8d5d5;
+    border-radius:999px;
+    background:#fff8f6;
+    color:#81656e;
+    font-size:11px;
+    line-height:1.2;
+    scroll-snap-align:start;
+  }
+  #produtos #category-chips .chip[aria-pressed="true"]{
+    border-color:#9e5567;
+    background:#a15a69;
+    color:#fff;
+  }
+}
+@media(max-width:360px){
+  #categorias.section{padding-top:18px}
+  #categorias #category-grid{grid-auto-columns:98px;gap:7px}
+  #categorias .category-scroll-hint{font-size:9px}
+  #produtos .section-heading h2{font-size:20px}
+  #produtos .section-heading .eyebrow{font-size:8px}
+  #produtos #show-all{font-size:10px}
+  #produtos #category-chips .chip{padding-inline:11px}
+}
+
+@media(min-width:701px){#categorias .category-scroll-hint{display:none}}

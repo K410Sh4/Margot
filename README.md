@@ -347,3 +347,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 ## V1.39 — Página inicial premium no mobile
 
 O novo `mobile-home.css`, carregado após os CSS existentes, reproduz a direção visual aprovada para telas de até 700px: faixa online elegante, logo oficial centralizada, hero fotográfico ampliado com painel translúcido, ornamento e CTA, indicadores refinados, quatro benefícios em cards 2×2 e navegação inferior rosé. Reutiliza imagens do carrossel e mantém a mesma lógica de login, busca, sacola e favoritos. Não altera o desktop, os dados comerciais nem as três colunas da vitrine mobile.
+
+
+## V1.40 — Seção de categorias mobile compacta
+
+- Fotos originais preservadas em uma faixa horizontal com cards de 98–124px, rolagem por toque e sem barra de rolagem aparente.
+- Título, espaçamentos e cabeçalho do catálogo menores, deixando a vitrine aparecer mais cedo.
+- Filtros compactos com os mesmos eventos e estados; nenhum dado de produtos ou lógica de conta/sacola foi alterado.
+- Testes responsivos 320/360/390/430/700px conferem dimensões, scroll, ausência de overflow horizontal e funcionamento do filtro.
