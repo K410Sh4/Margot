@@ -1,6 +1,6 @@
 /* Margot Acessórios · Vitrine V1
  * Substitua os itens do catálogo por seus produtos reais antes de abrir as vendas.
- * Sem checkout automático: a seleção pode ser encaminhada pelo WhatsApp.
+ * Sem checkout automático: pedidos de interesse são enviados à Central Privada SAITE.
  */
 'use strict';
 let STORE = window.MargotCatalog;
@@ -19,8 +19,15 @@ const ICONS = {
 function icon(name){return `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${ICONS[name]||ICONS.heart}</svg>`}
 const money = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:STORE.currency}).format(n);
 const $ = id => document.getElementById(id);
-// Número comercial de teste autorizado pela loja.
-const MARGOT_WHATSAPP='5535997450100';
+const SAITE_CONTACT_URL='https://k410sh4.github.io/SAITE/contato.html?origem=margot';
+function preparePrivateInquiry(subject,message){
+  try{
+    sessionStorage.setItem('saite:pending-request:v1',JSON.stringify({
+      source:'margot',subject,message:message.slice(0,3000),timestamp:Date.now()
+    }));
+  }catch(error){console.warn('Pre-preenchimento indisponivel; formulario continuara acessivel.')}
+  window.location.assign(SAITE_CONTACT_URL);
+}
 const getItem = id => STORE.products.find(p=>p.id===id);
 function readStorage(name,fallback){try{const parsed=JSON.parse(localStorage.getItem('margot-'+name));return parsed===null?fallback:parsed}catch{return fallback}}
 function saveStorage(name,value){try{localStorage.setItem('margot-'+name,JSON.stringify(value))}catch{}}
@@ -284,7 +291,7 @@ function changeQuantity(id,delta){
 }
 function cartLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${escapeHtml(p.name)}</h3><p>${money(p.price)} · Prévia</p>${lowStockMarkup(p)}<div class="quantity"><button type="button" data-qty="${escapeHtml(p.id)}" data-delta="-1" aria-label="Remover uma unidade de ${escapeHtml(p.name)}">−</button><span>${cart[p.id]}</span><button type="button" data-qty="${escapeHtml(p.id)}" data-delta="1" aria-label="Adicionar uma unidade de ${escapeHtml(p.name)}"${canAdd(p)?'':' disabled'}>+</button></div></div><button type="button" class="remove" data-remove="${escapeHtml(p.id)}" aria-label="Excluir ${escapeHtml(p.name)} da sacola">×</button></div>`}
 function favoriteLine(p){return `<div class="drawer-item"><div class="drawer-item-thumb">${productImage(p)}</div><div><h3>${escapeHtml(p.name)}</h3><p>${money(p.price)} · Prévia</p><button class="text-link" type="button" data-fav-add="${escapeHtml(p.id)}">${(cart[p.id]||0)>0?'Ver na sacola':'Adicionar à sacola'}</button></div><button type="button" class="remove" data-fav-remove="${escapeHtml(p.id)}" aria-label="Remover ${escapeHtml(p.name)} dos favoritos">×</button></div>`}
-function renderDrawer(){const isCart=drawerMode==='cart';$('drawer-title').textContent=isCart?'Sua sacola':'Meus favoritos';let items=isCart?Object.keys(cart).map(getItem):[...favorites].map(getItem);items=items.filter(Boolean);$('drawer-items').innerHTML=items.length?items.map(isCart?cartLine:favoriteLine).join(''):`<div class="drawer-empty"><span class="icon" data-icon="${isCart?'bag':'heart'}"></span><p>${isCart?'Sua sacola ainda está vazia.':'Você ainda não salvou favoritos.'}</p><p>Descubra os detalhes da coleção Margot.</p></div>`;populateIcons($('drawer-items'));if(isCart&&items.length){const subtotal=items.reduce((s,p)=>s+p.price*cart[p.id],0);$('drawer-footer').innerHTML=`<div class="subtotal"><span>Subtotal estimado</span><span>${money(subtotal)}</span></div><p class="checkout-note">Valores ilustrativos. Não há cobrança automática nem reserva de estoque. O pedido deve ser confirmado com a loja.</p><a id="whatsapp-order" class="button primary whatsapp-checkout" href="${whatsappOrderUrl()}" target="_blank" rel="noopener noreferrer" aria-label="Enviar pedido de produtos (abre em nova aba)">${USE_SAITE_PRIVATE_INBOX ? "Enviar pedido por e-mail ↗" : "Enviar seleção pelo WhatsApp ↗"}</a><button type="button" id="copy-order" class="button outline">Copiar lista de interesse</button><button type="button" id="continue-shopping" class="button outline">Continuar olhando</button>`;$('copy-order').addEventListener('click',copyOrder);$('continue-shopping').addEventListener('click',closeDrawer)}else{$('drawer-footer').innerHTML=`<button class="button outline" type="button" id="continue-shopping">Explorar coleção</button>`;$('continue-shopping').addEventListener('click',closeDrawer)}$('drawer-items').querySelectorAll('[data-qty]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.qty,Number(btn.dataset.delta))));$('drawer-items').querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.remove,-99)));$('drawer-items').querySelectorAll('[data-fav-remove]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(btn.dataset.favRemove)));$('drawer-items').querySelectorAll('[data-fav-add]').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.favAdd)))}
+function renderDrawer(){const isCart=drawerMode==='cart';$('drawer-title').textContent=isCart?'Sua sacola':'Meus favoritos';let items=isCart?Object.keys(cart).map(getItem):[...favorites].map(getItem);items=items.filter(Boolean);$('drawer-items').innerHTML=items.length?items.map(isCart?cartLine:favoriteLine).join(''):`<div class="drawer-empty"><span class="icon" data-icon="${isCart?'bag':'heart'}"></span><p>${isCart?'Sua sacola ainda está vazia.':'Você ainda não salvou favoritos.'}</p><p>Descubra os detalhes da coleção Margot.</p></div>`;populateIcons($('drawer-items'));if(isCart&&items.length){const subtotal=items.reduce((s,p)=>s+p.price*cart[p.id],0);$('drawer-footer').innerHTML=`<div class="subtotal"><span>Subtotal estimado</span><span>${money(subtotal)}</span></div><p class="checkout-note">Valores estimados. Sem cobrança automática nem reserva de estoque. Informe seu e-mail no formulário para receber a resposta.</p><a id="whatsapp-order" class="button primary whatsapp-checkout" href="${whatsappOrderUrl()}" target="_self" aria-label="Abrir formulário seguro para enviar seleção de produtos">${USE_SAITE_PRIVATE_INBOX ? "Enviar pedido por e-mail ↗" : "Enviar seleção pelo WhatsApp ↗"}</a><button type="button" id="copy-order" class="button outline">Copiar lista de interesse</button><button type="button" id="continue-shopping" class="button outline">Continuar olhando</button>`;$('copy-order').addEventListener('click',copyOrder);$('continue-shopping').addEventListener('click',closeDrawer)}else{$('drawer-footer').innerHTML=`<button class="button outline" type="button" id="continue-shopping">Explorar coleção</button>`;$('continue-shopping').addEventListener('click',closeDrawer)}$('drawer-items').querySelectorAll('[data-qty]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.qty,Number(btn.dataset.delta))));$('drawer-items').querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>changeQuantity(btn.dataset.remove,-99)));$('drawer-items').querySelectorAll('[data-fav-remove]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(btn.dataset.favRemove)));$('drawer-items').querySelectorAll('[data-fav-add]').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.favAdd)))}
 function openDrawer(mode){if($('drawer').classList.contains('open')){drawerMode=mode;renderDrawer();$('drawer-close').focus();return;}previousFocus=document.activeElement;previousFocusSnapshot=captureActionFocus();drawerMode=mode;renderDrawer();$('drawer').inert=false;$('drawer').setAttribute('aria-hidden','false');$('overlay').hidden=false;requestAnimationFrame(()=>{$('drawer').classList.add('open');$('overlay').classList.add('show')});document.body.style.overflow='hidden';$('drawer-close').focus()}
 function closeDrawer(){$('drawer').classList.remove('open');$('overlay').classList.remove('show');$('drawer').inert=true;$('drawer').setAttribute('aria-hidden','true');$('overlay').hidden=true;document.body.style.overflow='';if(previousFocus&&document.contains(previousFocus))previousFocus.focus();else restoreActionFocus(previousFocusSnapshot);previousFocusSnapshot=null}
 function orderMoney(value){return money(value).replace(/\u00a0/g,' ')}
@@ -302,17 +309,19 @@ function orderMessage(){
 }
 // Ative somente depois de publicar e testar o backend da central SAITE.
 // Quando ativo, substitua o canal antigo e remova o numero pessoal do codigo.
-const USE_SAITE_PRIVATE_INBOX = false;
+const USE_SAITE_PRIVATE_INBOX = true;
 function whatsappOrderUrl(){
-  if(USE_SAITE_PRIVATE_INBOX){
-    const url=new URL('https://k410sh4.github.io/SAITE/contato.html');
-    url.searchParams.set('origem','margot');
-    url.searchParams.set('assunto','Pedido de acessórios Margot');
-    url.searchParams.set('pedido',orderMessage().slice(0,2800));
-    return url.toString();
-  }
-  return 'https://wa.me/'+MARGOT_WHATSAPP+'?text='+encodeURIComponent(orderMessage());
+  return SAITE_CONTACT_URL;
 }
+// Eventos delegados: o carrinho e recriado a cada alteracao.
+document.addEventListener('click',event=>{
+  const link=event.target.closest('#whatsapp-order');
+  if(!link)return;
+  event.preventDefault();
+  if(!orderMessage())return;
+  preparePrivateInquiry('Pedido de acessórios Margot',orderMessage());
+});
+
 function copyOrder(){
   const msg=orderMessage();
   if(!msg){notify('Sua sacola está vazia.');return;}
