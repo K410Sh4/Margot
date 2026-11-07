@@ -334,3 +334,11 @@ O workflow `.github/workflows/layout-diagnostics.yml` executa um navegador Chrom
 - Card especial bordô/dourado reservado a produtos com selo confirmado de mais vendido no mês.
 - Preservadas as faixas de 6/5/4/3 colunas, catálogo Firestore, fotos existentes, sacola e favoritos.
 - Sem avaliações, números de reviews nem alegações comerciais inventadas.
+
+
+## V1.38 — Três colunas de produtos no mobile
+
+- Corrige a regra da V1.36 que forçava uma coluna abaixo de 560px; agora `#product-grid` e `#promotion-grid` exibem três colunas até 700px, incluindo celulares de 320px.
+- Cards compactos com fotos quadradas, títulos e preços menores, descontos e botão de 44px; cartões não ultrapassam o contêiner.
+- Preserva catálogo, ações de sacola/favoritos, confirmação de estoque e a grade desktop anterior.
+- Testes responsivos ampliados, inclusive alinhamento da primeira linha e ausência de overflow.
